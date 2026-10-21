@@ -65,6 +65,7 @@ export function CustomActionContent({
               targetCode={targetCode}
               status={status}
               theme={theme}
+              autoplay
               onRenderInfo={(info) => setLayoutFellBack(info.fellBack)}
             />
           )}

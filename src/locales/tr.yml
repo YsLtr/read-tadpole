@@ -326,7 +326,7 @@ options:
           description: Bu işlem tüm özel ayarlarınızı silip varsayılan değerlere döndürür. Lütfen onaylayın.
   shortcuts:
     title: Kısayollar
-    pageDescription: Okurken çeviriyi başlatan tuşları belirleyin.
+    pageDescription: Okurken çeviri, sesli okuma ve AI eylemlerini başlatan tuşları belirleyin.
     setShortcut: Kısayolu ayarla
     pageTranslation:
       title: Sayfa çevirisi
@@ -341,11 +341,24 @@ options:
       title: Altyazı çevirisi
       description: Videonun çevrilmiş altyazılarını açıp kapatır.
     nodeTranslation:
-      title: Paragraf çevirisi
+      title: Üzerine gelme çevirisi
       description: Bir paragrafın üzerine gelin veya uzun basın; yalnızca o paragraf çevrilir.
+      customDescription: Bir paragrafın üzerindeyken bu tuşlara basarak o paragrafı çevirin.
     translationHub:
       title: Çeviri Merkezi
-      description: Çeviri Merkezini uzantı ayarlarında açar.
+      description: Çeviri Merkezini yeni bir sekmede açar.
+    selectionSpeak:
+      title: "Seçimi sesli okuma"
+      description: "Seçili metni sesli okur. Durdurmak için tekrar basın."
+    actions:
+      title: "AI eylemleri"
+      description: "Seçili metin üzerinde bir AI eylemi çalıştırır. Özel eylemlerin, burada atayana kadar kısayolu yoktur."
+    turnedOff: "Kapalı olduğu için bu kısayol, tekrar açılana kadar hiçbir şey yapmaz."
+    turnOn: "Aç"
+    clash: "“$1” ile aynı kısayol. Birini değiştirin."
+    taken: "$1 zaten “$2” tarafından kullanılıyor."
+  overlayTools:
+    title: Kaplama Araçları
   inputTranslation:
     title: Giriş Çevirisi
     pageDescription: Giriş kutularına yazdıklarınızı göndermeden önce çevirin.
@@ -454,6 +467,8 @@ options:
         save: Kaydet
         defaultFieldName: sonuç
         fieldNamePlaceholder: alan_adı
+        selectionField: "Seçilen metin"
+        selectionFieldDescription: "Seçtiğiniz metin olduğu gibi kaydedilir. Yapay zekâ yazmaz."
         autoFieldPrefix: alan
         addFieldDialog:
           title: Çıktı alanı ekle
@@ -506,6 +521,8 @@ options:
             condition: İçeriği yalnızca alanın bir değeri olduğunda gösterir.
             loop: Her alan için sırayla tekrarlanır. f.name, f.value ve f.type kullanılabilir.
             speak: data-speak içeren her öğe, yanıt tamamlandığında değeri (değer boşsa kendi metnini) sesli okur.
+            speakLang: data-speak-lang okuma dilini belirtir (es veya en-US gibi bir kod), böylece o dilin sesi kullanılır. Belirtilmezse dil otomatik algılanır; tek bir kelimede bu çoğu zaman yanılır.
+            speakAutoplay: data-speak-autoplay içeren öğe, yanıt tamamlandığında kendiliğinden sesli okunur. Yalnızca ilk böyle öğe çalınır.
             status: Duruma göre stil verir. Kapsayıcının data-status değeri streaming, done veya error olur.
             filters: newline_to_br satır sonlarını korur (en sona koyun); lines metni satır listesine böler.
             styles: <style> bloğundaki CSS yalnızca bu sonucun içinde geçerlidir. --rf-* renkleri açık ve koyu temayı izler.
@@ -877,13 +894,13 @@ options:
       title: Temel ayarlar
       enable:
         title: Video altyazılarını aç
-        description: Oynatıcı kontrollerine bir çeviri düğmesi ekler. Şimdilik yalnızca YouTube destekleniyor.
+        description: YouTube, X ve Netflix'te oynatıcı kontrollerine bir çeviri düğmesi ekler.
       autoStart:
         title: Video açılınca çevir
         description: Video yüklenir yüklenmez, düğmeye basmadan altyazıları çevirmeye başlar.
       aiSegmentation:
         title: AI akıllı bölümlendirme
-        description: Yapay zekâ altyazıları cümle gibi okunan satırlara yeniden böler. Zamanlamayı da kendisi belirlediği için satırlar kayabilir. LLM çeviri sağlayıcısı gerekir.
+        description: Yapay zekâ altyazıları cümlelere yeniden böler. Çeviriler daha geç gelir. Güçlü bir LLM gerekir; zayıf modeller satırları atlayabilir veya kaydırabilir.
     style:
       title: Altyazı stili
       description: Görüntüleme modu, konum, yazı tipleri, renkler ve arka plan — canlı önizlemeye bakarak ayarlanır
@@ -1072,9 +1089,10 @@ subtitles:
     httpUnknown: HTTP hatası $1
     invalidResponse: YouTube altyazı yanıt biçimi geçersiz
     networkError: YouTube altyazılar alınırken ağ hatası oluştu.
-    fetchSubTimeout: YouTube altyazılar alınırken zaman aşımı oluştu.
+    fetchSubTimeout: Altyazılar alınırken zaman aşımı oluştu.
     buttonNotFound: Altyazı butonu bulunamadı
     noSubtitlesFound: Bu video için altyazı bulunmuyor
+    trackFileNotLoaded: Altyazılar yüklenemedi, lütfen sayfayı yenilemeyi deneyin
     videoNotFound: Video öğesi bulunamadı
     controlsBarNotFound: Kontrol çubuğu bulunamadı
     aiRateLimited: Çok fazla istek, lütfen daha sonra tekrar deneyin
@@ -1090,6 +1108,7 @@ hotkey:
   shift: Shift
   backtick: Ters tırnak
   clickAndHold: Tıkla ve basılı tut
+  custom: Özel kısayol
 translationHub:
   searchLanguages: Dil ara...
   noLanguagesFound: Dil bulunamadı

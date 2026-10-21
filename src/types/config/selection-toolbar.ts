@@ -1,6 +1,7 @@
 import { langCodeISO6393Schema } from "@read-frog/definitions"
 import { z } from "zod"
 import { isBuiltInActionId } from "@/utils/constants/custom-action"
+import { shortcutSchema } from "./shortcut"
 
 /**
  * The provider a built-in action falls back to before the user picks one: the
@@ -31,6 +32,12 @@ export const selectionToolbarCustomActionOutputFieldSchema = z.object({
   name: z.string().trim().min(1),
   type: selectionToolbarCustomActionOutputTypeSchema,
   description: z.string(),
+  // Where the value comes from: the model, unless this is "selection", the
+  // text the reader selected, which then rides along with the answer so the
+  // card can show it. A selection field is never asked of the model; it is
+  // always text. Older builds refuse a stored field that carries it rather
+  // than drop it and turn the field into one the model writes.
+  source: z.literal("selection").optional(),
 })
 
 // What the layout preview renders an action's result with: the text the
@@ -46,6 +53,9 @@ export const selectionToolbarCustomActionSampleDataSchema = z.object({
 export const selectionToolbarBuiltInActionStateSchema = z.object({
   enabled: z.boolean(),
   providerId: z.string().nonempty(),
+  // Missing means the action's default key (BUILT_IN_ACTION_DEFAULT_SHORTCUTS);
+  // empty means the user cleared it.
+  shortcut: shortcutSchema.optional(),
 })
 
 export const selectionToolbarBuiltInActionsSchema = z.object({
@@ -62,6 +72,9 @@ export const selectionToolbarCustomActionSchema = z
     systemPrompt: z.string(),
     prompt: z.string(),
     outputSchema: z.array(selectionToolbarCustomActionOutputFieldSchema).min(1),
+    // Runs the action on the selection. Missing or empty: no key. A custom
+    // action starts with none; a built-in one reads its key from its state.
+    shortcut: shortcutSchema.optional(),
     // HTML + Liquid template for the result. Optional, not defaulted, and never
     // syntax-checked here: a missing or blank layout renders the default field
     // list, and a template error must not fail the whole config parse (which

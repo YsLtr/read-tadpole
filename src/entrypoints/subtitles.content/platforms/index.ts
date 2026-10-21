@@ -1,3 +1,5 @@
+import type { SubtitlesPlatform } from "@/types/config/subtitles"
+
 export interface ControlsConfig {
   findVideoContainer?: () => HTMLElement | null
   measureHeight: (container: HTMLElement) => number
@@ -5,6 +7,8 @@ export interface ControlsConfig {
 }
 
 export interface PlatformConfig {
+  /** Which site's player this is; picks that site's translate-on-open switch. */
+  platform: SubtitlesPlatform
   embedded?: boolean
   silentErrors?: boolean
   containerShrinkRatio?: (container: HTMLElement) => number | null

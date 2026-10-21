@@ -23,6 +23,11 @@ import {
   createSelectionToolbarRuntimeError,
   isAbortError,
 } from "@/components/ui/selection-popover/inline-error"
+import {
+  getModelOutputFields,
+  getSelectionOutputValues,
+  withSelectionOutputValues,
+} from "@/utils/constants/custom-action"
 import { streamBackgroundStructuredObject } from "@/utils/content-script/background-stream-client"
 import { getSourceDocumentTitle } from "@/utils/content/document-title"
 import { truncateContextTextForCustomAction } from "@/utils/custom-action-prompt"
@@ -61,6 +66,9 @@ interface ResolvedWebPageContext {
 
 interface CustomActionExecutionRequest {
   key: string
+  // Each selection field's value: the run's selection, put into every answer
+  // so the result can show it.
+  selectionValues: Record<string, string>
   payload: {
     outputSchema: Array<{
       name: string
@@ -232,13 +240,16 @@ function buildCustomActionExecutionRequest({
   rerunNonce: number
 }): CustomActionExecutionRequest {
   const { action, provider, promptTokens } = executionContext
+  // A selection field is never asked of the model: neither its contract nor
+  // its schema names it.
+  const modelFields = getModelOutputFields(action.outputSchema)
   const systemPrompt = buildSelectionToolbarCustomActionSystemPrompt(
     action.systemPrompt,
     promptTokens,
-    action.outputSchema,
+    modelFields,
   )
   const prompt = replaceSelectionToolbarCustomActionPromptTokens(action.prompt, promptTokens)
-  const outputSchema = action.outputSchema.map(({ name, type }) => ({ name, type }))
+  const outputSchema = modelFields.map(({ name, type }) => ({ name, type }))
   const providerKey = provider.kind === "local" ? provider.config.provider : provider.id
   const model = provider.kind === "local" ? provider.config.model : undefined
   const modelName = provider.kind === "local" ? (resolveModelId(provider.config.model) ?? "") : ""
@@ -256,9 +267,10 @@ function buildCustomActionExecutionRequest({
     key: stringifyExecutionRequestKey({
       actionId: action.id,
       model,
-      outputSchema: action.outputSchema.map(({ description, name, type }) => ({
+      outputSchema: action.outputSchema.map(({ description, name, source, type }) => ({
         description,
         name,
+        source,
         type,
       })),
       popoverSessionKey,
@@ -271,6 +283,7 @@ function buildCustomActionExecutionRequest({
       instructions: systemPrompt,
       temperature,
     }),
+    selectionValues: getSelectionOutputValues(action.outputSchema, promptTokens.selection),
     payload: {
       providerId: provider.id,
       instructions: systemPrompt,
@@ -357,7 +370,7 @@ export function useCustomActionExecution({
               return
             }
 
-            setResult(partial.output)
+            setResult(withSelectionOutputValues(partial.output, request.selectionValues))
             setThinking(partial.thinking)
             scrollSelectionPopoverBodyToBottom(bodyRefRef.current)
           },
@@ -367,7 +380,7 @@ export function useCustomActionExecution({
           return
         }
 
-        setResult(finalResult.output)
+        setResult(withSelectionOutputValues(finalResult.output, request.selectionValues))
         setThinking(finalResult.thinking)
       } catch (caughtError) {
         if (isAbortError(caughtError)) {

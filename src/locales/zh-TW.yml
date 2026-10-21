@@ -327,7 +327,7 @@ options:
           description: 此操作將清空您所有的自訂設定，並重設為預設值。請確認。
   shortcuts:
     title: 快速鍵
-    pageDescription: 設定閱讀時觸發翻譯的按鍵。
+    pageDescription: 設定閱讀時觸發翻譯、朗讀和 AI 指令的按鍵。
     setShortcut: 設定快速鍵
     pageTranslation:
       title: 網頁翻譯
@@ -342,11 +342,24 @@ options:
       title: 字幕翻譯
       description: 開啟或關閉影片的翻譯字幕。
     nodeTranslation:
-      title: 段落翻譯
+      title: 滑鼠停留翻譯
       description: 滑鼠停留或長按段落，只翻譯這一段。
+      customDescription: 滑鼠停留在段落上時按下這組按鍵，即可翻譯這一段。
     translationHub:
       title: 翻譯中心
-      description: 在擴充功能設定中開啟翻譯中心。
+      description: 在新分頁中開啟翻譯中心。
+    selectionSpeak:
+      title: "選取文字朗讀"
+      description: "朗讀選取的文字，再按一次停止。"
+    actions:
+      title: "AI 指令"
+      description: "對選取的文字執行 AI 指令。自訂指令預設沒有快速鍵，在這裡設定即可。"
+    turnedOff: "此功能已關閉，重新開啟前快速鍵不會生效。"
+    turnOn: "去開啟"
+    clash: "與「$1」的快速鍵相同，請修改其中一個。"
+    taken: "$1 已被「$2」使用。"
+  overlayTools:
+    title: 懸浮工具
   inputTranslation:
     title: 輸入翻譯
     pageDescription: 在送出之前，把你在輸入框裡寫的內容翻譯好。
@@ -460,6 +473,8 @@ options:
         save: 儲存
         defaultFieldName: 結果
         fieldNamePlaceholder: 欄位名稱
+        selectionField: "選取的文字"
+        selectionFieldDescription: "你選取的原文，原樣儲存，不由 AI 產生。"
         autoFieldPrefix: 欄位
         addFieldDialog:
           title: 新增輸出欄位
@@ -512,6 +527,8 @@ options:
             condition: 僅當欄位有值時顯示其中的內容。
             loop: 依序對每個欄位重複一次，可使用 f.name、f.value 和 f.type。
             speak: 帶有 data-speak 的任何元素會在回答完成後朗讀該值（值為空時朗讀元素本身的文字）。
+            speakLang: data-speak-lang 指定朗讀語言（如 es、en-US），會用該語言的聲音朗讀；未指定時自動辨識語言，單一詞語常常辨識不準。
+            speakAutoplay: 帶有 data-speak-autoplay 的元素會在回答完成後自動朗讀，只有第一個這樣的元素會播放。
             status: 依狀態設定樣式，宿主的 data-status 為 streaming、done 或 error。
             filters: newline_to_br 保留換行（需放在最後）；lines 將文字拆成逐行的清單。
             styles: <style> 中的 CSS 只作用於此結果。--rf-* 色彩會跟隨淺色和深色主題。
@@ -887,13 +904,13 @@ options:
       title: 基礎設定
       enable:
         title: 開啟影片字幕
-        description: 在影片播放器控制列加上翻譯按鈕。目前只支援 YouTube。
+        description: 在 YouTube、X 和 Netflix 的影片播放器控制列加上翻譯按鈕。
       autoStart:
         title: 打開影片就翻譯
         description: 影片載入完成後自動開始翻譯字幕，不用再點按鈕。
       aiSegmentation:
         title: AI 智慧斷句
-        description: 讓 AI 把字幕重新切成讀起來完整的句子。時間軸也由 AI 判斷，可能出現錯位。需要設定 LLM 翻譯服務。
+        description: 讓 AI 把字幕重新切成完整句子，會增加翻譯回應時間。需要較強的 LLM，弱模型可能漏句或錯位。
     style:
       title: 字幕樣式
       description: 顯示模式、位置、字型、顏色和背景，都對著預覽調
@@ -1082,9 +1099,10 @@ subtitles:
     httpUnknown: HTTP 錯誤 $1
     invalidResponse: YouTube 字幕回應格式無效
     networkError: 取得字幕時發生網路錯誤
-    fetchSubTimeout: 取得 YouTube 字幕逾時
+    fetchSubTimeout: 取得字幕逾時
     buttonNotFound: 找不到字幕按鈕
     noSubtitlesFound: 這部影片沒有字幕
+    trackFileNotLoaded: 字幕載入失敗，請重新整理頁面後再試一次
     videoNotFound: 找不到影片元素
     controlsBarNotFound: 找不到控制列
     aiRateLimited: 請求過於頻繁，請稍後再試
@@ -1100,6 +1118,7 @@ hotkey:
   shift: Shift
   backtick: 反引號
   clickAndHold: 點選並按住
+  custom: 自訂快速鍵
 translationHub:
   searchLanguages: 搜尋語言…
   noLanguagesFound: 找不到語言

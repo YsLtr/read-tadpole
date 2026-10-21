@@ -9,6 +9,7 @@ import {
 } from "./overlay-layers"
 import { SelectionToolbar } from "./selection-toolbar"
 import { SelectionCustomActionProvider } from "./selection-toolbar/custom-action-button/provider"
+import { SelectionSpeechProvider } from "./selection-toolbar/speak-button"
 import { SelectionTranslationProvider } from "./selection-toolbar/translate-button/provider"
 
 export default function App({
@@ -39,7 +40,9 @@ export default function App({
     >
       <SelectionTranslationProvider>
         <SelectionCustomActionProvider>
-          <SelectionToolbar />
+          <SelectionSpeechProvider>
+            <SelectionToolbar />
+          </SelectionSpeechProvider>
         </SelectionCustomActionProvider>
       </SelectionTranslationProvider>
     </ToastProvider>

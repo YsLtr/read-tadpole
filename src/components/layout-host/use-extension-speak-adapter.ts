@@ -1,22 +1,28 @@
 import type { LayoutSpeakOptions, SpeakAdapter, SpeakLabels } from "@read-frog/layout-engine/dom"
 import type { TTSConfig } from "@/types/config/tts"
+import { speechLanguageFromTag } from "@read-frog/definitions"
 import { useAtomValue } from "jotai"
 import { useLayoutEffect, useMemo, useRef } from "react"
-import { useTextToSpeech } from "@/hooks/use-text-to-speech"
+import { selectTTSVoice, useTextToSpeech } from "@/hooks/use-text-to-speech"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { i18n } from "@/utils/i18n"
 
 // Text-to-speech for the `[data-speak]` triggers of one rendered layout,
 // through the extension's Edge TTS. One useTextToSpeech instance serves every
-// trigger of the layout, so starting a trigger stops the previous one.
+// trigger of the layout, so starting a trigger stops the previous one. A
+// trigger whose language the layout names (`data-speak-lang`, or a `lang`
+// around it) reads in that language's voice; any other text's language is
+// detected, as it is for a selection.
 
 interface LatestTTS {
-  play: (text: string, ttsConfig: TTSConfig) => Promise<void>
+  play: ReturnType<typeof useTextToSpeech>["play"]
   stop: () => void
   ttsConfig: TTSConfig
 }
 
-export function useExtensionSpeakAdapter(): LayoutSpeakOptions {
+// `autoplay` reads the trigger the layout marks `data-speak-autoplay` once the
+// layout is done. Where a layout is only previewed, it stays off.
+export function useExtensionSpeakAdapter(autoplay = false): LayoutSpeakOptions {
   const ttsConfig = useAtomValue(configFieldsAtomMap.tts)
   const { play, stop, isPlaying } = useTextToSpeech()
   const latestRef = useRef<LatestTTS>({ play, stop, ttsConfig })
@@ -42,7 +48,7 @@ export function useExtensionSpeakAdapter(): LayoutSpeakOptions {
 
   const adapter = useMemo<SpeakAdapter>(
     () => ({
-      play(text, { signal, onStart }) {
+      play(text, { lang, signal, onStart, autoplay: isAutoplay = false }) {
         pendingStartRef.current = onStart
         const forget = () => {
           if (pendingStartRef.current === onStart) pendingStartRef.current = null
@@ -51,9 +57,13 @@ export function useExtensionSpeakAdapter(): LayoutSpeakOptions {
         // calls stop() right after aborting, which silences it.
         signal.addEventListener("abort", forget, { once: true })
         const { play: playText, ttsConfig: config } = latestRef.current
-        // useTextToSpeech reports failures with its own toast; the rejection
-        // only has to end the run.
-        return playText(text, config).finally(() => {
+        const language = speechLanguageFromTag(lang)
+        // useTextToSpeech reports failures with its own toast, except for a
+        // run nobody pressed for; the rejection only has to end the run.
+        return playText(text, config, {
+          ...(language && { forcedVoice: selectTTSVoice(config, language) }),
+          quiet: isAutoplay,
+        }).finally(() => {
           signal.removeEventListener("abort", forget)
           forget()
         })
@@ -74,5 +84,5 @@ export function useExtensionSpeakAdapter(): LayoutSpeakOptions {
     [speak, loading, playing],
   )
 
-  return useMemo(() => ({ adapter, labels }), [adapter, labels])
+  return useMemo(() => ({ adapter, labels, autoplay }), [adapter, labels, autoplay])
 }

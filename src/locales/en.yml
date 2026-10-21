@@ -327,7 +327,7 @@ options:
           description: This operation will clear all your custom configurations and reset them to default values. Please confirm.
   shortcuts:
     title: Shortcuts
-    pageDescription: Set the keys that trigger translation while you read.
+    pageDescription: Set the keys that translate, read aloud and run AI actions while you read.
     setShortcut: Set shortcut
     pageTranslation:
       title: Page translation
@@ -342,11 +342,24 @@ options:
       title: Subtitle translation
       description: Turn translated video subtitles on or off.
     nodeTranslation:
-      title: Paragraph translation
+      title: Hover translation
       description: Hover or long-press a paragraph to translate just that one.
+      customDescription: Press these keys while hovering over a paragraph to translate it.
     translationHub:
       title: Translation Hub
-      description: Open the Translation Hub in the extension settings.
+      description: Open the Translation Hub in a new tab.
+    selectionSpeak:
+      title: "Read aloud"
+      description: "Read the text you selected aloud. Press again to stop."
+    actions:
+      title: "AI actions"
+      description: "Run an AI action on the text you selected. Custom actions have no key until you set one here."
+    turnedOff: "Turned off, so this key does nothing until you turn it back on."
+    turnOn: "Turn on"
+    clash: "Same key as “$1”. Change one of them."
+    taken: "$1 is already used by “$2”."
+  overlayTools:
+    title: Overlay Tools
   inputTranslation:
     title: Input Translation
     pageDescription: Translate what you type in input boxes before you send it.
@@ -460,6 +473,8 @@ options:
         save: Save
         defaultFieldName: Result
         fieldNamePlaceholder: Field name
+        selectionField: "Selected text"
+        selectionFieldDescription: "The text you selected, saved as it is. The AI doesn't write it."
         autoFieldPrefix: Field
         addFieldDialog:
           title: Add output field
@@ -512,6 +527,8 @@ options:
             condition: Shows the content only when the field has a value.
             loop: Repeats for every field, in order. f.name, f.value and f.type are available.
             speak: Any element with data-speak reads the value aloud (or its own text if the value is empty) once the answer is done.
+            speakLang: data-speak-lang names the language to read in (a code such as es or en-US), so it gets that language's voice. Without it the language is detected, which often fails for a single word.
+            speakAutoplay: An element with data-speak-autoplay is read aloud on its own once the answer is done. Only the first such element plays.
             status: Styles by state. The host's data-status is streaming, done or error.
             filters: newline_to_br keeps line breaks (use it last); lines splits text into a list of lines.
             styles: CSS in a <style> block only applies inside this result. The --rf-* colors follow the light and dark themes.
@@ -887,13 +904,13 @@ options:
       title: Basics
       enable:
         title: Enable video subtitles
-        description: Puts a translate button in the video player's controls. YouTube only, for now.
+        description: Puts a translate button in the video player's controls on YouTube, X and Netflix.
       autoStart:
         title: Translate on open
         description: Start translating as soon as a video loads, without pressing the button.
       aiSegmentation:
         title: AI smart segmentation
-        description: Lets AI re-cut the subtitles into lines that read as sentences. It sets their timing too, so lines can drift out of sync. Needs an LLM translation provider.
+        description: Lets AI re-cut the subtitles into sentences. Translations take longer. Needs a strong LLM; weaker models may drop or misalign lines.
     style:
       title: Subtitle style
       description: Display mode, position, fonts, colors and background, set against a live preview
@@ -1082,9 +1099,10 @@ subtitles:
     httpUnknown: HTTP error $1
     invalidResponse: Invalid Youtube subtitle response format
     networkError: Network error occurred when fetching captions
-    fetchSubTimeout: Fetching youtube captions timed out
+    fetchSubTimeout: Fetching captions timed out
     buttonNotFound: Subtitle button not found
     noSubtitlesFound: No subtitles available for this video
+    trackFileNotLoaded: Subtitles failed to load, please try refreshing the page
     videoNotFound: Video element not found
     controlsBarNotFound: Controls bar not found
     aiRateLimited: Too many requests, please try again later
@@ -1100,6 +1118,7 @@ hotkey:
   shift: Shift
   backtick: Backtick
   clickAndHold: Click and hold
+  custom: Custom shortcut
 translationHub:
   searchLanguages: Search languages...
   noLanguagesFound: No languages found

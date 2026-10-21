@@ -327,7 +327,7 @@ options:
           description: 该操作将清空您的所有自定义配置，并将其重置为默认值。请确认是否清除。
   shortcuts:
     title: 快捷键
-    pageDescription: 设置阅读时触发翻译的按键。
+    pageDescription: 设置阅读时触发翻译、朗读和 AI 指令的按键。
     setShortcut: 设置快捷键
     pageTranslation:
       title: 网页翻译
@@ -342,11 +342,24 @@ options:
       title: 字幕翻译
       description: 打开或关闭视频的翻译字幕。
     nodeTranslation:
-      title: 段落翻译
+      title: 悬停翻译
       description: 悬停或长按段落，只翻译这一段。
+      customDescription: 悬停在段落上时按下这组按键，即可翻译这一段。
     translationHub:
       title: 翻译中心
-      description: 在扩展设置中打开翻译中心。
+      description: 在新标签页中打开翻译中心。
+    selectionSpeak:
+      title: "划词朗读"
+      description: "朗读选中的文本，再按一次停止。"
+    actions:
+      title: "AI 指令"
+      description: "对选中的文本运行 AI 指令。自定义指令默认没有快捷键，在这里设置即可。"
+    turnedOff: "该功能已关闭，重新开启前快捷键不会生效。"
+    turnOn: "去开启"
+    clash: "与「$1」的快捷键相同，请修改其中一个。"
+    taken: "$1 已被「$2」使用。"
+  overlayTools:
+    title: 悬浮工具
   inputTranslation:
     title: 输入翻译
     pageDescription: 在发送之前，把你在输入框里写的内容翻译好。
@@ -460,6 +473,8 @@ options:
         save: 保存
         defaultFieldName: 结果
         fieldNamePlaceholder: 字段名
+        selectionField: "选中的文字"
+        selectionFieldDescription: "你选中的原文，原样保存，不由 AI 生成。"
         autoFieldPrefix: 字段
         addFieldDialog:
           title: 添加输出字段
@@ -512,6 +527,8 @@ options:
             condition: 仅当字段有值时显示其中的内容。
             loop: 按顺序对每个字段重复一次，可使用 f.name、f.value 和 f.type。
             speak: 带 data-speak 的任意元素会在回答完成后朗读该值（值为空时朗读元素自身的文字）。
+            speakLang: data-speak-lang 指定朗读语言（如 es、en-US），会用该语言的声音朗读；不写时自动识别语言，单个词常常识别不准。
+            speakAutoplay: 带 data-speak-autoplay 的元素会在回答完成后自动朗读，只有第一个这样的元素会播放。
             status: 按状态设置样式，宿主的 data-status 为 streaming、done 或 error。
             filters: newline_to_br 保留换行（需放在最后）；lines 把文本拆成按行的列表。
             styles: <style> 中的 CSS 只作用于此结果。--rf-* 颜色会跟随浅色和深色主题。
@@ -887,13 +904,13 @@ options:
       title: 基础设置
       enable:
         title: 开启视频字幕
-        description: 在视频播放器控制栏加上翻译按钮。目前只支持 YouTube。
+        description: 在 YouTube、X 和 Netflix 的视频播放器控制栏加上翻译按钮。
       autoStart:
         title: 打开视频就翻译
         description: 视频加载完成后自动开始翻译字幕，不用再点按钮。
       aiSegmentation:
         title: AI 智能断句
-        description: 让 AI 把字幕重新切成读起来完整的句子。时间轴也由 AI 判断，可能出现错位。需要配置 LLM 翻译服务。
+        description: 让 AI 把字幕重新切成完整句子，会增加翻译响应时间。需要较强的 LLM，弱模型可能漏句或错位。
     style:
       title: 字幕样式
       description: 显示模式、位置、字体、颜色和背景，都对着预览调
@@ -1082,9 +1099,10 @@ subtitles:
     httpUnknown: HTTP 错误 $1
     invalidResponse: youtube 字幕响应格式无效
     networkError: 获取字幕时发生网络错误
-    fetchSubTimeout: 获取 youtube 字幕超时
+    fetchSubTimeout: 获取字幕超时
     buttonNotFound: 字幕按钮未找到
     noSubtitlesFound: 当前视频没有字幕
+    trackFileNotLoaded: 字幕加载失败，请刷新页面后重试
     videoNotFound: 视频元素未找到
     controlsBarNotFound: 控制栏未找到
     aiRateLimited: 请求过于频繁，请稍后再试
@@ -1100,6 +1118,7 @@ hotkey:
   shift: Shift
   backtick: 反引号
   clickAndHold: 点击并按住
+  custom: 自定义快捷键
 translationHub:
   searchLanguages: 搜索语言...
   noLanguagesFound: 未找到语言

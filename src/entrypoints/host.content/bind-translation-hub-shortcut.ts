@@ -3,10 +3,7 @@ import { HotkeyManager } from "@tanstack/hotkeys"
 import { getLocalConfig } from "@/utils/config/storage"
 import { TRANSLATION_HUB_ROUTE } from "@/utils/constants/translation-hub"
 import { sendMessage } from "@/utils/message"
-import {
-  isPageTranslationShortcutEmpty,
-  isValidConfiguredPageTranslationShortcut,
-} from "@/utils/page-translation-shortcut"
+import { isShortcutEmpty, isValidShortcut } from "@/utils/shortcut"
 
 /**
  * Opens the Translation Hub from any page. A content script cannot open a tab
@@ -15,12 +12,12 @@ import {
  */
 export async function bindTranslationHubShortcutKey() {
   const config = await getLocalConfig()
-  if (!config || isPageTranslationShortcutEmpty(config.translationHub.shortcut)) {
+  if (!config || isShortcutEmpty(config.translationHub.shortcut)) {
     return () => {}
   }
 
   const shortcut = config.translationHub.shortcut
-  if (!isValidConfiguredPageTranslationShortcut(shortcut)) {
+  if (!isValidShortcut(shortcut)) {
     return () => {}
   }
 

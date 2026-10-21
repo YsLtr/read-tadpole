@@ -20,7 +20,7 @@ export interface SelectionSession {
 
 let nextSelectionSessionId = 0
 
-function createSelectionSession(
+export function createSelectionSession(
   selection: SelectionSnapshot | null,
   context: ContextSnapshot | null,
 ): SelectionSession | null {

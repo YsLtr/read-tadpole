@@ -7,7 +7,7 @@ import {
 } from "@/utils/constants/subtitles"
 import { getYoutubeVideoId } from "@/utils/subtitles/video-id"
 
-type YoutubeMode = "watch" | "embed" | "shorts"
+export type YoutubeMode = "watch" | "embed" | "shorts"
 
 interface YoutubeConfigOptions {
   mode?: YoutubeMode
@@ -32,6 +32,7 @@ function isYoutubeAdPlaying(playerContainer: HTMLElement): boolean {
 
 const YOUTUBE_MODE_CONFIGS: Record<YoutubeMode, PlatformConfig> = {
   watch: {
+    platform: "youtube",
     embedded: false,
     subtitlesZIndex: ABOVE_PLAYER_CHROME_BELOW_PLAYER_MENUS,
     selectors: {
@@ -58,6 +59,7 @@ const YOUTUBE_MODE_CONFIGS: Record<YoutubeMode, PlatformConfig> = {
   },
 
   embed: {
+    platform: "youtube",
     embedded: true,
     subtitlesZIndex: ABOVE_PLAYER_CHROME_BELOW_PLAYER_MENUS,
     selectors: {
@@ -83,6 +85,7 @@ const YOUTUBE_MODE_CONFIGS: Record<YoutubeMode, PlatformConfig> = {
   },
 
   shorts: {
+    platform: "youtube",
     embedded: true,
     subtitlesZIndex: ABOVE_PLAYER_CHROME_BELOW_PLAYER_MENUS,
     silentErrors: true,

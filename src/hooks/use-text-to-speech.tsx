@@ -15,6 +15,9 @@ interface PlayAudioParams {
   text: string
   ttsConfig: TTSConfig
   forcedVoice?: string
+  // A run nobody pressed for (a layout reading a field as the answer arrives)
+  // fails without a toast; pressing the trigger tries again and reports it.
+  quiet?: boolean
 }
 
 interface SynthesizedAudioChunk {
@@ -173,13 +176,15 @@ export function useTextToSpeech() {
         throw error
       }
     },
-    onError: (error) => {
-      toastManager.add({
-        type: "error",
-        title: i18n.t("speak.failedToGenerateSpeech"),
-        id: TTS_ERROR_TOAST_ID,
-        description: getTTSFriendlyErrorDescription(error),
-      })
+    onError: (error, variables) => {
+      if (!variables.quiet) {
+        toastManager.add({
+          type: "error",
+          title: i18n.t("speak.failedToGenerateSpeech"),
+          id: TTS_ERROR_TOAST_ID,
+          description: getTTSFriendlyErrorDescription(error),
+        })
+      }
       activeRequestIdRef.current = null
       setIsPlaying(false)
       setCurrentChunk(0)
@@ -283,11 +288,16 @@ export function useTextToSpeech() {
     }
   }
 
-  const play = (text: string, ttsConfig: TTSConfig, options?: { forcedVoice?: string }) => {
+  const play = (
+    text: string,
+    ttsConfig: TTSConfig,
+    options?: { forcedVoice?: string; quiet?: boolean },
+  ) => {
     return playMutation.mutateAsync({
       text,
       ttsConfig,
       forcedVoice: options?.forcedVoice,
+      quiet: options?.quiet,
     })
   }
 

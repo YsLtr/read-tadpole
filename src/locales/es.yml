@@ -327,7 +327,7 @@ options:
           description: Esta operación borrará toda tu configuración personalizada y la restablecerá a los valores por defecto. Confirma, por favor.
   shortcuts:
     title: Atajos
-    pageDescription: Define las teclas que activan la traducción mientras lees.
+    pageDescription: Define las teclas que traducen, leen en voz alta y ejecutan acciones AI mientras lees.
     setShortcut: Configurar atajo
     pageTranslation:
       title: Traducción de la página
@@ -342,11 +342,24 @@ options:
       title: Traducción de subtítulos
       description: Activa o desactiva los subtítulos traducidos del vídeo.
     nodeTranslation:
-      title: Traducción de párrafo
+      title: Traducción al pasar el cursor
       description: Pasa el cursor o mantén pulsado un párrafo para traducir solo ese.
+      customDescription: Pulsa estas teclas con el cursor sobre un párrafo para traducirlo.
     translationHub:
       title: Centro de traducción
-      description: Abre el Centro de traducción en los ajustes de la extensión.
+      description: Abre el Centro de traducción en una pestaña nueva.
+    selectionSpeak:
+      title: "Leer la selección en voz alta"
+      description: "Lee en voz alta el texto seleccionado. Vuelve a pulsar para detener."
+    actions:
+      title: "Acciones AI"
+      description: "Ejecuta una acción AI sobre el texto seleccionado. Las acciones personalizadas no tienen atajo hasta que les asignes uno aquí."
+    turnedOff: "Está desactivado, así que este atajo no hace nada hasta que lo vuelvas a activar."
+    turnOn: "Activar"
+    clash: "Mismo atajo que «$1». Cambia uno de ellos."
+    taken: "«$2» ya usa $1."
+  overlayTools:
+    title: Herramientas superpuestas
   inputTranslation:
     title: Traducción de entrada
     pageDescription: Traduce lo que escribes en los campos de texto antes de enviarlo.
@@ -455,6 +468,8 @@ options:
         save: Guardar
         defaultFieldName: Resultado
         fieldNamePlaceholder: Nombre del campo
+        selectionField: "Texto seleccionado"
+        selectionFieldDescription: "El texto que seleccionaste, guardado tal cual. La IA no lo escribe."
         autoFieldPrefix: Campo
         addFieldDialog:
           title: Añadir campo de salida
@@ -507,6 +522,8 @@ options:
             condition: Muestra el contenido solo cuando el campo tiene un valor.
             loop: Se repite para cada campo, en orden. Puedes usar f.name, f.value y f.type.
             speak: Cualquier elemento con data-speak lee en voz alta el valor (o su propio texto si el valor está vacío) cuando la respuesta termina.
+            speakLang: data-speak-lang indica el idioma de lectura (un código como es o en-US) para usar la voz de ese idioma. Sin él, el idioma se detecta, algo que suele fallar con una sola palabra.
+            speakAutoplay: Un elemento con data-speak-autoplay se lee en voz alta por sí solo cuando la respuesta termina. Solo suena el primero.
             status: Aplica estilos según el estado. El data-status del contenedor es streaming, done o error.
             filters: newline_to_br conserva los saltos de línea (úsalo al final); lines divide el texto en una lista de líneas.
             styles: El CSS de un bloque <style> solo se aplica dentro de este resultado. Los colores --rf-* siguen los temas claro y oscuro.
@@ -882,13 +899,13 @@ options:
       title: Aspectos básicos
       enable:
         title: Activar subtítulos de video
-        description: Añade un botón de traducción a los controles del reproductor. Por ahora solo funciona en YouTube.
+        description: Añade un botón de traducción a los controles del reproductor en YouTube, X y Netflix.
       autoStart:
         title: Traducir al abrir el video
         description: Empieza a traducir en cuanto se carga el video, sin pulsar el botón.
       aiSegmentation:
         title: Segmentación inteligente de IA
-        description: La IA vuelve a cortar los subtítulos en líneas que se leen como frases. También fija sus tiempos, así que pueden desajustarse. Requiere un proveedor de traducción LLM.
+        description: La IA vuelve a cortar los subtítulos en frases. Las traducciones tardan más. Requiere un LLM potente; los modelos más débiles pueden omitir o desalinear líneas.
     style:
       title: Estilo de subtítulos
       description: Modo de visualización, posición, fuentes, colores y fondo, ajustados sobre una vista previa en vivo
@@ -1077,9 +1094,10 @@ subtitles:
     httpUnknown: Error HTTP $1
     invalidResponse: Formato de respuesta de subtítulos de Youtube no válido
     networkError: Se produjo un error de red al obtener subtítulos
-    fetchSubTimeout: Se agotó el tiempo al obtener subtítulos de youtube
+    fetchSubTimeout: Se agotó el tiempo al obtener subtítulos
     buttonNotFound: Botón de subtítulos no encontrado
     noSubtitlesFound: No hay subtítulos disponibles para este video
+    trackFileNotLoaded: No se pudieron cargar los subtítulos; intenta actualizar la página
     videoNotFound: Elemento de video no encontrado
     controlsBarNotFound: Barra de controles no encontrada
     aiRateLimited: Demasiadas solicitudes, inténtalo de nuevo más tarde
@@ -1095,6 +1113,7 @@ hotkey:
   shift: Mayús
   backtick: Acento grave
   clickAndHold: Hacer clic y mantener
+  custom: Atajo personalizado
 translationHub:
   searchLanguages: Buscar idiomas...
   noLanguagesFound: No se encontraron idiomas

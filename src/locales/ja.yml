@@ -29,6 +29,12 @@ popup:
       translationOnly:
         current: 現在は翻訳のみ
         action: クリックしてバイリンガルへ切り替え
+  hub:
+    tooltip: 複数の翻訳モデルで同時にテキストを翻訳
+  discord:
+    tooltip: Discordに参加して開発者とつながり、新機能を先行体験しましょう
+  blog:
+    notification: ReadTadpole の最新情報
   aiSmartContext: AI スマートコンテキスト
   aiSmartContextDescription: ウェブページのコンテキストを使用して翻訳品質を向上させます。LLM翻訳プロバイダーが必要です。
 errorRecovery:
@@ -326,7 +332,7 @@ options:
           description: この操作はすべてのカスタム設定を消去し、既定値に戻します。確認してください。
   shortcuts:
     title: ショートカット
-    pageDescription: 読みながら翻訳を実行するキーを設定します。
+    pageDescription: 読みながら翻訳・読み上げ・AI アクションを実行するキーを設定します。
     setShortcut: ショートカットを設定
     pageTranslation:
       title: ページ翻訳
@@ -341,11 +347,24 @@ options:
       title: 字幕翻訳
       description: 動画の翻訳字幕をオンまたはオフにします。
     nodeTranslation:
-      title: 段落翻訳
+      title: ホバー翻訳
       description: 段落にホバーまたは長押しすると、その段落だけ翻訳します。
+      customDescription: 段落にホバーしたままこのキーを押すと、その段落を翻訳します。
     translationHub:
       title: 翻訳ハブ
-      description: 拡張機能の設定で翻訳ハブを開きます。
+      description: 翻訳ハブを新しいタブで開きます。
+    selectionSpeak:
+      title: "選択範囲の読み上げ"
+      description: "選択したテキストを読み上げます。もう一度押すと停止します。"
+    actions:
+      title: "AI アクション"
+      description: "選択したテキストに AI アクションを実行します。カスタムアクションには最初はショートカットがないので、ここで設定してください。"
+    turnedOff: "この機能はオフのため、オンに戻すまでこのキーは何もしません。"
+    turnOn: "オンにする"
+    clash: "「$1」と同じキーです。どちらかを変更してください。"
+    taken: "$1 はすでに「$2」で使われています。"
+  overlayTools:
+    title: オーバーレイツール
   inputTranslation:
     title: 入力翻訳
     pageDescription: 入力欄に書いた内容を、送信する前に翻訳します。
@@ -454,6 +473,8 @@ options:
         save: 保存
         defaultFieldName: 結果
         fieldNamePlaceholder: フィールド名
+        selectionField: "選択したテキスト"
+        selectionFieldDescription: "選択したテキストをそのまま保存します。AI は書きません。"
         autoFieldPrefix: フィールド
         addFieldDialog:
           title: 出力フィールドを追加
@@ -506,6 +527,8 @@ options:
             condition: フィールドに値があるときだけ中身を表示します。
             loop: すべてのフィールドについて順に繰り返します。f.name、f.value、f.type が使えます。
             speak: data-speak を付けた要素は、回答の完了後にその値（空なら要素自身のテキスト）を読み上げます。
+            speakLang: data-speak-lang で読み上げる言語（es、en-US など）を指定すると、その言語の音声で読み上げます。指定しない場合は言語を自動判定しますが、単語だけだとよく外れます。
+            speakAutoplay: data-speak-autoplay を付けた要素は、回答の完了後に自動で読み上げます。再生されるのは最初の 1 つだけです。
             status: 状態ごとにスタイルを設定します。ホストの data-status は streaming、done、error のいずれかです。
             filters: newline_to_br は改行を保持します（最後に置いてください）。lines はテキストを行のリストに分けます。
             styles: <style> ブロックの CSS はこの結果の中だけに適用されます。--rf-* の色はライト／ダークテーマに追従します。
@@ -877,13 +900,13 @@ options:
       title: 基本設定
       enable:
         title: 動画字幕を有効にする
-        description: 動画プレーヤーのコントロールバーに翻訳ボタンを表示します。現在は YouTube のみ対応です。
+        description: YouTube、X、Netflix の動画プレーヤーのコントロールバーに翻訳ボタンを表示します。
       autoStart:
         title: 動画を開いたら翻訳する
         description: 動画の読み込みが終わり次第、ボタンを押さなくても字幕の翻訳を始めます。
       aiSegmentation:
         title: AI スマート区切り
-        description: AI が字幕を文として読める形に切り直します。タイミングも AI が決めるため、字幕がずれることがあります。LLM 翻訳プロバイダーが必要です。
+        description: AI が字幕を文単位に切り直します。翻訳の応答が遅くなります。高性能な LLM が必要です。性能の低いモデルでは字幕の欠落やずれが起きることがあります。
     style:
       title: 字幕スタイル
       description: 表示モード・位置・フォント・色・背景を、プレビューを見ながら設定します
@@ -1072,9 +1095,10 @@ subtitles:
     httpUnknown: HTTP エラー $1
     invalidResponse: YouTube字幕のレスポンス形式が無効です
     networkError: 字幕取得時にネットワークエラーが発生しました
-    fetchSubTimeout: YouTube字幕の取得がタイムアウトしました
+    fetchSubTimeout: 字幕の取得がタイムアウトしました
     buttonNotFound: 字幕ボタンが見つかりません
     noSubtitlesFound: この動画には字幕がありません
+    trackFileNotLoaded: 字幕を読み込めませんでした。ページを再読み込みしてみてください
     videoNotFound: 動画要素が見つかりません
     controlsBarNotFound: コントロールバーが見つかりません
     aiRateLimited: リクエストが多すぎます。後でもう一度お試しください
@@ -1090,6 +1114,7 @@ hotkey:
   shift: Shift
   backtick: バッククォート
   clickAndHold: クリックして長押し
+  custom: カスタムショートカット
 translationHub:
   searchLanguages: 言語を検索...
   noLanguagesFound: 言語が見つかりません

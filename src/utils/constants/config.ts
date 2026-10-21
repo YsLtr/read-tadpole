@@ -7,7 +7,7 @@ import type { PageTranslateRange } from "@/types/config/translate"
 import { DEFAULT_LAYOUT } from "@read-frog/layout-engine/presets"
 import { DEFAULT_BUILT_IN_ACTION_PROVIDER_ID } from "@/types/config/selection-toolbar"
 import { buildDictionaryActionLayout } from "@/utils/layout-host/slots"
-import { BUILT_IN_DICTIONARY_ACTION_ID } from "./custom-action"
+import { BUILT_IN_ACTION_DEFAULT_SHORTCUTS, BUILT_IN_DICTIONARY_ACTION_ID } from "./custom-action"
 import { createDictionaryDefinition } from "./custom-action-templates"
 import {
   DEFAULT_SUBTITLE_TRANSLATE_PROMPTS_CONFIG,
@@ -18,7 +18,11 @@ import {
   buildDefaultProviderConfigList,
   DEFAULT_PROVIDER_CONFIG_LIST,
 } from "./providers"
-import { DEFAULT_SELECTION_OVERLAY_OPACITY, SELECTION_TOOLBAR_FEATURE_IDS } from "./selection"
+import {
+  DEFAULT_SELECTION_OVERLAY_OPACITY,
+  DEFAULT_SELECTION_SPEAK_SHORTCUT_KEY,
+  SELECTION_TOOLBAR_FEATURE_IDS,
+} from "./selection"
 import {
   DEFAULT_BACKGROUND_OPACITY,
   DEFAULT_DISPLAY_MODE,
@@ -42,16 +46,18 @@ import {
   DEFAULT_SELECTION_TRANSLATION_SHORTCUT_KEY,
   DEFAULT_TRANSLATION_MODE_SHORTCUT_KEY,
 } from "./translate"
+import { DEFAULT_NODE_TRANSLATION_SHORTCUT_KEY } from "./hotkeys"
 import { DEFAULT_TRANSLATION_HUB_SHORTCUT_KEY } from "./translation-hub"
 import { TRANSLATION_NODE_STYLE_ON_INSTALLED } from "./translation-node-style"
 import { DEFAULT_TTS_CONFIG } from "./tts"
 
-export const CONFIG_STORAGE_KEY = "config"
+export { CONFIG_STORAGE_KEY } from "./config-storage-key"
 export const LAST_SYNCED_CONFIG_STORAGE_KEY = "lastSyncedConfig"
 export const GOOGLE_DRIVE_TOKEN_STORAGE_KEY = "__googleDriveToken"
 
 export const THEME_STORAGE_KEY = "theme"
 export const DEFAULT_DETECTED_CODE = "eng" as const
+
 
 /**
  * The shape of the stored config. Nothing upgrades a config written by an older
@@ -59,7 +65,7 @@ export const DEFAULT_DETECTED_CODE = "eng" as const
  * alongside a config (and into exports) to say what produced it. A stored config
  * that does not match the current schema is replaced by the defaults.
  */
-export const CONFIG_SCHEMA_VERSION = 114
+export const CONFIG_SCHEMA_VERSION = 115
 
 type OutputSchema = SelectionToolbarCustomActionOutputField[]
 
@@ -117,6 +123,7 @@ export const DEFAULT_CONFIG: Config = {
     node: {
       enabled: false,
       hotkey: "control",
+      shortcut: DEFAULT_NODE_TRANSLATION_SHORTCUT_KEY,
       forceRetranslation: false,
     },
     page: {
@@ -167,12 +174,14 @@ export const DEFAULT_CONFIG: Config = {
       },
       speak: {
         enabled: true,
+        shortcut: DEFAULT_SELECTION_SPEAK_SHORTCUT_KEY,
       },
     },
     builtInActions: {
       dictionary: {
         enabled: true,
         providerId: DEFAULT_BUILT_IN_ACTION_PROVIDER_ID,
+        shortcut: BUILT_IN_ACTION_DEFAULT_SHORTCUTS[BUILT_IN_DICTIONARY_ACTION_ID],
       },
     },
     customActions: [],
@@ -189,7 +198,7 @@ export const DEFAULT_CONFIG: Config = {
   },
   videoSubtitles: {
     enabled: true,
-    autoStart: false,
+    autoStart: { youtube: false, xcom: false, netflix: false },
     toggleShortcut: DEFAULT_SUBTITLES_TOGGLE_SHORTCUT_KEY,
     providerId: BILIBILI_PRESET_PROVIDER_ID,
     style: {

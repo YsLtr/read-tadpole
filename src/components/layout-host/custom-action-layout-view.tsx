@@ -32,6 +32,9 @@ interface CustomActionLayoutViewProps {
   targetCode: LangCodeISO6393
   status: LayoutStatus
   theme: "light" | "dark"
+  // Reads the trigger the layout marks `data-speak-autoplay` once the answer
+  // is done. Off in the options preview, which only shows the layout.
+  autoplay?: boolean
   className?: string
   onRenderInfo?: (info: CustomActionLayoutRenderInfo) => void
 }
@@ -60,6 +63,7 @@ export function CustomActionLayoutView({
   targetCode,
   status,
   theme,
+  autoplay = false,
   className,
   onRenderInfo,
 }: CustomActionLayoutViewProps) {
@@ -67,7 +71,7 @@ export function CustomActionLayoutView({
     () => buildCustomActionLayoutScope({ outputSchema, value, selection, targetCode, status }),
     [outputSchema, value, selection, targetCode, status],
   )
-  const speak = useExtensionSpeakAdapter()
+  const speak = useExtensionSpeakAdapter(autoplay)
 
   // The layout reports whenever anything about the render changes; callers
   // only hear about changes to what they are shown. LayoutView always calls

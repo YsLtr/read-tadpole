@@ -109,6 +109,13 @@ export const SEARCH_ITEMS: SearchItem[] = [
     pageKey: "options.shortcuts.title",
   },
   {
+    sectionId: "selection-speak-shortcut",
+    route: "/shortcuts",
+    titleKey: "options.shortcuts.selectionSpeak.title",
+    descriptionKey: "options.shortcuts.selectionSpeak.description",
+    pageKey: "options.shortcuts.title",
+  },
+  {
     sectionId: "subtitles-toggle-shortcut",
     route: "/shortcuts",
     titleKey: "options.shortcuts.subtitlesToggle.title",
@@ -127,6 +134,13 @@ export const SEARCH_ITEMS: SearchItem[] = [
     route: "/shortcuts",
     titleKey: "options.shortcuts.translationHub.title",
     descriptionKey: "options.shortcuts.translationHub.description",
+    pageKey: "options.shortcuts.title",
+  },
+  {
+    sectionId: "selection-action-shortcuts",
+    route: "/shortcuts",
+    titleKey: "options.shortcuts.actions.title",
+    descriptionKey: "options.shortcuts.actions.description",
     pageKey: "options.shortcuts.title",
   },
 
@@ -392,8 +406,9 @@ export const SEARCH_ITEMS: SearchItem[] = [
     pageKey: "options.videoSubtitles.title",
   },
   {
+    // Its own page, drilled into from the Translate on open row of the Basics section.
     sectionId: "subtitles-auto-start",
-    route: "/video-subtitles",
+    route: "/video-subtitles/auto-start",
     titleKey: "options.videoSubtitles.preference.autoStart.title",
     descriptionKey: "options.videoSubtitles.preference.autoStart.description",
     pageKey: "options.videoSubtitles.title",

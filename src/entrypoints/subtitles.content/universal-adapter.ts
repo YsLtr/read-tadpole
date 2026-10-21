@@ -97,6 +97,9 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
   private subtitlesSummaryContextHash: string | null = null
   private adObserver: MutationObserver | null = null
   private observedAdPlayer: HTMLElement | null = null
+  // Set by destroy(); async work that resumes afterwards backs out instead of
+  // touching the page.
+  private destroyed = false
 
   get embedded() {
     return this.config.embedded
@@ -136,9 +139,49 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     void this.renderTranslateButton()
 
     await this.initializeScheduler()
+    if (this.destroyed) return
     this.setupAdObserver()
     await this.tryAutoStartSubtitles()
+    if (this.destroyed) return
     this.setupNavigationListeners()
+  }
+
+  /**
+   * Releases everything the adapter holds on the page. A document that swaps
+   * player layouts (YouTube watch <-> Shorts) builds a new adapter per layout,
+   * so the old one has to give back its DOM, timers, listeners and the shared
+   * atoms before the next one publishes into them.
+   */
+  destroy() {
+    if (this.destroyed) return
+    this.destroyed = true
+    this.switchOperationId++
+    this.hasPendingNavigationReset = false
+
+    const { events } = this.config
+    if (events.navigateStart) {
+      window.removeEventListener(events.navigateStart, this.handleNavigationStart)
+    }
+    if (events.navigateFinish) {
+      window.removeEventListener(events.navigateFinish, this.handleNavigationFinish)
+    }
+
+    this.clearNavigationReinitTimeout()
+    this.prepareSummaryForNavigation()
+    this.teardownAdObserver()
+    this.translatedSubtitlesDownloader?.dispose()
+    this.translatedSubtitlesDownloader = null
+    this.destroyScheduler()
+    this.clearRuntimeSession()
+    this.clearSourceCache()
+    this.fetcher.cleanup()
+    subtitlesStore.set(subtitlesSettingsPanelOpenAtom, false)
+    subtitlesStore.set(subtitlesSettingsPanelViewAtom, ROOT_VIEW)
+    subtitlesStore.set(translatedTrackAtom, [])
+    this.showNativeSubtitles()
+
+    const toggleButton = document.getElementById(TRANSLATE_BUTTON_CONTAINER_ID)
+    if (toggleButton) removeReactShadowHost(toggleButton)
   }
 
   getControlsConfig(): ControlsConfig | undefined {
@@ -154,6 +197,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
   }
 
   async handleSourceTrackChanged(): Promise<void> {
+    if (this.destroyed) return
     if (!this.trackChangeRefreshPromise) {
       this.trackChangeRefreshPromise = this.refreshSourceTrackIfNeeded().finally(() => {
         this.trackChangeRefreshPromise = null
@@ -442,6 +486,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
   }
 
   notifyNavigation() {
+    if (this.destroyed) return
     this.hasPendingNavigationReset = true
     this.clearVisibleStateForNavigation()
 
@@ -454,7 +499,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
 
   private async handleNavigation() {
     // A -> B -> A still needs to restore the state torn down at navigation start.
-    if (!this.hasPendingNavigationReset) {
+    if (!this.hasPendingNavigationReset || this.destroyed) {
       return
     }
 
@@ -463,6 +508,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     void this.renderTranslateButton()
 
     await this.initializeScheduler()
+    if (this.destroyed) return
     this.setupAdObserver()
     await this.tryAutoStartSubtitles()
   }
@@ -554,7 +600,8 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
 
   private async tryAutoStartSubtitles() {
     const config = await getLocalConfig()
-    const autoStart = config?.videoSubtitles?.autoStart ?? false
+    if (this.destroyed) return
+    const autoStart = config?.videoSubtitles?.autoStart?.[this.config.platform] ?? false
 
     const learningOpen = subtitlesStore.get(subtitlesSidebarOpenAtom)
 

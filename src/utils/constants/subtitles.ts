@@ -43,6 +43,8 @@ export const YOUTUBE_NAVIGATE_FINISH_EVENT = "yt-navigate-finish"
 export const YOUTUBE_NATIVE_SUBTITLES_CLASS = ".ytp-caption-window-container"
 export const PLAYER_DATA_REQUEST_TYPE = "READ_TADPOLE_GET_PLAYER_DATA"
 export const PLAYER_DATA_RESPONSE_TYPE = "READ_TADPOLE_PLAYER_DATA"
+// The player is on the requested video but has not received its player response yet.
+export const PLAYER_RESPONSE_PENDING_ERROR = "PLAYER_RESPONSE_PENDING"
 export const WAIT_TIMEDTEXT_REQUEST_TYPE = "READ_TADPOLE_WAIT_TIMEDTEXT"
 export const WAIT_TIMEDTEXT_RESPONSE_TYPE = "READ_TADPOLE_TIMEDTEXT_READY"
 export const TIMEDTEXT_WAIT_TIMEOUT_MS = 5000
@@ -76,7 +78,14 @@ export const NETFLIX_CONTROLS_GROUP_SELECTOR =
 export const NETFLIX_NATIVE_SUBTITLES_SELECTOR = ".player-timedtext"
 export const NETFLIX_SUBTITLES_REQUEST_TYPE = "READ_TADPOLE_NETFLIX_SUBTITLES"
 export const NETFLIX_SUBTITLES_RESPONSE_TYPE = "READ_TADPOLE_NETFLIX_SUBTITLES_DONE"
+// The page script answers "state" and "restore" within this, inside POST_MESSAGE_TIMEOUT_MS.
 export const NETFLIX_PAGE_WAIT_TIMEOUT_MS = 5000
+// The page script answers "load" within this one deadline, which covers waiting for the player
+// and then for its subtitle file.
+export const NETFLIX_LOAD_TIMEOUT_MS = 10_000
+// Outwaits the page's load deadline, with room for its last poll even in a throttled background
+// tab, so a slow load reports how it ended instead of timing out.
+export const NETFLIX_LOAD_POST_MESSAGE_TIMEOUT_MS = NETFLIX_LOAD_TIMEOUT_MS + 2000
 export const NETFLIX_PAGE_POLL_INTERVAL_MS = 100
 export const NETFLIX_WATCH_POLL_INTERVAL_MS = 1000
 export const NETFLIX_TRANSLATE_BUTTON_ZOOM = 1.4
@@ -84,6 +93,9 @@ export const NETFLIX_TRANSLATE_BUTTON_ZOOM = 1.4
 // YouTube player wait constants
 export const MAX_PLAYER_WAIT_ATTEMPTS = 50
 export const PLAYER_WAIT_INTERVAL_MS = 100
+// AdGuard's YouTube rules make a cold load fetch the player response again, which can take
+// well over the wait above; a player already on the video gets this much longer.
+export const MAX_PLAYER_RESPONSE_WAIT_ATTEMPTS = 300
 export const MAX_STATE_WAIT_ATTEMPTS = 20
 export const STATE_WAIT_INTERVAL_MS = 300
 export const MAX_FETCH_RETRIES = 5

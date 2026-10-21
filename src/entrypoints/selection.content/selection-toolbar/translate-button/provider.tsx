@@ -39,15 +39,12 @@ import { prepareTranslationText } from "@/utils/host/translate/text-preparation"
 import { translateTextCore } from "@/utils/host/translate/translate-text"
 import { getOrCreateWebPageContext } from "@/utils/host/translate/webpage-context"
 import { getOrGenerateWebPageSummary } from "@/utils/host/translate/webpage-summary"
-import {
-  isPageTranslationShortcutEmpty,
-  isValidConfiguredPageTranslationShortcut,
-} from "@/utils/page-translation-shortcut"
+import { isShortcutEmpty, isValidShortcut } from "@/utils/shortcut"
 import { getTranslatePromptFromConfig } from "@/utils/prompts/translate"
 import { resolveModelId } from "@/utils/providers/model-id"
 import { getProviderOptionsWithOverride } from "@/utils/providers/options"
 import { getSelectableProvidersForCapability } from "@/utils/providers/provider-registry"
-import { shadowWrapper } from "../.."
+import { shadowWrapper } from "../../main"
 import {
   isSelectionToolbarOpenAtom,
   selectionSessionAtom,
@@ -531,10 +528,7 @@ export function SelectionTranslationProvider({ children }: { children: ReactNode
 
   useEffect(() => {
     const shortcut = selectionToolbar.features.translate.shortcut
-    if (
-      isPageTranslationShortcutEmpty(shortcut) ||
-      !isValidConfiguredPageTranslationShortcut(shortcut)
-    ) {
+    if (isShortcutEmpty(shortcut) || !isValidShortcut(shortcut)) {
       return undefined
     }
 

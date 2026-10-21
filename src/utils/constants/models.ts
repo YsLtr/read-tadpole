@@ -178,7 +178,16 @@ export const LLM_MODEL_OPTIONS: Array<{
     options: { thinkingConfig: { thinkingBudget: 0, includeThoughts: false } },
   },
 
-  // Claude - disable thinking
+  // Claude - use the lowest supported thinking setting.
+  // https://platform.claude.com/docs/en/build-with-claude/thinking
+  {
+    pattern: /^claude-(?:opus-5-5|fable-5(?:-1)?)$/i,
+    options: { effort: "low" },
+  },
+  {
+    pattern: /^claude-sonnet-5-5$/i,
+    options: { thinking: { type: "between_tools" } },
+  },
   {
     pattern: /^claude-/i,
     options: { thinking: { type: "disabled" } },
