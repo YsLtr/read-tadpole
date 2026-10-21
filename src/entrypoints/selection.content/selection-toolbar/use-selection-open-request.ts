@@ -57,16 +57,22 @@ function getViewportCenterAnchor(): SelectionAnchor {
 }
 
 export function useSelectionOpenRequestResolver(selectionSession: SelectionSession | null) {
-  const resolveShortcutOpenRequest = useCallback((): SelectionOpenRequest | null => {
-    if (!selectionSession) {
-      return null
-    }
+  // A shortcut passes the selection it was pressed on, which is the live one
+  // even when the toolbar recorded an older one; everything else resolves the
+  // recorded session.
+  const resolveShortcutOpenRequest = useCallback(
+    (session: SelectionSession | null = selectionSession): SelectionOpenRequest | null => {
+      if (!session) {
+        return null
+      }
 
-    return {
-      anchor: getSelectionAnchor(selectionSession) ?? getViewportCenterAnchor(),
-      session: selectionSession,
-    }
-  }, [selectionSession])
+      return {
+        anchor: getSelectionAnchor(session) ?? getViewportCenterAnchor(),
+        session,
+      }
+    },
+    [selectionSession],
+  )
 
   return { resolveShortcutOpenRequest }
 }

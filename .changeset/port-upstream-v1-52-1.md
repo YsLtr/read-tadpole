@@ -11,9 +11,9 @@ install-onboarding flow):
 - One shared content runtime behind a small loader script: React, zod and
   i18next are bundled once per page instead of once per content script, which
   cuts what every page has to parse and keep in memory.
-- Selection shortcuts: the toolbar's actions, translation and speak can now be
-  triggered from the keyboard, with the options page listing every binding and
-  refusing two commands on one key.
+- Selection shortcuts: the toolbar's actions and speak can now be triggered from
+  the keyboard (translation already was), with the options page listing every
+  binding and refusing two commands on one key.
 - Per-platform "translate on open" for video subtitles, so YouTube, X and
   Netflix can each start on their own.
 - YouTube Shorts: the subtitle adapter is torn down when the layout changes, so

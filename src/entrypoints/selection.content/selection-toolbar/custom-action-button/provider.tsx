@@ -16,7 +16,11 @@ import { SelectionToolbarFooterContent } from "@/components/ui/selection-popover
 import { SelectionToolbarTitleContent } from "@/components/ui/selection-popover/selection-toolbar-title-content"
 import { configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
 import { getSourceDocumentTitle } from "@/utils/content/document-title"
-import { findSelectionToolbarAction, patchSelectionToolbarAction } from "@/utils/custom-actions"
+import {
+  findSelectionToolbarAction,
+  getSelectionToolbarActions,
+  patchSelectionToolbarAction,
+} from "@/utils/custom-actions"
 import {
   getSelectableProvidersForCapability,
   resolveProviderRefForCapability,
@@ -29,6 +33,8 @@ import {
   selectionAtom,
   selectionSessionAtom,
 } from "../atoms"
+import { useSelectionOpenRequestResolver } from "../use-selection-open-request"
+import { useSelectionShortcuts } from "../use-selection-shortcuts"
 
 interface SelectionCustomActionPendingOpenRequest {
   actionId: string
@@ -73,6 +79,7 @@ export function SelectionCustomActionProvider({ children }: { children: ReactNod
   const [activeSession, setActiveSession] = useState<SelectionSession | null>(null)
   const [activeActionId, setActiveActionId] = useState<string | null>(null)
   const selectionSession = useAtomValue(selectionSessionAtom)
+  const { resolveShortcutOpenRequest } = useSelectionOpenRequestResolver(selectionSession)
   const selection = useAtomValue(selectionAtom)
   const context = useAtomValue(contextAtom)
   const selectionToolbarConfig = useAtomValue(configFieldsAtomMap.selectionToolbar)
@@ -203,6 +210,30 @@ export function SelectionCustomActionProvider({ children }: { children: ReactNod
     },
     [commitOpenRequest],
   )
+
+  // An action switched off has no key, whatever it was given.
+  const actionShortcuts = useMemo(
+    () =>
+      Object.fromEntries(
+        getSelectionToolbarActions(selectionToolbarConfig)
+          .filter((action) => action.enabled !== false)
+          .map((action) => [action.id, action.shortcut]),
+      ),
+    [selectionToolbarConfig],
+  )
+
+  useSelectionShortcuts(actionShortcuts, (actionId, session) => {
+    const request = resolveShortcutOpenRequest(session)
+    if (!request) {
+      return false
+    }
+    openActionRequest({
+      actionId,
+      anchor: request.anchor,
+      session: request.session,
+    })
+    return true
+  })
 
   const openToolbarCustomAction = useCallback(
     (actionId: string, triggerElement: HTMLElement | null) => {

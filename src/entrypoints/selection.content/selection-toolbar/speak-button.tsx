@@ -9,15 +9,36 @@ import {
 } from "@/components/ui/selection-popover/selection-tooltip"
 import { useTextToSpeech } from "@/hooks/use-text-to-speech"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
+import { getSpeakShortcut } from "@/utils/constants/selection"
 import { i18n } from "@/utils/i18n"
 import { selectionContentAtom } from "./atoms"
+import { useSelectionShortcuts } from "./use-selection-shortcuts"
 
-// Reads the selection aloud from the toolbar.
+// Reads the selection aloud from the toolbar, or from its key.
 function useSelectionSpeechController() {
   const selectionContent = useAtomValue(selectionContentAtom)
   const ttsConfig = useAtomValue(configFieldsAtomMap.tts)
+  const { speak } = useAtomValue(configFieldsAtomMap.selectionToolbar).features
   const { play, stop, isFetching, isPlaying } = useTextToSpeech()
   const isBusy = isFetching || isPlaying
+
+  // The key toggles like the button, but with nothing to read it lets the
+  // page have the keystroke rather than complain.
+  useSelectionShortcuts(
+    { speak: speak.enabled ? getSpeakShortcut(speak) : undefined },
+    (_, session) => {
+      if (isBusy) {
+        stop()
+        return true
+      }
+      const text = session?.selectionSnapshot.text
+      if (!text) {
+        return false
+      }
+      void play(text, ttsConfig, { quiet: true })
+      return true
+    },
+  )
 
   // Starts reading, or stops the reading in progress. False when nothing is
   // selected to read.
