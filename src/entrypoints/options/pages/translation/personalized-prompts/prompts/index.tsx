@@ -1,0 +1,41 @@
+import { PromptManager } from "@/components/prompt-configurator"
+import { getBuiltInPageTranslatePrompts } from "@/components/prompt-configurator/built-in-prompts"
+import { getTokenCellText, WEB_PAGE_PROMPT_TOKENS } from "@/utils/constants/prompt"
+import { i18n } from "@/utils/i18n"
+import { ConfigDetailSection } from "../../../../components/config-detail-section"
+import { PageLayout } from "../../../../components/page-layout"
+import { promptAtoms } from "../atoms"
+
+/**
+ * Every prompt this extension can translate a page with, drilled into from the Translation page.
+ */
+export function PersonalizedPromptsPage() {
+  const insertCells = WEB_PAGE_PROMPT_TOKENS.map((token) => ({
+    text: getTokenCellText(token),
+    description: i18n.t(
+      `options.translation.personalizedPrompts.editPrompt.promptCellInput.${token}`,
+    ),
+  }))
+
+  return (
+    <PageLayout
+      title={i18n.t("options.translation.title")}
+      description={i18n.t("options.translation.pageDescription")}
+    >
+      <ConfigDetailSection
+        backTo="/page-translation"
+        title={
+          <span id="personalized-prompts">
+            {i18n.t("options.translation.personalizedPrompts.title")}
+          </span>
+        }
+      >
+        <PromptManager
+          promptAtoms={promptAtoms}
+          insertCells={insertCells}
+          builtInPrompts={getBuiltInPageTranslatePrompts()}
+        />
+      </ConfigDetailSection>
+    </PageLayout>
+  )
+}

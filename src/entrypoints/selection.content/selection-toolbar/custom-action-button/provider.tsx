@@ -1,0 +1,316 @@
+import type { ComponentProps, ReactNode } from "react"
+import type { SelectionSession } from "../atoms"
+import type { SelectionPopoverActions } from "@/components/ui/selection-popover"
+import { useAtomValue, useSetAtom } from "jotai"
+import { createContext, use, useCallback, useMemo, useRef, useState } from "react"
+import { CustomActionContent } from "@/components/custom-action/custom-action-content"
+import { CustomActionToolButton } from "@/components/custom-action/custom-action-tool-button"
+import {
+  buildCustomActionExecutionPlan,
+  useCustomActionExecution,
+  useCustomActionWebPageContext,
+} from "@/components/custom-action/use-custom-action-execution"
+import { SelectionPopover } from "@/components/ui/selection-popover"
+import { SelectionToolbarErrorAlert } from "@/components/ui/selection-popover/selection-toolbar-error-alert"
+import { SelectionToolbarFooterContent } from "@/components/ui/selection-popover/selection-toolbar-footer-content"
+import { SelectionToolbarTitleContent } from "@/components/ui/selection-popover/selection-toolbar-title-content"
+import { configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
+import { getSourceDocumentTitle } from "@/utils/content/document-title"
+import { findSelectionToolbarAction, patchSelectionToolbarAction } from "@/utils/custom-actions"
+import {
+  getSelectableProvidersForCapability,
+  resolveProviderRefForCapability,
+} from "@/utils/providers/provider-registry"
+import { shadowWrapper } from "../.."
+import { normalizeSelectedText } from "../../utils"
+import {
+  contextAtom,
+  isSelectionToolbarOpenAtom,
+  selectionAtom,
+  selectionSessionAtom,
+} from "../atoms"
+
+interface SelectionCustomActionPendingOpenRequest {
+  actionId: string
+  anchor?: { x: number; y: number }
+  session: SelectionSession | null
+}
+
+interface SelectionCustomActionContextValue {
+  openToolbarCustomAction: (actionId: string, triggerElement: HTMLElement | null) => void
+}
+
+const SelectionCustomActionContext = createContext<SelectionCustomActionContextValue | null>(null)
+
+/** Thin wrapper so the footer's provider list is built inside SelectionPopover.Content. */
+function CustomActionFooterContent({
+  providers,
+  ...props
+}: ComponentProps<typeof SelectionToolbarFooterContent>) {
+  return <SelectionToolbarFooterContent providers={providers} {...props} />
+}
+
+function useSelectionCustomActionContext() {
+  const context = use(SelectionCustomActionContext)
+  if (!context) {
+    throw new Error(
+      "Selection custom action triggers must be used within SelectionCustomActionProvider.",
+    )
+  }
+
+  return context
+}
+
+export function useSelectionCustomActionPopover() {
+  return useSelectionCustomActionContext()
+}
+
+export function SelectionCustomActionProvider({ children }: { children: ReactNode }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null)
+  const [popoverSessionKey, setPopoverSessionKey] = useState(0)
+  const [rerunNonce, setRerunNonce] = useState(0)
+  const [activeSession, setActiveSession] = useState<SelectionSession | null>(null)
+  const [activeActionId, setActiveActionId] = useState<string | null>(null)
+  const selectionSession = useAtomValue(selectionSessionAtom)
+  const selection = useAtomValue(selectionAtom)
+  const context = useAtomValue(contextAtom)
+  const selectionToolbarConfig = useAtomValue(configFieldsAtomMap.selectionToolbar)
+  const providersConfig = useAtomValue(configFieldsAtomMap.providersConfig)
+  const language = useAtomValue(configFieldsAtomMap.language)
+  const setIsSelectionToolbarOpen = useSetAtom(isSelectionToolbarOpenAtom)
+  const setConfig = useSetAtom(writeConfigAtom)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const pendingOpenRequestRef = useRef<SelectionCustomActionPendingOpenRequest | null>(null)
+  const popoverActionsRef = useRef<SelectionPopoverActions | null>(null)
+  const nextEphemeralSessionIdRef = useRef(0)
+  const selectionText = activeSession?.selectionSnapshot.text ?? null
+  const cleanSelection = useMemo(() => normalizeSelectedText(selectionText), [selectionText])
+  const paragraphsText = useMemo(() => {
+    if (!cleanSelection) {
+      return ""
+    }
+
+    return activeSession?.contextSnapshot.text || cleanSelection
+  }, [activeSession?.contextSnapshot.text, cleanSelection])
+  const webPageContext = useCustomActionWebPageContext(isOpen, popoverSessionKey)
+  const titleText = (webPageContext?.webTitle ?? getSourceDocumentTitle()) || null
+  const activeAction = useMemo(() => {
+    if (!activeActionId) {
+      return null
+    }
+    const action = findSelectionToolbarAction(selectionToolbarConfig, activeActionId)
+    return action && action.enabled !== false ? action : null
+  }, [activeActionId, selectionToolbarConfig])
+  const customActionRequest = useMemo(
+    () => ({
+      language,
+      action: activeAction,
+      provider: activeAction
+        ? resolveProviderRefForCapability("customAction", providersConfig, activeAction.providerId)
+        : null,
+    }),
+    [activeAction, language, providersConfig],
+  )
+  const baseCustomActionProviders = useMemo(
+    () => getSelectableProvidersForCapability("customAction", providersConfig),
+    [providersConfig],
+  )
+  const executionPlan = useMemo(
+    () =>
+      buildCustomActionExecutionPlan(
+        customActionRequest,
+        cleanSelection,
+        paragraphsText,
+        webPageContext,
+      ),
+    [cleanSelection, customActionRequest, paragraphsText, webPageContext],
+  )
+  const { error, isRunning, resetSessionState, result, thinking } = useCustomActionExecution({
+    bodyRef,
+    executionContext: executionPlan.executionContext,
+    open: isOpen,
+    popoverSessionKey,
+    rerunNonce,
+  })
+  const displayedResult = executionPlan.executionContext ? result : null
+  const displayedError = error ?? executionPlan.error
+  const displayedIsRunning =
+    (isOpen && webPageContext === undefined) || (executionPlan.executionContext ? isRunning : false)
+  const displayedThinking = executionPlan.executionContext ? thinking : null
+  const layoutStatus = displayedIsRunning ? "streaming" : displayedError ? "error" : "done"
+  // The layout's ctx mirrors the prompt tokens of the run on screen; before
+  // there is one (precheck, page context still loading) it falls back to the
+  // same sources those tokens are built from.
+  const layoutSelection = executionPlan.executionContext?.promptTokens.selection ?? cleanSelection
+  const layoutTargetCode = executionPlan.executionContext?.targetCode ?? language.targetCode
+
+  const resetPopoverSession = useCallback((options?: { clearAnchor?: boolean }) => {
+    setActiveSession(null)
+    setActiveActionId(null)
+    if (options?.clearAnchor) {
+      setAnchor(null)
+    }
+  }, [])
+
+  // Anchor application is owned by SelectionPopover.Root (via requestOpen) so
+  // a pinned popover reused in place never moves.
+  const commitOpenRequest = useCallback((request: SelectionCustomActionPendingOpenRequest) => {
+    pendingOpenRequestRef.current = request
+  }, [])
+
+  const applyPendingSession = useCallback(() => {
+    const pendingRequest = pendingOpenRequestRef.current
+
+    setActiveSession(pendingRequest?.session ?? selectionSession)
+    setActiveActionId(pendingRequest?.actionId ?? null)
+    setIsSelectionToolbarOpen(false)
+    pendingOpenRequestRef.current = null
+  }, [selectionSession, setIsSelectionToolbarOpen])
+
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      resetSessionState()
+
+      if (nextOpen) {
+        setPopoverSessionKey((prev) => prev + 1)
+        applyPendingSession()
+      } else {
+        resetPopoverSession({
+          clearAnchor: pendingOpenRequestRef.current === null,
+        })
+      }
+
+      setIsOpen(nextOpen)
+    },
+    [applyPendingSession, resetPopoverSession, resetSessionState],
+  )
+
+  // Pinned popovers are reused in place for a new selection or action: the
+  // window keeps its position, size, and pin state while the action reruns.
+  const handleReuseRequest = useCallback(() => {
+    resetSessionState()
+    applyPendingSession()
+    // Forces a rerun even when the retriggered request resolves to an
+    // identical execution key.
+    setRerunNonce((prev) => prev + 1)
+  }, [applyPendingSession, resetSessionState])
+
+  const openActionRequest = useCallback(
+    (request: SelectionCustomActionPendingOpenRequest) => {
+      commitOpenRequest(request)
+      popoverActionsRef.current?.requestOpen(request.anchor ?? null)
+    },
+    [commitOpenRequest],
+  )
+
+  const openToolbarCustomAction = useCallback(
+    (actionId: string, triggerElement: HTMLElement | null) => {
+      if (!triggerElement) {
+        return
+      }
+
+      const rect = triggerElement.getBoundingClientRect()
+      openActionRequest({
+        actionId,
+        anchor: { x: rect.left, y: rect.top },
+        session:
+          selectionSession ??
+          (selection
+            ? {
+                id: --nextEphemeralSessionIdRef.current,
+                createdAt: Date.now(),
+                selectionSnapshot: selection,
+                contextSnapshot: context ?? {
+                  text: "",
+                  paragraphs: [],
+                },
+              }
+            : null),
+      })
+    },
+    [context, openActionRequest, selection, selectionSession],
+  )
+
+  const handleProviderChange = useCallback(
+    (providerId: string) => {
+      if (!activeActionId) {
+        return
+      }
+
+      void setConfig({
+        selectionToolbar: patchSelectionToolbarAction(selectionToolbarConfig, activeActionId, {
+          providerId,
+        }),
+      })
+    },
+    [activeActionId, selectionToolbarConfig, setConfig],
+  )
+
+  const handleRegenerate = useCallback(() => {
+    setRerunNonce((prev) => prev + 1)
+  }, [])
+
+  const contextValue = useMemo<SelectionCustomActionContextValue>(
+    () => ({
+      openToolbarCustomAction,
+    }),
+    [openToolbarCustomAction],
+  )
+
+  return (
+    <SelectionCustomActionContext value={contextValue}>
+      {children}
+      <SelectionPopover.Root
+        open={isOpen}
+        onOpenChange={handleOpenChange}
+        anchor={anchor}
+        onAnchorChange={setAnchor}
+        actionsRef={popoverActionsRef}
+        onReuseRequest={handleReuseRequest}
+      >
+        <SelectionPopover.Content
+          key={popoverSessionKey}
+          container={shadowWrapper ?? document.body}
+        >
+          <SelectionPopover.Header className="border-b">
+            <SelectionToolbarTitleContent
+              title={activeAction?.name ?? "Custom Action"}
+              icon={activeAction?.icon ?? "tabler:sparkles"}
+            />
+            <div className="flex items-center gap-1">
+              <SelectionPopover.Pin />
+              <SelectionPopover.Close />
+            </div>
+          </SelectionPopover.Header>
+
+          <SelectionPopover.Body
+            key={`${popoverSessionKey}:${activeSession?.id ?? 0}`}
+            ref={bodyRef}
+          >
+            <CustomActionContent
+              action={activeAction}
+              status={layoutStatus}
+              selection={layoutSelection}
+              targetCode={layoutTargetCode}
+              selectionContent={selectionText}
+              value={displayedResult}
+              thinking={displayedThinking}
+            />
+            <SelectionToolbarErrorAlert error={displayedError} />
+          </SelectionPopover.Body>
+          <CustomActionFooterContent
+            paragraphsText={paragraphsText}
+            providers={baseCustomActionProviders}
+            titleText={titleText}
+            value={customActionRequest.provider?.id ?? ""}
+            onProviderChange={handleProviderChange}
+            onRegenerate={handleRegenerate}
+          >
+            {activeAction && <CustomActionToolButton action={activeAction} />}
+          </CustomActionFooterContent>
+        </SelectionPopover.Content>
+      </SelectionPopover.Root>
+    </SelectionCustomActionContext>
+  )
+}

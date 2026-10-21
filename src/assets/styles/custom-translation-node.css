@@ -1,0 +1,47 @@
+@import "@/assets/styles/host-theme.css";
+
+[data-read-tadpole-custom-translation-style="blur"] {
+  filter: blur(4px);
+  opacity: 0.75;
+  transition:
+    filter 0.1s ease-in-out,
+    opacity 0.1s ease-in-out;
+}
+
+[data-read-tadpole-custom-translation-style="blur"]:hover {
+  filter: blur(0);
+  opacity: 1;
+}
+
+.read-tadpole-translated-block-content[data-read-tadpole-custom-translation-style="blockquote"] {
+  border-left: 4px solid var(--read-tadpole-brand);
+  padding: 4px 0 4px 8px;
+}
+
+[data-read-tadpole-custom-translation-style="weakened"] {
+  opacity: 1;
+  color: var(--read-tadpole-muted-foreground) !important;
+}
+
+[data-read-tadpole-custom-translation-style="dashedLine"] {
+  text-decoration: underline dashed var(--read-tadpole-brand) !important;
+  text-underline-offset: 5px;
+}
+
+[data-read-tadpole-custom-translation-style="border"] {
+  border: 1px solid var(--read-tadpole-brand);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* The style a fresh install starts from, so it uses the brand colour rather
+   than a one-off literal — every other rule in this file already does. */
+[data-read-tadpole-custom-translation-style="textColor"] {
+  color: var(--read-tadpole-brand) !important;
+}
+
+[data-read-tadpole-custom-translation-style="background"] {
+  background-color: color-mix(in srgb, var(--read-tadpole-brand) 15%, transparent);
+  padding: 2px 4px;
+  border-radius: 4px;
+}

@@ -1,0 +1,17 @@
+:root {
+  --read-tadpole-primary: oklch(0.205 0 0);
+  --read-tadpole-brand: oklch(76.034% 0.12361 82.191);
+  --read-tadpole-foreground: oklch(0.985 0 0);
+  --read-tadpole-muted: oklch(0.97 0 0);
+  --read-tadpole-muted-foreground: oklch(0.556 0 0);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --read-tadpole-primary: oklch(0.922 0 0);
+    --read-tadpole-brand: oklch(76.034% 0.12361 82.191);
+    --read-tadpole-foreground: oklch(0.205 0 0);
+    --read-tadpole-muted: oklch(0.269 0 0);
+    --read-tadpole-muted-foreground: oklch(0.708 0 0);
+  }
+}

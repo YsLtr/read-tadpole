@@ -1,0 +1,9 @@
+{
+  "prettier.enable": false,
+  "editor.formatOnSave": false,
+  "i18n-ally.localesPaths": [
+    "src/locales",
+    "src/utils/i18n",
+    "src/entrypoints/options/pages/input-translation/languages"
+  ]
+}
