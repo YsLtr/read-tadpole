@@ -156,7 +156,6 @@ export default defineConfig({
         // @codemirror/lang-liquid's parser and highlighting share these with the other languages.
         "@lezer/highlight",
         "@lezer/lr",
-
       ],
     },
     plugins: [
