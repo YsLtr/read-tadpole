@@ -36,8 +36,7 @@ import {
   replaceSelectionToolbarCustomActionPromptTokens,
 } from "@/utils/custom-action-prompt"
 import { getOrCreateWebPageContext } from "@/utils/host/translate/webpage-context"
-import { resolveModelId } from "@/utils/providers/model-id"
-import { getProviderOptionsWithOverride } from "@/utils/providers/options"
+import { getProviderOptions } from "@/utils/providers/options"
 
 export interface CustomActionExecutionContext {
   action: SelectionToolbarCustomAction
@@ -252,14 +251,9 @@ function buildCustomActionExecutionRequest({
   const outputSchema = modelFields.map(({ name, type }) => ({ name, type }))
   const providerKey = provider.kind === "local" ? provider.config.provider : provider.id
   const model = provider.kind === "local" ? provider.config.model : undefined
-  const modelName = provider.kind === "local" ? (resolveModelId(provider.config.model) ?? "") : ""
   const providerOptions =
     provider.kind === "local"
-      ? getProviderOptionsWithOverride(
-          modelName,
-          provider.config.provider,
-          provider.config.providerOptions,
-        )
+      ? getProviderOptions(provider.config, provider.config.providerOptions)
       : undefined
   const temperature = provider.kind === "local" ? provider.config.temperature : undefined
 

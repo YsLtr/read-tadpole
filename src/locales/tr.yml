@@ -99,10 +99,6 @@ options:
       featureWouldLoseProvider: 'Silinemiyor: "$1" özelliğini çalıştırabilecek hiçbir sağlayıcı kalmayacak.'
       duplicateProviderName: 'Yinelenen sağlayıcı adı "$1"'
       models:
-        translate:
-          title: Çeviri modeli
-          customTitle: Özel çeviri modeli
-          placeholder: Bir model seçin
         fetchModels: Mevcut modelleri getir
         fetchError: Modeller getirilemedi
         clickToRetry: Yeniden denemek için tıklayın
@@ -111,7 +107,6 @@ options:
         searchModels: Model ara...
         noModelsFound: Model bulunamadı
         label: Model
-        enterCustomModel: Özel model adını girin
       advancedOptions: Gelişmiş seçenekler
       temperature: Sıcaklık
       temperatureHint: Yanıtlardaki rastgeleliği kontrol eder. Düşük değerler (0) daha belirleyici, yüksek değerler daha yaratıcıdır. Aralık sağlayıcıya göre değişir. Sağlayıcı varsayılanını kullanmak için boş bırakın.
@@ -125,11 +120,6 @@ options:
       headersHint: "Her istekte tüm sağlayıcılar için gönderilen ek HTTP başlıkları. {{apiKey}} API anahtarıyla değiştirilir; hiçbir şey göndermemek için boş bırakın."
       providerOptions: Sağlayıcı seçenekleri
       providerOptionsHint: Düşünme/akıl yürütme modu gibi standart dışı API özellikleri için sağlayıcıya özel seçenekler. Ayrıntılar için Vercel AI SDK belgelerine veya sağlayıcınızın resmi belgelerine bakın.
-      providerOptionsRecommendationTrigger: Önerilen sağlayıcı seçeneklerini görüntüle
-      providerOptionsRecommendationTitle: Önerilen sağlayıcı seçenekleri bulundu
-      providerOptionsRecommendationDescription: Önerilen yapılandırmayı gözden geçirip manuel olarak uygulayın.
-      providerOptionsRecommendationApply: Uygula
-      providerOptionsRecommendationApplied: Uygulandı
       invalidJson: Geçersiz JSON formatı
       showCookie: Çerezi göster
       fetchCookie: Çerezi al

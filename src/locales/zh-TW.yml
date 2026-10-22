@@ -100,10 +100,6 @@ options:
       providerInUseCannotDisable: 無法停用「$1」，因為 $2 個功能正在使用它。
       duplicateProviderName: 重複的提供者名稱「$1」
       models:
-        translate:
-          title: 翻譯模型
-          customTitle: 自訂翻譯模型
-          placeholder: 選擇一個模型
         fetchModels: 取得可用模型
         fetchError: 取得模型失敗
         clickToRetry: 點選重試
@@ -112,7 +108,6 @@ options:
         searchModels: 搜尋模型…
         noModelsFound: 找不到模型
         label: 模型
-        enterCustomModel: 輸入自訂模型名稱
       advancedOptions: 進階選項
       temperature: 溫度
       temperatureHint: 控制回應的隨機性。數值越低（如 0）越穩定，數值越高越有創造性。可用範圍依提供者而異。留空則使用提供者預設值。
@@ -126,11 +121,6 @@ options:
       headersHint: "每次請求都會附帶的自訂 HTTP 請求標頭，對所有提供者生效。{{apiKey}} 會替換為 API Key；留空則不送出。"
       providerOptions: 提供者選項
       providerOptionsHint: 用於非標準 API 功能（例如思考／推理模式）的提供者專屬選項。詳細資訊請參閱 Vercel AI SDK 文件或提供者的官方文件。
-      providerOptionsRecommendationTrigger: 檢視建議的提供者選項
-      providerOptionsRecommendationTitle: 偵測到建議的提供者選項
-      providerOptionsRecommendationDescription: 請先檢查，再手動套用建議設定。
-      providerOptionsRecommendationApply: 套用
-      providerOptionsRecommendationApplied: 已套用
       invalidJson: JSON 格式無效
       showCookie: 顯示 Cookie
       fetchCookie: 一鍵取得

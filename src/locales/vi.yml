@@ -99,10 +99,6 @@ options:
       featureWouldLoseProvider: 'Không thể xóa: "$1" sẽ không còn nhà cung cấp nào có thể chạy được.'
       duplicateProviderName: 'Tên nhà cung cấp trùng lặp "$1"'
       models:
-        translate:
-          title: Mô hình dịch
-          customTitle: Mô hình dịch tùy chỉnh
-          placeholder: Chọn mô hình
         fetchModels: Lấy các mô hình có sẵn
         fetchError: Không thể lấy mô hình
         clickToRetry: Nhấp để thử lại
@@ -111,7 +107,6 @@ options:
         searchModels: Tìm kiếm mô hình...
         noModelsFound: Không tìm thấy mô hình
         label: Mô hình
-        enterCustomModel: Nhập tên mô hình tùy chỉnh
       advancedOptions: Tùy chọn nâng cao
       temperature: Nhiệt độ
       temperatureHint: Kiểm soát tính ngẫu nhiên trong phản hồi. Giá trị thấp (0) mang tính xác định hơn, giá trị cao mang tính sáng tạo hơn. Phạm vi thay đổi theo nhà cung cấp. Để trống để sử dụng giá trị mặc định của nhà cung cấp.
@@ -125,11 +120,6 @@ options:
       headersHint: "Header HTTP bổ sung cho mọi yêu cầu, áp dụng cho mọi nhà cung cấp. {{apiKey}} được thay bằng khóa API; để trống nếu không muốn gửi."
       providerOptions: Tùy chọn nhà cung cấp
       providerOptionsHint: Các tùy chọn dành riêng cho nhà cung cấp cho các tính năng API không chuẩn như chế độ suy nghĩ/lập luận. Xem tài liệu Vercel AI SDK hoặc tài liệu chính thức của nhà cung cấp để biết chi tiết cấu hình.
-      providerOptionsRecommendationTrigger: Xem tùy chọn nhà cung cấp được đề xuất
-      providerOptionsRecommendationTitle: Đã phát hiện tùy chọn nhà cung cấp được đề xuất
-      providerOptionsRecommendationDescription: Hãy xem lại và tự áp dụng cấu hình được đề xuất.
-      providerOptionsRecommendationApply: Áp dụng
-      providerOptionsRecommendationApplied: Đã áp dụng
       invalidJson: Định dạng JSON không hợp lệ
       showCookie: Hiển thị cookie
       fetchCookie: Lấy cookie

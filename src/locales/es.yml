@@ -100,10 +100,6 @@ options:
       providerInUseCannotDisable: 'No se puede desactivar "$1" porque actualmente lo usan $2 función(es).'
       duplicateProviderName: 'Nombre de proveedor duplicado "$1"'
       models:
-        translate:
-          title: Modelo de traducción
-          customTitle: Modelo de traducción personalizado
-          placeholder: Selecciona un modelo
         fetchModels: Obtener modelos disponibles
         fetchError: No se pudieron obtener los modelos
         clickToRetry: Haz clic para reintentar
@@ -112,7 +108,6 @@ options:
         searchModels: Buscar modelos...
         noModelsFound: No se encontraron modelos
         label: Modelo
-        enterCustomModel: Introduce el nombre del modelo personalizado
       advancedOptions: Opciones avanzadas
       temperature: Temperatura
       temperatureHint: Controla la aleatoriedad en las respuestas. Los valores más bajos (0) son más deterministas; los más altos son más creativos. El rango varía según el proveedor. Déjalo vacío para usar el valor predeterminado del proveedor.
@@ -126,11 +121,6 @@ options:
       headersHint: "Encabezados HTTP adicionales enviados con cada solicitud, para todos los proveedores. {{apiKey}} se sustituye por la clave API; déjalo vacío para no enviar ninguno."
       providerOptions: Opciones del proveedor
       providerOptionsHint: Opciones específicas del proveedor para funciones API no estándar, como el modo thinking/reasoning. Consulta la documentación de Vercel AI SDK o la documentación oficial de tu proveedor para ver detalles de configuración.
-      providerOptionsRecommendationTrigger: Ver opciones recomendadas del proveedor
-      providerOptionsRecommendationTitle: Opciones recomendadas del proveedor detectadas
-      providerOptionsRecommendationDescription: Revisa y aplica manualmente la configuración recomendada.
-      providerOptionsRecommendationApply: Aplicar
-      providerOptionsRecommendationApplied: Aplicado
       invalidJson: Formato JSON no válido
       showCookie: Mostrar cookie
       fetchCookie: Obtener cookie
