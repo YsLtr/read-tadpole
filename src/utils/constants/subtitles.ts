@@ -1,3 +1,5 @@
+import type { SubtitlesStyle } from "@/types/config/subtitles"
+
 // Timing constants
 export const NAVIGATION_HANDLER_DELAY = 1000
 export const FETCH_CHECK_INTERVAL = 100
@@ -108,17 +110,33 @@ export const SELECTED_TRACK_WAIT_INTERVAL_MS = 100
 // Subtitle style constants
 export const MIN_FONT_SCALE = 30
 export const MAX_FONT_SCALE = 150
-export const DEFAULT_FONT_SCALE = 100
 export const MIN_FONT_WEIGHT = 300
 export const MAX_FONT_WEIGHT = 700
-export const DEFAULT_FONT_WEIGHT = 400
 export const MIN_BACKGROUND_OPACITY = 0
 export const MAX_BACKGROUND_OPACITY = 100
-export const DEFAULT_BACKGROUND_OPACITY = 75
-export const DEFAULT_FONT_FAMILY = "system" as const
-export const DEFAULT_SUBTITLE_COLOR = "#FFFFFF"
-export const DEFAULT_DISPLAY_MODE = "bilingual" as const
-export const DEFAULT_TRANSLATION_POSITION = "above" as const
+
+// The one place the install and per-section reset defaults live, so a fresh
+// install and the reset buttons can never disagree.
+export const DEFAULT_SUBTITLES_STYLE: SubtitlesStyle = {
+  displayMode: "bilingual",
+  translationPosition: "below",
+  main: {
+    fontFamily: "noto-sans",
+    fontScale: 100,
+    color: "#e0ab25",
+    fontWeight: 400,
+  },
+  translation: {
+    fontFamily: "roboto",
+    fontScale: 100,
+    color: "#FFFFFF",
+    fontWeight: 500,
+  },
+  container: {
+    backgroundOpacity: 35,
+  },
+  customCSS: null,
+}
 export const DEFAULT_CONTROLS_HEIGHT = 60
 export const MAX_CONTROLS_HEIGHT_RATIO = 0.25
 export const DEFAULT_SUBTITLE_POSITION = { percent: 10, anchor: "bottom" } as const

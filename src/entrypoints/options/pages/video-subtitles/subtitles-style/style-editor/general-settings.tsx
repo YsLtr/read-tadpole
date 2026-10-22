@@ -19,9 +19,7 @@ import { SliderComfortable } from "@/components/ui/base-ui/slider"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/base-ui/tooltip"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import {
-  DEFAULT_BACKGROUND_OPACITY,
-  DEFAULT_DISPLAY_MODE,
-  DEFAULT_TRANSLATION_POSITION,
+  DEFAULT_SUBTITLES_STYLE,
   MAX_BACKGROUND_OPACITY,
   MIN_BACKGROUND_OPACITY,
 } from "@/utils/constants/subtitles"
@@ -61,11 +59,9 @@ export function GeneralSettings() {
     void setVideoSubtitlesConfig(
       deepmerge(videoSubtitlesConfig, {
         style: {
-          displayMode: DEFAULT_DISPLAY_MODE,
-          translationPosition: DEFAULT_TRANSLATION_POSITION,
-          container: {
-            backgroundOpacity: DEFAULT_BACKGROUND_OPACITY,
-          },
+          displayMode: DEFAULT_SUBTITLES_STYLE.displayMode,
+          translationPosition: DEFAULT_SUBTITLES_STYLE.translationPosition,
+          container: DEFAULT_SUBTITLES_STYLE.container,
         },
       }),
     )

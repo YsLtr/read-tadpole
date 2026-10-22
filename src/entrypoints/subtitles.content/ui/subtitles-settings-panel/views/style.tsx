@@ -24,13 +24,7 @@ import {
 import { SliderComfortable } from "@/components/ui/base-ui/slider"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import {
-  DEFAULT_BACKGROUND_OPACITY,
-  DEFAULT_DISPLAY_MODE,
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SCALE,
-  DEFAULT_FONT_WEIGHT,
-  DEFAULT_SUBTITLE_COLOR,
-  DEFAULT_TRANSLATION_POSITION,
+  DEFAULT_SUBTITLES_STYLE,
   MAX_BACKGROUND_OPACITY,
   MAX_FONT_SCALE,
   MAX_FONT_WEIGHT,
@@ -212,13 +206,6 @@ function TextStyleGroup({
   )
 }
 
-const DEFAULT_TEXT_STYLE: SubtitleTextStyle = {
-  fontFamily: DEFAULT_FONT_FAMILY,
-  fontScale: DEFAULT_FONT_SCALE,
-  color: DEFAULT_SUBTITLE_COLOR,
-  fontWeight: DEFAULT_FONT_WEIGHT,
-}
-
 export function StyleView() {
   const [config, setConfig] = useAtom(configFieldsAtomMap.videoSubtitles, { store: subtitlesStore })
   const portalContainer = use(ShadowWrapperContext)
@@ -235,9 +222,9 @@ export function StyleView() {
         title={i18n.t("options.videoSubtitles.style.generalSettings")}
         onReset={() =>
           updateStyle({
-            displayMode: DEFAULT_DISPLAY_MODE,
-            translationPosition: DEFAULT_TRANSLATION_POSITION,
-            container: { backgroundOpacity: DEFAULT_BACKGROUND_OPACITY },
+            displayMode: DEFAULT_SUBTITLES_STYLE.displayMode,
+            translationPosition: DEFAULT_SUBTITLES_STYLE.translationPosition,
+            container: DEFAULT_SUBTITLES_STYLE.container,
           })
         }
       >
@@ -312,7 +299,7 @@ export function StyleView() {
         title={i18n.t("options.videoSubtitles.style.mainSubtitle")}
         textStyle={config.style.main}
         onChange={(patch) => updateStyle({ main: patch })}
-        onReset={() => updateStyle({ main: DEFAULT_TEXT_STYLE })}
+        onReset={() => updateStyle({ main: DEFAULT_SUBTITLES_STYLE.main })}
         portalContainer={portalContainer}
       />
 
@@ -321,7 +308,7 @@ export function StyleView() {
         title={i18n.t("options.videoSubtitles.style.translationSubtitle")}
         textStyle={config.style.translation}
         onChange={(patch) => updateStyle({ translation: patch })}
-        onReset={() => updateStyle({ translation: DEFAULT_TEXT_STYLE })}
+        onReset={() => updateStyle({ translation: DEFAULT_SUBTITLES_STYLE.translation })}
         portalContainer={portalContainer}
       />
     </div>

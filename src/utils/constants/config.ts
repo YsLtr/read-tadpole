@@ -24,15 +24,9 @@ import {
   SELECTION_TOOLBAR_FEATURE_IDS,
 } from "./selection"
 import {
-  DEFAULT_BACKGROUND_OPACITY,
-  DEFAULT_DISPLAY_MODE,
-  DEFAULT_FONT_FAMILY,
-  DEFAULT_FONT_SCALE,
-  DEFAULT_FONT_WEIGHT,
-  DEFAULT_SUBTITLE_COLOR,
+  DEFAULT_SUBTITLES_STYLE,
   DEFAULT_SUBTITLE_POSITION,
   DEFAULT_SUBTITLES_TOGGLE_SHORTCUT_KEY,
-  DEFAULT_TRANSLATION_POSITION,
 } from "./subtitles"
 import {
   DEFAULT_AUTO_TRANSLATE_SHORTCUT_KEY,
@@ -193,26 +187,7 @@ export const DEFAULT_CONFIG: Config = {
     autoStart: { youtube: false, xcom: false, netflix: false },
     toggleShortcut: DEFAULT_SUBTITLES_TOGGLE_SHORTCUT_KEY,
     providerId: BILIBILI_PRESET_PROVIDER_ID,
-    style: {
-      displayMode: DEFAULT_DISPLAY_MODE,
-      translationPosition: DEFAULT_TRANSLATION_POSITION,
-      main: {
-        fontFamily: DEFAULT_FONT_FAMILY,
-        fontScale: DEFAULT_FONT_SCALE,
-        color: DEFAULT_SUBTITLE_COLOR,
-        fontWeight: DEFAULT_FONT_WEIGHT,
-      },
-      translation: {
-        fontFamily: DEFAULT_FONT_FAMILY,
-        fontScale: DEFAULT_FONT_SCALE,
-        color: DEFAULT_SUBTITLE_COLOR,
-        fontWeight: DEFAULT_FONT_WEIGHT,
-      },
-      container: {
-        backgroundOpacity: DEFAULT_BACKGROUND_OPACITY,
-      },
-      customCSS: null,
-    },
+    style: DEFAULT_SUBTITLES_STYLE,
     aiSegmentation: false,
     requestQueueConfig: {
       capacity: DEFAULT_REQUEST_CAPACITY,
