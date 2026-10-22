@@ -2,8 +2,8 @@ import type { LangCodeISO6393 } from "@read-frog/definitions"
 import type { ContentScriptContext } from "#imports"
 import type { Config } from "@/types/config/config"
 import { storage } from "#imports"
-import { configSchema } from "@/types/config/config"
 import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "@/utils/constants/config"
+import { parseImportedConfig } from "@/utils/config/parse-imported"
 import { detectPageLanguageLightweight } from "@/utils/content/page-language"
 import { ensurePresetStyles } from "@/utils/host/translate/ui/style-injector"
 import { logger } from "@/utils/logger"
@@ -47,14 +47,17 @@ export async function bootstrapHostContent(
 
   // The tab-title switch applies to an already-translated page at once. Only
   // the top frame owns the title, so iframes skip parsing every config write.
+  // Read field by field, like every other config read here: a write whose shape
+  // this build only partly knows still carries the switch.
   const cleanupTitleTranslationWatch =
     window === window.top
       ? storage.watch<Config>(`local:${CONFIG_STORAGE_KEY}`, (config) => {
-          const parsedConfig = configSchema.safeParse(config)
-          if (parsedConfig.success) {
+          try {
             manager.setTitleTranslationEnabled(
-              parsedConfig.data.pageTranslation.page.translateTitle,
+              parseImportedConfig(config).pageTranslation.page.translateTitle,
             )
+          } catch {
+            // Not a config at all: leave the switch as it is.
           }
         })
       : () => {}

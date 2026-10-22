@@ -10,6 +10,7 @@ import {
   DEFAULT_CONFIG,
 } from "../constants/config"
 import { logger } from "../logger"
+import { parseImportedConfig } from "./parse-imported"
 
 /**
  * Initialize the config, this function should only be called once in the background script
@@ -39,9 +40,14 @@ export async function initializeConfig(): Promise<void> {
     // toolbar's order and pins in step with its actions.
     config = parsedConfig.data
   } else {
-    logger.warn("Config is invalid, using default config")
+    // A stored config this build cannot read whole is repaired the same way a
+    // file from another build is — field by field, keeping everything that still
+    // parses (see `parse-imported`). Answering with the defaults instead would
+    // trade the reader's API keys, prompts and site rules for one field that
+    // changed shape. Only a value that is not a config at all reaches that.
+    logger.warn("Stored config does not match the current schema, repairing it", parsedConfig.error)
     await initI18n(DEFAULT_CONFIG.uiLanguage)
-    config = buildFreshDefaultConfig()
+    config = repairStoredConfig(config)
     didConfigChange = true
   }
 
@@ -61,6 +67,15 @@ export async function initializeConfig(): Promise<void> {
     await storage.setMeta<ConfigMeta>(`local:${CONFIG_STORAGE_KEY}`, {
       lastModifiedAt: configMeta?.lastModifiedAt ?? Date.now(),
     })
+  }
+}
+
+function repairStoredConfig(storedConfig: Config): Config {
+  try {
+    return parseImportedConfig(storedConfig)
+  } catch (error) {
+    logger.error("Stored config could not be repaired, using default config", error)
+    return buildFreshDefaultConfig()
   }
 }
 

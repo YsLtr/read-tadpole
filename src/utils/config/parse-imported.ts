@@ -1,5 +1,6 @@
 import type { Config } from "@/types/config/config"
 import type { ProviderConfig, ProvidersConfig } from "@/types/config/provider"
+import type { ProviderCapability } from "@/utils/providers/provider-registry"
 import type { ZodType } from "zod"
 import { configSchema } from "@/types/config/config"
 import {
@@ -15,7 +16,11 @@ import {
   BUILT_IN_ACTION_KEYS,
   isBuiltInActionId,
 } from "@/utils/constants/custom-action"
-import { FEATURE_KEYS, FEATURE_PROVIDER_DEFS } from "@/utils/constants/feature-providers"
+import {
+  FEATURE_KEYS,
+  FEATURE_PROVIDER_DEFS,
+  isFeatureEnabled,
+} from "@/utils/constants/feature-providers"
 import {
   BILIBILI_PRESET_PROVIDER_CONFIG,
   DEFAULT_LLM_PROVIDER_MODELS,
@@ -26,9 +31,14 @@ import { getUsableProviderIdsForCapability } from "@/utils/providers/provider-av
 import { doesProviderSupportsCapability } from "@/utils/providers/provider-registry"
 
 /**
- * Read a config that came from outside this install — an imported file, a Drive
- * blob, a backup, the last-synced mirror — by looking at which fields it carries
- * rather than at a version number.
+ * Read a config this build did not write itself — an imported file, a Drive
+ * blob, a backup, the last-synced mirror, the stored config on startup — by
+ * looking at which fields it carries rather than at a version number.
+ *
+ * This is the only way a config is read. Everything a build writes goes through
+ * `configSchema` first, so a stored value that does not validate is not this
+ * build's own output: answering it with the defaults would trade the reader's
+ * settings for whatever changed shape, and refusing it would do the same.
  *
  * Nothing here compares versions: a field the payload has is used, a field it
  * does not have (or carries in a shape this build cannot read) is left at this
@@ -320,17 +330,17 @@ function dedupeProviders(providers: ProvidersConfig): ProvidersConfig {
 }
 
 function readProvidersConfig(candidate: unknown, fallback: ProvidersConfig): ProvidersConfig {
+  // A payload that carries no provider list at all keeps this build's own: a key
+  // it lacks is not a list the reader emptied. A list it does carry is used as
+  // it stands, even when empty — every feature can be turned off, so a config
+  // that names no provider is one this build writes.
   if (!Array.isArray(candidate)) return fallback
 
-  const providers = dedupeProviders(
+  return dedupeProviders(
     candidate
       .map((entry) => readProviderRow(entry))
       .filter((provider): provider is ProviderConfig => provider !== undefined),
   )
-
-  // Nothing left is the one case a stored config cannot hold: a fresh install
-  // ships with the keyless preset, which is what such a file gets.
-  return providers.length > 0 ? providers : fallback
 }
 
 /* ──────────────────────────────
@@ -343,7 +353,7 @@ function readProvidersConfig(candidate: unknown, fallback: ProvidersConfig): Pro
  * config can refer to.
  */
 function withUsableProvider(
-  capability: "selectionTranslation" | "customAction",
+  capability: ProviderCapability,
   providersConfig: ProvidersConfig,
 ): ProvidersConfig {
   if (getUsableProviderIdsForCapability(capability, providersConfig).length > 0) {
@@ -379,26 +389,38 @@ function assignProviderId(config: Config, path: readonly string[], providerId: s
  * The reference is re-pointed at the first usable provider rather than the
  * feature being turned off: the reader asked for translation, and the toolbar
  * and the schema both expect something to run it.
+ *
+ * The keyless preset is added only where a reference has nothing to point at.
+ * It answers a reference this build cannot resolve, not an empty provider list:
+ * a config whose reader turned every feature off may name no provider, and
+ * reading it back must leave it that way.
  */
 function repairProviderReferences(draft: Config): Config {
-  let providersConfig = draft.providersConfig
-  for (const capability of ["selectionTranslation", "customAction"] as const) {
-    providersConfig = withUsableProvider(capability, providersConfig)
-  }
+  const config: Config = { ...draft }
 
-  const config: Config = { ...draft, providersConfig }
+  /** The first provider that can run `capability`, adding the preset if none can. */
+  const getFallbackProviderId = (capability: ProviderCapability): string | undefined => {
+    let [fallbackId] = getUsableProviderIdsForCapability(capability, config.providersConfig)
+    if (fallbackId) return fallbackId
+
+    config.providersConfig = withUsableProvider(capability, config.providersConfig)
+    ;[fallbackId] = getUsableProviderIdsForCapability(capability, config.providersConfig)
+    return fallbackId
+  }
 
   for (const featureKey of FEATURE_KEYS) {
     const def = FEATURE_PROVIDER_DEFS[featureKey]
     const providerId = def.getProviderId(config)
-    // An empty provider is the reader's "off"; it is not a reference to repair.
-    if (!providerId) continue
-    const isUsable = doesProviderSupportsCapability(featureKey, providersConfig, providerId, {
+    // An empty provider is the reader's "off", and a switched-off feature keeps
+    // its provider as the memory of what to resume; `configSchema` validates
+    // neither, so there is nothing here to repair.
+    if (!providerId || !isFeatureEnabled(config, featureKey)) continue
+    const isUsable = doesProviderSupportsCapability(featureKey, config.providersConfig, providerId, {
       requireEnable: true,
     })
     if (isUsable) continue
 
-    const [fallbackId] = getUsableProviderIdsForCapability(featureKey, providersConfig)
+    const fallbackId = getFallbackProviderId(featureKey)
     if (fallbackId) assignProviderId(config, def.configPath, fallbackId)
   }
 
@@ -408,12 +430,12 @@ function repairProviderReferences(draft: Config): Config {
     const providerId = languageDetection.providerId
     const isUsable =
       providerId !== undefined &&
-      doesProviderSupportsCapability("languageDetection", providersConfig, providerId, {
+      doesProviderSupportsCapability("languageDetection", config.providersConfig, providerId, {
         requireEnable: true,
       })
 
     if (!isUsable) {
-      const [fallbackId] = getUsableProviderIdsForCapability("languageDetection", providersConfig)
+      const fallbackId = getFallbackProviderId("languageDetection")
       // Nothing promptable to detect with: the locale-based mode is the only
       // answer left, and it needs no provider at all.
       if (fallbackId) languageDetection.providerId = fallbackId
@@ -421,16 +443,20 @@ function repairProviderReferences(draft: Config): Config {
     }
   }
 
-  const assignActionProviderId = (action: { providerId: string }) => {
+  const assignActionProviderId = (action: { providerId: string; enabled?: boolean }) => {
+    // An empty or switched-off action keeps its provider as the memory of what
+    // to resume, and `configSchema` does not validate it — the reader's off.
+    if (!action.providerId || action.enabled === false) return
+
     const isUsable = doesProviderSupportsCapability(
       "customAction",
-      providersConfig,
+      config.providersConfig,
       action.providerId,
       { requireEnable: true },
     )
     if (isUsable) return
 
-    const [fallbackId] = getUsableProviderIdsForCapability("customAction", providersConfig)
+    const fallbackId = getFallbackProviderId("customAction")
     if (fallbackId) action.providerId = fallbackId
   }
 
