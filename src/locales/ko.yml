@@ -391,7 +391,6 @@ options:
   selectionToolbar:
     title: 선택 툴바
     pageDescription: 텍스트를 선택했을 때 나타날 동작과 도구 모음을 표시할 사이트를 설정하세요.
-    demoImageAlt: 선택 툴바 데모
     enable:
       title: 선택 툴바 활성화
       description: 웹 페이지에서 텍스트를 선택할 때 도구 모음을 표시하여 빠르게 번역, 읽기, AI 액션을 사용할 수 있습니다

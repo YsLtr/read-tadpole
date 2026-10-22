@@ -392,7 +392,6 @@ options:
   selectionToolbar:
     title: Selection Toolbar
     pageDescription: Set which actions appear when you select text, and where the toolbar shows up.
-    demoImageAlt: Selection toolbar demo
     enable:
       title: Enable selection toolbar
       description: Display the toolbar when selecting text on web pages for quick translation, speech, and AI actions

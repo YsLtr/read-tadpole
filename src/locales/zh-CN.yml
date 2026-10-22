@@ -392,7 +392,6 @@ options:
   selectionToolbar:
     title: 选择工具栏
     pageDescription: 设置选中文本时出现哪些操作，以及工具栏在哪些网站显示。
-    demoImageAlt: 选择工具栏演示
     enable:
       title: 启用选择工具栏
       description: 在网页上选择文本时显示工具栏，快速翻译、朗读和使用 AI 指令

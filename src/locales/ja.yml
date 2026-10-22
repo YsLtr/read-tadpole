@@ -397,7 +397,6 @@ options:
   selectionToolbar:
     title: 選択ツールバー
     pageDescription: テキストを選択したときに表示するアクションと、ツールバーを表示するサイトを設定します。
-    demoImageAlt: 選択ツールバーデモ
     enable:
       title: 選択ツールバーを有効化
       description: ウェブページでテキストを選択したときにツールバーを表示し、すばやく翻訳・読み上げ・AIアクションを実行します

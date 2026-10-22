@@ -391,7 +391,6 @@ options:
   selectionToolbar:
     title: Thanh công cụ chọn
     pageDescription: Đặt các thao tác xuất hiện khi bạn chọn văn bản và nơi hiển thị thanh công cụ.
-    demoImageAlt: Demo thanh công cụ chọn văn bản
     enable:
       title: Bật thanh công cụ chọn văn bản
       description: Hiển thị thanh công cụ khi chọn văn bản trên trang web để dịch nhanh, đọc to và dùng các hành động AI

@@ -392,7 +392,6 @@ options:
   selectionToolbar:
     title: 選取工具列
     pageDescription: 設定選取文字時出現哪些操作，以及工具列在哪些網站顯示。
-    demoImageAlt: 選取工具列示範
     enable:
       title: 啟用選取工具列
       description: 在網頁上選取文字時顯示工具列，快速翻譯、朗讀和使用 AI 指令

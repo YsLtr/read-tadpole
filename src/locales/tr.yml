@@ -391,7 +391,6 @@ options:
   selectionToolbar:
     title: Seçim Araç Çubuğu
     pageDescription: Metin seçtiğinizde hangi eylemlerin görüneceğini ve araç çubuğunun nerede çıkacağını belirleyin.
-    demoImageAlt: Seçim araç çubuğu demosu
     enable:
       title: Seçim araç çubuğunu etkinleştir
       description: Web sayfalarında metin seçtiğinizde araç çubuğunu göstererek hızlı çeviri, seslendirme ve AI eylemleri sunar

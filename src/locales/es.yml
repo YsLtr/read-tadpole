@@ -392,7 +392,6 @@ options:
   selectionToolbar:
     title: Barra de selección
     pageDescription: Define qué acciones aparecen al seleccionar texto y dónde se muestra la barra.
-    demoImageAlt: Demostración de la barra de selección
     enable:
       title: Activar barra de selección
       description: Muestra la barra de herramientas al seleccionar texto en páginas web para traducción rápida, voz y acciones AI
