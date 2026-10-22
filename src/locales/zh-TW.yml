@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: 可選
         endpointFormat: 端點格式
+        cookie: Cookie
       duplicate: 複製
       delete: 刪除
       deleteDialog:
@@ -99,10 +100,6 @@ options:
       providerInUseCannotDisable: 無法停用「$1」，因為 $2 個功能正在使用它。
       duplicateProviderName: 重複的提供者名稱「$1」
       models:
-        translate:
-          title: 翻譯模型
-          customTitle: 自訂翻譯模型
-          placeholder: 選擇一個模型
         fetchModels: 取得可用模型
         fetchError: 取得模型失敗
         clickToRetry: 點選重試
@@ -111,7 +108,6 @@ options:
         searchModels: 搜尋模型…
         noModelsFound: 找不到模型
         label: 模型
-        enterCustomModel: 輸入自訂模型名稱
       advancedOptions: 進階選項
       temperature: 溫度
       temperatureHint: 控制回應的隨機性。數值越低（如 0）越穩定，數值越高越有創造性。可用範圍依提供者而異。留空則使用提供者預設值。
@@ -125,12 +121,14 @@ options:
       headersHint: "每次請求都會附帶的自訂 HTTP 請求標頭，對所有提供者生效。{{apiKey}} 會替換為 API Key；留空則不送出。"
       providerOptions: 提供者選項
       providerOptionsHint: 用於非標準 API 功能（例如思考／推理模式）的提供者專屬選項。詳細資訊請參閱 Vercel AI SDK 文件或提供者的官方文件。
-      providerOptionsRecommendationTrigger: 檢視建議的提供者選項
-      providerOptionsRecommendationTitle: 偵測到建議的提供者選項
-      providerOptionsRecommendationDescription: 請先檢查，再手動套用建議設定。
-      providerOptionsRecommendationApply: 套用
-      providerOptionsRecommendationApplied: 已套用
       invalidJson: JSON 格式無效
+      showCookie: 顯示 Cookie
+      fetchCookie: 一鍵取得
+      cookieFetching: 取得中...
+      cookieFilled: 已填入豆包 Cookie
+      cookieNotLoggedIn: 未偵測到豆包登入狀態，已開啟登入頁；登入後再點一次「一鍵取得」
+      cookieFetchFailed: 讀取豆包 Cookie 失敗
+      cookieHint: 先在 www.doubao.com 登入，再點「一鍵取得」從本瀏覽器讀取登入 Cookie 並填入；也可手動貼上：開發者工具 → 網路 → 任一 doubao.com 請求 → 複製 Cookie 請求標頭。
     providers:
       description:
         bilibiliTranslate: Bilibili 免費 Index 模型，支援翻譯與 AI 功能，無需 API Key
@@ -139,6 +137,7 @@ options:
         deepl: 官方 DeepL API；端點可修改，也適用於代理或免費版伺服器
         googleTranslate: Google 機器翻譯，無需 API Key
         microsoftTranslate: Microsoft 機器翻譯，無需 API Key
+        doubaoTranslate: 豆包網頁翻譯介面，以瀏覽器中的豆包 Cookie 驗證，無需 API Key
     apiKey:
       showAPIKey: 顯示 API 金鑰
     testConnection:
@@ -383,7 +382,6 @@ options:
   selectionToolbar:
     title: 選取工具列
     pageDescription: 設定選取文字時出現哪些操作，以及工具列在哪些網站顯示。
-    demoImageAlt: 選取工具列示範
     enable:
       title: 啟用選取工具列
       description: 在網頁上選取文字時顯示工具列，快速翻譯、朗讀和使用 AI 指令
@@ -1048,13 +1046,6 @@ subtitles:
     needsSubtitles: 這部影片沒有字幕。
     menu:
       label: 學習
-    summary:
-      tab: AI 總結
-      generating: 正在產生總結…
-      failedTitle: 產生失敗
-      retry: 重試
-      needsModel: 請先為影片字幕選擇一個 LLM 模型，才能總結這部影片。
-      openSettings: 前往設定
     transcript:
       tab: 字幕
       failedTitle: 字幕載入失敗

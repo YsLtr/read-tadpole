@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: Opcional
         endpointFormat: Formato del endpoint
+        cookie: Cookie
       duplicate: Duplicar
       delete: Eliminar
       deleteDialog:
@@ -99,10 +100,6 @@ options:
       providerInUseCannotDisable: 'No se puede desactivar "$1" porque actualmente lo usan $2 función(es).'
       duplicateProviderName: 'Nombre de proveedor duplicado "$1"'
       models:
-        translate:
-          title: Modelo de traducción
-          customTitle: Modelo de traducción personalizado
-          placeholder: Selecciona un modelo
         fetchModels: Obtener modelos disponibles
         fetchError: No se pudieron obtener los modelos
         clickToRetry: Haz clic para reintentar
@@ -111,7 +108,6 @@ options:
         searchModels: Buscar modelos...
         noModelsFound: No se encontraron modelos
         label: Modelo
-        enterCustomModel: Introduce el nombre del modelo personalizado
       advancedOptions: Opciones avanzadas
       temperature: Temperatura
       temperatureHint: Controla la aleatoriedad en las respuestas. Los valores más bajos (0) son más deterministas; los más altos son más creativos. El rango varía según el proveedor. Déjalo vacío para usar el valor predeterminado del proveedor.
@@ -125,12 +121,14 @@ options:
       headersHint: "Encabezados HTTP adicionales enviados con cada solicitud, para todos los proveedores. {{apiKey}} se sustituye por la clave API; déjalo vacío para no enviar ninguno."
       providerOptions: Opciones del proveedor
       providerOptionsHint: Opciones específicas del proveedor para funciones API no estándar, como el modo thinking/reasoning. Consulta la documentación de Vercel AI SDK o la documentación oficial de tu proveedor para ver detalles de configuración.
-      providerOptionsRecommendationTrigger: Ver opciones recomendadas del proveedor
-      providerOptionsRecommendationTitle: Opciones recomendadas del proveedor detectadas
-      providerOptionsRecommendationDescription: Revisa y aplica manualmente la configuración recomendada.
-      providerOptionsRecommendationApply: Aplicar
-      providerOptionsRecommendationApplied: Aplicado
       invalidJson: Formato JSON no válido
+      showCookie: Mostrar cookie
+      fetchCookie: Obtener cookie
+      cookieFetching: Obteniendo...
+      cookieFilled: Cookie de Doubao capturada
+      cookieNotLoggedIn: No se encontró una sesión de Doubao. Inicia sesión en la pestaña que se acaba de abrir y pulsa «Obtener cookie» otra vez
+      cookieFetchFailed: No se pudo leer la cookie de Doubao
+      cookieHint: Inicia sesión en www.doubao.com y pulsa «Obtener cookie» para leer la cookie de sesión de este navegador y rellenarla. Para pegarla a mano, abre DevTools → Network → cualquier petición a doubao.com → copia la cabecera Cookie.
     providers:
       description:
         bilibiliTranslate: Modelo Index gratuito de Bilibili para traducción y funciones de IA, sin clave API
@@ -139,6 +137,7 @@ options:
         deepl: API oficial de DeepL; el endpoint es editable, así que también sirve un proxy o el host gratuito
         googleTranslate: Traducción automática de Google, sin clave API
         microsoftTranslate: Traducción automática de Microsoft, sin clave API
+        doubaoTranslate: Traducción web de Doubao; se autentica con la cookie de Doubao del navegador en lugar de una clave API
     apiKey:
       showAPIKey: Mostrar clave API
     testConnection:
@@ -383,7 +382,6 @@ options:
   selectionToolbar:
     title: Barra de selección
     pageDescription: Define qué acciones aparecen al seleccionar texto y dónde se muestra la barra.
-    demoImageAlt: Demostración de la barra de selección
     enable:
       title: Activar barra de selección
       description: Muestra la barra de herramientas al seleccionar texto en páginas web para traducción rápida, voz y acciones AI
@@ -1043,13 +1041,6 @@ subtitles:
     needsSubtitles: "Este video no tiene subtítulos."
     menu:
       label: Aprendizaje
-    summary:
-      tab: Resumen de IA
-      generating: Generando el resumen…
-      failedTitle: No se pudo generar
-      retry: Reintentar
-      needsModel: Elige un modelo LLM para los subtítulos y así resumir este video.
-      openSettings: Abrir ajustes
     transcript:
       tab: Subtítulos
       failedTitle: No se pudieron cargar los subtítulos

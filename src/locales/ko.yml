@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: 선택사항
         endpointFormat: 엔드포인트 형식
+        cookie: Cookie
       duplicate: 복제
       delete: 삭제
       deleteDialog:
@@ -98,10 +99,6 @@ options:
       featureWouldLoseProvider: '삭제할 수 없습니다: "$1"을(를) 실행할 수 있는 제공업체가 없어집니다.'
       duplicateProviderName: '중복된 제공업체 이름 "$1"'
       models:
-        translate:
-          title: 번역 모델
-          customTitle: 사용자 정의 번역 모델
-          placeholder: 모델을 선택하세요
         fetchModels: 사용 가능한 모델 가져오기
         fetchError: 모델을 가져오지 못했습니다
         clickToRetry: 다시 시도하려면 클릭
@@ -110,7 +107,6 @@ options:
         searchModels: 모델 검색...
         noModelsFound: 모델을 찾을 수 없습니다
         label: 모델
-        enterCustomModel: 사용자 정의 모델 이름 입력
       advancedOptions: 고급 옵션
       temperature: 온도
       temperatureHint: 응답의 무작위성을 제어합니다. 낮은 값(0)은 더 결정적이고, 높은 값은 더 창의적입니다. 범위는 제공자에 따라 다릅니다. 비워두면 제공자 기본값을 사용합니다.
@@ -124,12 +120,14 @@ options:
       headersHint: "모든 요청에 추가되는 사용자 지정 HTTP 헤더이며 모든 공급자에 적용됩니다. {{apiKey}}는 API 키로 바뀝니다. 비워두면 아무것도 보내지 않습니다."
       providerOptions: 제공자 옵션
       providerOptionsHint: 사고/추론 모드와 같은 비표준 API 기능을 위한 공급자별 옵션입니다. 자세한 내용은 Vercel AI SDK 문서 또는 공급자의 공식 문서를 참조하세요.
-      providerOptionsRecommendationTrigger: 추천 제공자 옵션 보기
-      providerOptionsRecommendationTitle: 추천 제공자 옵션이 감지되었습니다
-      providerOptionsRecommendationDescription: 추천 구성을 검토한 뒤 수동으로 적용하세요.
-      providerOptionsRecommendationApply: 적용
-      providerOptionsRecommendationApplied: 적용됨
       invalidJson: 잘못된 JSON 형식
+      showCookie: Cookie 표시
+      fetchCookie: Cookie 가져오기
+      cookieFetching: 가져오는 중...
+      cookieFilled: 더우바오 쿠키를 채웠습니다
+      cookieNotLoggedIn: 더우바오 로그인을 찾지 못했습니다. 방금 열린 탭에서 로그인한 뒤 "Cookie 가져오기"를 다시 누르세요
+      cookieFetchFailed: 더우바오 쿠키를 읽지 못했습니다
+      cookieHint: www.doubao.com에 로그인한 뒤 "Cookie 가져오기"를 누르면 이 브라우저의 로그인 쿠키를 읽어 채웁니다. 직접 붙여넣으려면 개발자 도구 → 네트워크 → 아무 doubao.com 요청 → Cookie 요청 헤더를 복사하세요.
     providers:
       description:
         bilibiliTranslate: 번역과 AI 기능을 위한 Bilibili 무료 Index 모델. API 키 불필요
@@ -138,6 +136,7 @@ options:
         deepl: DeepL 공식 API입니다. 엔드포인트를 변경할 수 있어 프록시나 무료 호스트도 사용할 수 있습니다
         googleTranslate: Google 기계 번역. API 키 불필요
         microsoftTranslate: Microsoft 기계 번역. API 키 불필요
+        doubaoTranslate: API 키 대신 브라우저의 더우바오 쿠키로 인증하는 더우바오 웹 번역
     apiKey:
       showAPIKey: API Key 표시
     testConnection:
@@ -382,7 +381,6 @@ options:
   selectionToolbar:
     title: 선택 툴바
     pageDescription: 텍스트를 선택했을 때 나타날 동작과 도구 모음을 표시할 사이트를 설정하세요.
-    demoImageAlt: 선택 툴바 데모
     enable:
       title: 선택 툴바 활성화
       description: 웹 페이지에서 텍스트를 선택할 때 도구 모음을 표시하여 빠르게 번역, 읽기, AI 액션을 사용할 수 있습니다
@@ -1038,13 +1036,6 @@ subtitles:
     needsSubtitles: 이 동영상에는 자막이 없습니다.
     menu:
       label: 학습
-    summary:
-      tab: AI 요약
-      generating: 요약을 생성하는 중…
-      failedTitle: 생성하지 못했습니다
-      retry: 다시 시도
-      needsModel: 이 동영상을 요약하려면 자막에 사용할 LLM 모델을 선택하세요.
-      openSettings: 설정 열기
     transcript:
       tab: 자막
       failedTitle: 자막을 불러오지 못했습니다

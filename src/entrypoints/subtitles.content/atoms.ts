@@ -1,5 +1,4 @@
 import type { ViewId } from "./ui/subtitles-settings-panel/views"
-import type { SectionId } from "./ui/subtitles-sidebar/sections"
 import type { SubtitlesSource } from "@/utils/constants/subtitles"
 import type { StateData, SubtitlesFragment, SubtitlesState } from "@/utils/subtitles/types"
 import { atom, createStore } from "jotai"
@@ -7,7 +6,6 @@ import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { DEFAULT_SUBTITLE_POSITION, SUBTITLES_SOURCE } from "@/utils/constants/subtitles"
 import { hasRenderableSubtitleByMode, isAwaitingTranslation } from "@/utils/subtitles/display-rules"
 import { ROOT_VIEW } from "./ui/subtitles-settings-panel/views"
-import { DEFAULT_SECTION_ID } from "./ui/subtitles-sidebar/sections"
 
 export const subtitlesStore = createStore()
 
@@ -63,10 +61,6 @@ export const subtitlesSettingsPanelOpenAtom = atom<boolean>(false)
 export const subtitlesSettingsPanelViewAtom = atom<ViewId>(ROOT_VIEW)
 
 export const subtitlesSidebarOpenAtom = atom<boolean>(false)
-
-export const videoSummaryPartialAtom = atom<string>("")
-
-export const subtitlesSidebarActiveSectionAtom = atom<SectionId>(DEFAULT_SECTION_ID)
 
 export const TranslatedDownloadPhase = {
   Idle: "idle",

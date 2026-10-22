@@ -41,8 +41,7 @@ import { getOrCreateWebPageContext } from "@/utils/host/translate/webpage-contex
 import { getOrGenerateWebPageSummary } from "@/utils/host/translate/webpage-summary"
 import { isShortcutEmpty, isValidShortcut } from "@/utils/shortcut"
 import { getTranslatePromptFromConfig } from "@/utils/prompts/translate"
-import { resolveModelId } from "@/utils/providers/model-id"
-import { getProviderOptionsWithOverride } from "@/utils/providers/options"
+import { getProviderOptions } from "@/utils/providers/options"
 import { getSelectableProvidersForCapability } from "@/utils/providers/provider-registry"
 import { shadowWrapper } from "../../main"
 import {
@@ -101,12 +100,7 @@ async function translateWithTextStream({
   registerAbortController: (abortController: AbortController) => void
 }) {
   const targetLangName = LANG_CODE_TO_EN_NAME[translateRequest.language.targetCode]
-  const modelName = resolveModelId(providerConfig.model)
-  const providerOptions = getProviderOptionsWithOverride(
-    modelName ?? "",
-    providerConfig.provider,
-    providerConfig.providerOptions,
-  )
+  const providerOptions = getProviderOptions(providerConfig, providerConfig.providerOptions)
   const temperature = providerConfig.temperature
   const abortController = new AbortController()
   registerAbortController(abortController)

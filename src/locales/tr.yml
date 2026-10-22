@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: İsteğe Bağlı
         endpointFormat: Uç nokta biçimi
+        cookie: Çerez
       duplicate: Çoğalt
       delete: Sil
       deleteDialog:
@@ -98,10 +99,6 @@ options:
       featureWouldLoseProvider: 'Silinemiyor: "$1" özelliğini çalıştırabilecek hiçbir sağlayıcı kalmayacak.'
       duplicateProviderName: 'Yinelenen sağlayıcı adı "$1"'
       models:
-        translate:
-          title: Çeviri modeli
-          customTitle: Özel çeviri modeli
-          placeholder: Bir model seçin
         fetchModels: Mevcut modelleri getir
         fetchError: Modeller getirilemedi
         clickToRetry: Yeniden denemek için tıklayın
@@ -110,7 +107,6 @@ options:
         searchModels: Model ara...
         noModelsFound: Model bulunamadı
         label: Model
-        enterCustomModel: Özel model adını girin
       advancedOptions: Gelişmiş seçenekler
       temperature: Sıcaklık
       temperatureHint: Yanıtlardaki rastgeleliği kontrol eder. Düşük değerler (0) daha belirleyici, yüksek değerler daha yaratıcıdır. Aralık sağlayıcıya göre değişir. Sağlayıcı varsayılanını kullanmak için boş bırakın.
@@ -124,12 +120,14 @@ options:
       headersHint: "Her istekte tüm sağlayıcılar için gönderilen ek HTTP başlıkları. {{apiKey}} API anahtarıyla değiştirilir; hiçbir şey göndermemek için boş bırakın."
       providerOptions: Sağlayıcı seçenekleri
       providerOptionsHint: Düşünme/akıl yürütme modu gibi standart dışı API özellikleri için sağlayıcıya özel seçenekler. Ayrıntılar için Vercel AI SDK belgelerine veya sağlayıcınızın resmi belgelerine bakın.
-      providerOptionsRecommendationTrigger: Önerilen sağlayıcı seçeneklerini görüntüle
-      providerOptionsRecommendationTitle: Önerilen sağlayıcı seçenekleri bulundu
-      providerOptionsRecommendationDescription: Önerilen yapılandırmayı gözden geçirip manuel olarak uygulayın.
-      providerOptionsRecommendationApply: Uygula
-      providerOptionsRecommendationApplied: Uygulandı
       invalidJson: Geçersiz JSON formatı
+      showCookie: Çerezi göster
+      fetchCookie: Çerezi al
+      cookieFetching: Alınıyor...
+      cookieFilled: Doubao çerezi alındı
+      cookieNotLoggedIn: Doubao oturumu bulunamadı. Açılan sekmede giriş yapıp "Çerezi al" düğmesine tekrar basın
+      cookieFetchFailed: Doubao çerezi okunamadı
+      cookieHint: www.doubao.com adresinde giriş yapın, ardından "Çerezi al" düğmesine basarak bu tarayıcıdaki oturum çerezini okuyup doldurun. Elle yapıştırmak için Geliştirici araçları → Network → herhangi bir doubao.com isteği → Cookie istek başlığını kopyalayın.
     providers:
       description:
         bilibiliTranslate: Çeviri ve yapay zekâ özellikleri için ücretsiz Bilibili Index modeli; API anahtarı gerekmez
@@ -138,6 +136,7 @@ options:
         deepl: DeepL'nin resmi API'si; uç nokta değiştirilebilir, bu yüzden proxy veya ücretsiz sunucu da çalışır
         googleTranslate: Google makine çevirisi; API anahtarı gerekmez
         microsoftTranslate: Microsoft makine çevirisi; API anahtarı gerekmez
+        doubaoTranslate: Doubao web çevirisi; API anahtarı yerine tarayıcıdaki Doubao çereziyle kimlik doğrular
     apiKey:
       showAPIKey: API anahtarını göster
     testConnection:
@@ -382,7 +381,6 @@ options:
   selectionToolbar:
     title: Seçim Araç Çubuğu
     pageDescription: Metin seçtiğinizde hangi eylemlerin görüneceğini ve araç çubuğunun nerede çıkacağını belirleyin.
-    demoImageAlt: Seçim araç çubuğu demosu
     enable:
       title: Seçim araç çubuğunu etkinleştir
       description: Web sayfalarında metin seçtiğinizde araç çubuğunu göstererek hızlı çeviri, seslendirme ve AI eylemleri sunar
@@ -1038,13 +1036,6 @@ subtitles:
     needsSubtitles: Bu videoda altyazı yok.
     menu:
       label: Öğrenme
-    summary:
-      tab: AI özeti
-      generating: Özet oluşturuluyor…
-      failedTitle: Oluşturulamadı
-      retry: Tekrar dene
-      needsModel: Bu videoyu özetlemek için altyazılara bir LLM modeli seçin.
-      openSettings: Ayarları aç
     transcript:
       tab: Altyazılar
       failedTitle: Altyazılar yüklenemedi

@@ -1,15 +1,12 @@
-import { IconX } from "@tabler/icons-react"
-import { useAtom, useSetAtom } from "jotai"
+import { IconFileText, IconX } from "@tabler/icons-react"
+import { useSetAtom } from "jotai"
 import { Button } from "@/components/ui/base-ui/button"
 import { ScrollArea } from "@/components/ui/base-ui/scroll-area"
-import { Tabs, TabsContent } from "@/components/ui/base-ui/tabs"
 import { i18n } from "@/utils/i18n"
-import { subtitlesSidebarActiveSectionAtom, subtitlesSidebarOpenAtom } from "../../atoms"
-import { SECTIONS } from "./sections"
-import { SidebarTabBar } from "./tab-bar"
+import { subtitlesSidebarOpenAtom } from "../../atoms"
+import { TranscriptSection } from "./sections/transcript"
 
 export function SidebarShell() {
-  const [activeSection, setActiveSection] = useAtom(subtitlesSidebarActiveSectionAtom)
   const setOpen = useSetAtom(subtitlesSidebarOpenAtom)
 
   return (
@@ -17,33 +14,26 @@ export function SidebarShell() {
       data-slot="subtitles-sidebar"
       className="pointer-events-auto flex h-full flex-col overflow-hidden rounded-[20px] border border-border bg-popover/90 font-light text-popover-foreground shadow-lg backdrop-blur-2xl backdrop-saturate-150"
     >
-      <Tabs value={activeSection} onValueChange={setActiveSection} className="min-h-0 flex-1 gap-0">
-        <div className="flex items-center gap-2 border-b border-border px-2">
-          <SidebarTabBar />
-          <Button
-            type="button"
-            variant="ghost-secondary"
-            size="icon-sm"
-            aria-label={i18n.t("subtitles.sidebar.close")}
-            onClick={() => setOpen(false)}
-            className="ml-auto shrink-0 rounded-full"
-          >
-            <IconX className="size-4" />
-          </Button>
+      <div className="flex items-center gap-2 border-b border-border px-2">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 px-2 text-sm font-medium">
+          <IconFileText className="size-4" />
+          {i18n.t("subtitles.sidebar.transcript.tab")}
         </div>
+        <Button
+          type="button"
+          variant="ghost-secondary"
+          size="icon-sm"
+          aria-label={i18n.t("subtitles.sidebar.close")}
+          onClick={() => setOpen(false)}
+          className="ml-auto shrink-0 rounded-full"
+        >
+          <IconX className="size-4" />
+        </Button>
+      </div>
 
-        {SECTIONS.map(({ id, component: Section }) => (
-          <TabsContent
-            key={id}
-            value={id}
-            className="min-h-0 flex-1 animate-in duration-200 ease-out fade-in-0"
-          >
-            <ScrollArea className="h-full">
-              <Section />
-            </ScrollArea>
-          </TabsContent>
-        ))}
-      </Tabs>
+      <ScrollArea className="min-h-0 flex-1">
+        <TranscriptSection />
+      </ScrollArea>
     </div>
   )
 }

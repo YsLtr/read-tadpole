@@ -26,15 +26,12 @@ import {
 } from "@/utils/subtitles/processor/translator"
 import { downloadSubtitlesAsSrt } from "@/utils/subtitles/srt"
 import { showSubtitlesErrorToast } from "@/utils/subtitles/toast"
-import { requestVideoSummary, VIDEO_SUMMARY_QUERY_SCOPE } from "@/utils/subtitles/video-summary"
-import { queryClient } from "@/utils/tanstack-query"
 import {
   adPlayingAtom,
   currentTimeMsAtom,
   currentVideoIdAtom,
   sourceTrackAtom,
   translatedTrackAtom,
-  videoSummaryPartialAtom,
   subtitlesPositionAtom,
   subtitlesSettingsPanelOpenAtom,
   subtitlesSettingsPanelViewAtom,
@@ -58,7 +55,6 @@ export interface SubtitlesProvidersAdapter {
   readonly containerShrinkRatio: ((container: HTMLElement) => number | null) | undefined
   getControlsConfig: () => ControlsConfig | undefined
   readonly supportsSidebar: boolean
-  generateVideoSummary: (config: Config, videoId?: string | null) => Promise<string | null>
   hasSubtitlesAvailable: () => Promise<boolean>
   ensureSourceTrackPublished: () => Promise<void>
   seekTo: (seconds: number) => void
@@ -81,7 +77,6 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
 
   private sourceSubtitles: SubtitlesFragment[] = []
   private sourceProcessedSubtitles: SubtitlesFragment[] = []
-  private summaryAbortController: AbortController | null = null
   private sourceVideoId: string | null = null
   private sourceCacheVersion = 0
   private navigationVideoId: string | null
@@ -167,7 +162,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     }
 
     this.clearNavigationReinitTimeout()
-    this.prepareSummaryForNavigation()
+    subtitlesStore.set(currentVideoIdAtom, null)
     this.teardownAdObserver()
     this.translatedSubtitlesDownloader?.dispose()
     this.translatedSubtitlesDownloader = null
@@ -205,40 +200,6 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     }
 
     await this.trackChangeRefreshPromise
-  }
-
-  generateVideoSummary = async (config: Config, videoId = this.config.getVideoId?.() ?? null) => {
-    // A stale query must not cancel the new video's stream or borrow its subtitles.
-    if (
-      videoId === null ||
-      videoId !== subtitlesStore.get(currentVideoIdAtom) ||
-      videoId !== (this.config.getVideoId?.() ?? null)
-    ) {
-      throw new DOMException("Video summary superseded", "AbortError")
-    }
-    this.summaryAbortController?.abort()
-    const abortController = new AbortController()
-    this.summaryAbortController = abortController
-    const { signal } = abortController
-    subtitlesStore.set(videoSummaryPartialAtom, "")
-    try {
-      await this.getOrLoadSourceSubtitles(signal)
-      signal.throwIfAborted()
-      const summary = await requestVideoSummary(this.sourceProcessedSubtitles, config, {
-        signal,
-        onChunk: (partialMarkdown) => {
-          if (!signal.aborted) {
-            subtitlesStore.set(videoSummaryPartialAtom, partialMarkdown)
-          }
-        },
-      })
-      signal.throwIfAborted()
-      return summary
-    } finally {
-      if (this.summaryAbortController === abortController) {
-        this.summaryAbortController = null
-      }
-    }
   }
 
   hasSubtitlesAvailable = () => this.fetcher.hasAvailableSubtitles()
@@ -308,22 +269,9 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     subtitlesStore.set(currentVideoIdAtom, this.navigationVideoId)
   }
 
-  private prepareSummaryForNavigation() {
-    subtitlesStore.set(currentVideoIdAtom, null)
-    this.cancelVideoSummary()
-  }
-
-  private cancelVideoSummary() {
-    this.summaryAbortController?.abort()
-    this.summaryAbortController = null
-    subtitlesStore.set(videoSummaryPartialAtom, "")
-  }
-
   private resetForNavigation() {
     this.switchOperationId++
-    this.prepareSummaryForNavigation()
-    // Keyed by video id already; this only stops them accumulating.
-    queryClient.removeQueries({ queryKey: VIDEO_SUMMARY_QUERY_SCOPE })
+    subtitlesStore.set(currentVideoIdAtom, null)
     this.clearNavigationReinitTimeout()
     this.teardownAdObserver()
     this.destroyScheduler()
@@ -433,7 +381,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
   }
 
   private clearVisibleStateForNavigation() {
-    this.prepareSummaryForNavigation()
+    subtitlesStore.set(currentVideoIdAtom, null)
     this.clearNavigationReinitTimeout()
     this.teardownAdObserver()
     this.translatedSubtitlesDownloader?.dispose()

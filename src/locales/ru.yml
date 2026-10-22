@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: Необязательно
         endpointFormat: Формат эндпоинта
+        cookie: Cookie
       duplicate: Дублировать
       delete: Удалить
       deleteDialog:
@@ -98,10 +99,6 @@ options:
       featureWouldLoseProvider: "Невозможно удалить: у функции «$1» не останется ни одного работающего провайдера."
       duplicateProviderName: 'Дублирующееся имя провайдера "$1"'
       models:
-        translate:
-          title: Модель перевода
-          customTitle: Пользовательская модель перевода
-          placeholder: Выберите модель
         fetchModels: Получить доступные модели
         fetchError: Не удалось получить модели
         clickToRetry: Нажмите для повтора
@@ -110,7 +107,6 @@ options:
         searchModels: Поиск моделей...
         noModelsFound: Модели не найдены
         label: Модель
-        enterCustomModel: Введите название пользовательской модели
       advancedOptions: Расширенные настройки
       temperature: Температура
       temperatureHint: Контролирует случайность ответов. Низкие значения (0) более детерминированы, высокие — более креативны. Диапазон зависит от провайдера. Оставьте пустым для использования значения по умолчанию.
@@ -124,12 +120,14 @@ options:
       headersHint: "Дополнительные HTTP-заголовки для каждого запроса, для всех провайдеров. {{apiKey}} заменяется на API-ключ; оставьте пустым, чтобы ничего не отправлять."
       providerOptions: Параметры провайдера
       providerOptionsHint: Специфические параметры провайдера для нестандартных функций API, таких как режим размышления/рассуждения. Подробнее см. документацию Vercel AI SDK или официальную документацию вашего провайдера.
-      providerOptionsRecommendationTrigger: Показать рекомендуемые параметры провайдера
-      providerOptionsRecommendationTitle: Обнаружены рекомендуемые параметры провайдера
-      providerOptionsRecommendationDescription: Проверьте рекомендованную конфигурацию и примените её вручную.
-      providerOptionsRecommendationApply: Применить
-      providerOptionsRecommendationApplied: Применено
       invalidJson: Неверный формат JSON
+      showCookie: Показать cookie
+      fetchCookie: Получить cookie
+      cookieFetching: Получение...
+      cookieFilled: Cookie Doubao получен
+      cookieNotLoggedIn: Вход в Doubao не найден. Войдите во вкладке, которая только что открылась, и снова нажмите «Получить cookie»
+      cookieFetchFailed: Не удалось прочитать cookie Doubao
+      cookieHint: Войдите на www.doubao.com, затем нажмите «Получить cookie», чтобы прочитать cookie входа из этого браузера и подставить его. Чтобы вставить вручную, откройте DevTools → Network → любой запрос к doubao.com → скопируйте заголовок Cookie.
     providers:
       description:
         bilibiliTranslate: Бесплатная модель Bilibili Index для перевода и функций ИИ, без API-ключа
@@ -138,6 +136,7 @@ options:
         deepl: "Официальный API DeepL; эндпоинт можно изменить, поэтому подойдёт и прокси, или бесплатный хост"
         googleTranslate: Машинный перевод Google, без API-ключа
         microsoftTranslate: Машинный перевод Microsoft, без API-ключа
+        doubaoTranslate: Веб-перевод Doubao; вход по cookie Doubao из браузера вместо API-ключа
     apiKey:
       showAPIKey: Показать API-ключ
     testConnection:
@@ -382,7 +381,6 @@ options:
   selectionToolbar:
     title: Панель выделения
     pageDescription: Укажите, какие действия появляются при выделении текста и где показывать панель.
-    demoImageAlt: Демо панели выделения
     enable:
       title: Включить панель выделения
       description: Показывать панель при выделении текста на веб-страницах для быстрого перевода, озвучивания и AI-действий
@@ -1038,13 +1036,6 @@ subtitles:
     needsSubtitles: У этого видео нет субтитров.
     menu:
       label: Обучение
-    summary:
-      tab: Сводка ИИ
-      generating: Создаём сводку…
-      failedTitle: Не удалось создать
-      retry: Повторить
-      needsModel: Выберите LLM-модель для субтитров, чтобы получить сводку этого видео.
-      openSettings: Открыть настройки
     transcript:
       tab: Субтитры
       failedTitle: Не удалось загрузить субтитры

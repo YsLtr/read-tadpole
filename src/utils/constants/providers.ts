@@ -15,6 +15,7 @@ import { DEFAULT_BUILT_IN_ACTION_PROVIDER_ID } from "@/types/config/selection-to
 import {
   DEEPL_OFFICIAL_ENDPOINT,
   DEEPLX_DEFAULT_ENDPOINT,
+  DOUBAO_TRANSLATE_ENDPOINT,
   GOOGLE_TRANSLATE_HTML_URL,
   MICROSOFT_TRANSLATE_URL,
 } from "@/utils/constants/provider-endpoints"
@@ -37,6 +38,15 @@ export const DEFAULT_LLM_PROVIDER_MODELS: LLMProviderModels = {
 }
 
 export const BILIBILI_PRESET_LOGO = "https://www.bilibili.com/favicon.ico"
+
+/**
+ * Doubao's own 128px favicon: the largest of the three marks its CDN serves, so
+ * it still resolves crisply at the largest icon size on a 3x display. The other
+ * two are the same artwork at 80 and 76px. Its own host also beats a third-party
+ * icon CDN for the audience this provider serves.
+ */
+export const DOUBAO_PROVIDER_LOGO =
+  "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/favicon/128x128.png"
 
 export const PROVIDER_ITEMS: Record<
   AllProviderTypes,
@@ -64,6 +74,10 @@ export const PROVIDER_ITEMS: Record<
   "microsoft-translate": {
     logo: getLobeIconsCDNUrlFn("microsoft-color"),
     name: NON_API_TRANSLATE_PROVIDERS_MAP["microsoft-translate"],
+  },
+  "doubao-translate": {
+    logo: () => DOUBAO_PROVIDER_LOGO,
+    name: "Doubao Translate",
   },
 }
 
@@ -103,6 +117,14 @@ export const DEFAULT_PROVIDER_CONFIG = {
     name: PROVIDER_ITEMS["microsoft-translate"].name,
     enabled: true,
     provider: "microsoft-translate",
+  },
+  "doubao-translate": {
+    id: "doubao-translate-default",
+    name: PROVIDER_ITEMS["doubao-translate"].name,
+    enabled: true,
+    provider: "doubao-translate",
+    baseURL: DOUBAO_TRANSLATE_ENDPOINT,
+    cookie: "",
   },
 } as const satisfies Record<AllProviderTypes, ProviderConfig>
 
@@ -202,6 +224,13 @@ export const PROVIDER_PRESETS: readonly ProviderPreset[] = [
     config: DEFAULT_PROVIDER_CONFIG["microsoft-translate"],
     description: () => getDefaultProviderDescription("microsoft-translate"),
   },
+  {
+    id: "doubao-translate",
+    name: PROVIDER_ITEMS["doubao-translate"].name,
+    logo: PROVIDER_ITEMS["doubao-translate"].logo,
+    config: DEFAULT_PROVIDER_CONFIG["doubao-translate"],
+    description: () => getDefaultProviderDescription("doubao-translate"),
+  },
 ]
 
 /**
@@ -220,6 +249,7 @@ export const PROVIDER_URL_PLACEHOLDERS: Partial<Record<APIProviderTypes, string>
   deepl: DEFAULT_PROVIDER_CONFIG.deepl.baseURL,
   "google-translate": GOOGLE_TRANSLATE_HTML_URL,
   "microsoft-translate": MICROSOFT_TRANSLATE_URL,
+  "doubao-translate": DOUBAO_TRANSLATE_ENDPOINT,
 }
 
 export const DEFAULT_PROVIDER_CONFIG_LIST: ProvidersConfig = [BILIBILI_PRESET_PROVIDER_CONFIG]

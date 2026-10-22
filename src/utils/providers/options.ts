@@ -1,37 +1,13 @@
 import type { JSONValue } from "ai"
-import { isOpenAICompatibleLLMProvider } from "@/types/config/provider"
-import { LLM_MODEL_OPTIONS } from "../constants/models"
-
-export interface RecommendedProviderOptionsMatch {
-  matchIndex: number
-  options: Record<string, JSONValue>
-}
+import type { LLMProviderConfig } from "@/types/config/provider"
+import { isOpenAICompatibleLLMProvider, isResponsesEndpointFormat } from "@/types/config/provider"
 
 const OPENAI_COMPATIBLE_OPTION_ALIASES = {
   reasoning_effort: "reasoningEffort",
   verbosity: "textVerbosity",
 } as const satisfies Record<string, string>
 
-const REASONING_PROVIDER_OPTION_KEYS = new Set([
-  "effort",
-  "enableThinking",
-  "reasoningEffort",
-  "reasoningHistory",
-  "thinking",
-  "thinkingConfig",
-])
-
-/**
- * Whether a set of options does nothing but choose how much the model thinks. A
- * model with a saved 思考程度 must not also be pinned by the recommended options —
- * the picker would silently lose to them.
- */
-function containsOnlyReasoningProviderOptions(options: Record<string, JSONValue>): boolean {
-  return (
-    Object.keys(options).length > 0 &&
-    Object.keys(options).every((key) => REASONING_PROVIDER_OPTION_KEYS.has(key))
-  )
-}
+type ProviderOptionsOwner = Pick<LLMProviderConfig, "provider" | "endpointFormat">
 
 function normalizeUserProviderOptions(
   provider: string,
@@ -61,69 +37,38 @@ function normalizeUserProviderOptions(
 }
 
 /**
- * Detect the recommended provider options for a given model.
- * First match wins - more specific patterns should be placed first in MODEL_OPTIONS.
+ * The key the model we build reads its options from. The Chat Completions client
+ * accepts the provider name it was created with or the camelCase form of it — but
+ * flags the former as deprecated — while the Responses client is hard-coded to
+ * `openai` (`azure` when its name says so), so anything filed under the custom
+ * provider's own name is silently dropped there.
  */
-export function getRecommendedProviderOptionsMatch(
-  model: string,
-): RecommendedProviderOptionsMatch | undefined {
-  for (const [matchIndex, { pattern, options }] of LLM_MODEL_OPTIONS.entries()) {
-    if (pattern.test(model)) {
-      return { matchIndex, options }
-    }
+function getProviderOptionsKey(owner: ProviderOptionsOwner): string {
+  if (isResponsesEndpointFormat(owner.endpointFormat)) {
+    return "openai"
   }
-  return undefined
+
+  const name = owner.provider.split(".")[0]!.trim()
+  return name.replace(/[-_]([a-z])/g, (_match, letter: string) => letter.toUpperCase())
 }
 
 /**
- * Get the recommended provider options payload without wrapping it by provider id.
- */
-export function getRecommendedProviderOptions(
-  model: string,
-): Record<string, JSONValue> | undefined {
-  return getRecommendedProviderOptionsMatch(model)?.options
-}
-
-/**
- * Wrap a recommendation for the AI SDK request shape.
+ * Wrap the reader's provider options for the AI SDK request shape.
+ *
+ * Nothing is recommended on top: a custom endpoint's model id says nothing about
+ * which vendor-specific extras that endpoint accepts, so only what the reader
+ * typed is sent. `undefined` means "say nothing", which keeps the provider's own
+ * default.
  */
 export function getProviderOptions(
-  model: string,
-  provider: string,
-): Record<string, Record<string, JSONValue>> {
-  const options = getRecommendedProviderOptions(model)
-  if (!options) {
-    return {}
-  }
-
-  return { [provider]: options }
-}
-
-/**
- * Get provider options for AI SDK calls.
- * - If the user has saved provider options (including `{}`), use them as-is.
- * - Otherwise fall back to the recommended defaults for the current model.
- */
-export function getProviderOptionsWithOverride(
-  model: string,
-  provider: string,
+  owner: ProviderOptionsOwner,
   userOptions?: Record<string, JSONValue>,
-  reasoning?: string,
 ): Record<string, Record<string, JSONValue>> | undefined {
-  if (userOptions !== undefined) {
-    return { [provider]: normalizeUserProviderOptions(provider, userOptions) }
-  }
-
-  const recommendedOptions = getRecommendedProviderOptions(model)
-  if (!recommendedOptions) {
+  if (userOptions === undefined) {
     return undefined
   }
 
-  // The picker already said how much thinking to do; a recommended
-  // `reasoningEffort`/`thinking` would override it.
-  if (reasoning !== undefined && containsOnlyReasoningProviderOptions(recommendedOptions)) {
-    return undefined
+  return {
+    [getProviderOptionsKey(owner)]: normalizeUserProviderOptions(owner.provider, userOptions),
   }
-
-  return { [provider]: recommendedOptions }
 }

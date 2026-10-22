@@ -73,6 +73,14 @@ export const providerConfigSchemaList = [
   baseAPIProviderConfigSchema.extend({
     provider: z.literal("microsoft-translate"),
   }),
+  // Doubao authenticates with a logged-in Cookie instead of a key. It is stored
+  // in its own field rather than in `headers`, because the browser refuses to
+  // send a hand-set `Cookie` header and the adapter has to route it through a
+  // declarativeNetRequest rule.
+  baseAPIProviderConfigSchema.extend({
+    provider: z.literal("doubao-translate"),
+    cookie: z.string().optional(),
+  }),
 ] as const
 
 export const llmProviderConfigItemSchema = z.discriminatedUnion(

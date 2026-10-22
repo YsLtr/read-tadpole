@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: Optional
         endpointFormat: Endpoint format
+        cookie: Cookie
       duplicate: Duplicate
       delete: Delete
       deleteDialog:
@@ -99,10 +100,6 @@ options:
       providerInUseCannotDisable: 'Cannot disable "$1" because it is currently used by $2 feature(s).'
       duplicateProviderName: 'Duplicate provider name "$1"'
       models:
-        translate:
-          title: Translate model
-          customTitle: Translate custom model
-          placeholder: Select a model
         fetchModels: Fetch available models
         fetchError: Failed to fetch models
         clickToRetry: Click to retry
@@ -111,7 +108,6 @@ options:
         searchModels: Search models...
         noModelsFound: No models found
         label: Model
-        enterCustomModel: Enter the name of the custom model
       advancedOptions: Advanced options
       temperature: Temperature
       temperatureHint: Controls randomness in responses. Lower values (0) are more deterministic, higher values are more creative. Range varies by provider. Leave empty to use provider default.
@@ -125,12 +121,14 @@ options:
       headersHint: "Extra HTTP headers sent with every request, for every provider. {{apiKey}} is replaced by the API key; leave empty to send none."
       providerOptions: Provider options
       providerOptionsHint: Provider-specific options for non-standard API features like thinking/reasoning mode. See the Vercel AI SDK docs or your provider's official documentation for configuration details.
-      providerOptionsRecommendationTrigger: View recommended provider options
-      providerOptionsRecommendationTitle: Recommended provider options detected
-      providerOptionsRecommendationDescription: Review and manually apply the recommended configuration.
-      providerOptionsRecommendationApply: Apply
-      providerOptionsRecommendationApplied: Applied
       invalidJson: Invalid JSON format
+      showCookie: Show cookie
+      fetchCookie: Get cookie
+      cookieFetching: Getting...
+      cookieFilled: Doubao cookie captured
+      cookieNotLoggedIn: No Doubao login found — sign in in the tab that just opened, then press "Get cookie" again
+      cookieFetchFailed: Could not read the Doubao cookie
+      cookieHint: Log in at www.doubao.com, then press "Get cookie" to read the login cookie from this browser and fill it in. To paste it by hand, open DevTools → Network → any doubao.com request → copy the Cookie request header.
     providers:
       description:
         bilibiliTranslate: Free Bilibili Index model for translation and AI features; no API key required
@@ -139,6 +137,7 @@ options:
         deepl: DeepL's own API; the endpoint is editable, so a proxy or DeepL's free host also works
         googleTranslate: Google machine translation; no API key required
         microsoftTranslate: Microsoft machine translation; no API key required
+        doubaoTranslate: Doubao web translation; authenticate with your browser's Doubao cookie instead of an API key
     apiKey:
       showAPIKey: Show API key
     testConnection:
@@ -383,7 +382,6 @@ options:
   selectionToolbar:
     title: Selection Toolbar
     pageDescription: Set which actions appear when you select text, and where the toolbar shows up.
-    demoImageAlt: Selection toolbar demo
     enable:
       title: Enable selection toolbar
       description: Display the toolbar when selecting text on web pages for quick translation, speech, and AI actions
@@ -1048,13 +1046,6 @@ subtitles:
     needsSubtitles: This video has no subtitles.
     menu:
       label: Learning
-    summary:
-      tab: AI summary
-      generating: Generating the summary…
-      failedTitle: Could not generate
-      retry: Try again
-      needsModel: Pick an LLM model for video subtitles to summarize this video.
-      openSettings: Open settings
     transcript:
       tab: Subtitles
       failedTitle: Could not load subtitles

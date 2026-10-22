@@ -7,6 +7,7 @@ import { isLLMProviderConfig } from "@/types/config/provider"
 import { aiTranslate } from "./api/ai"
 import { deeplTranslate } from "./api/deepl"
 import { deeplxTranslate } from "./api/deeplx"
+import { doubaoTranslate } from "./api/doubao"
 import { googleTranslate } from "./api/google"
 import { microsoftTranslate } from "./api/microsoft"
 import { prepareTranslationText } from "./text-preparation"
@@ -77,6 +78,17 @@ export async function executeTranslate<TContext>(
       provider === "deeplx"
         ? await deeplxTranslate(preparedText, sourceLang, targetLang, providerConfig, requestOptions)
         : await deeplTranslate(preparedText, sourceLang, targetLang, providerConfig, requestOptions)
+  } else if (provider === "doubao-translate") {
+    // ISO 639-1 has no separate code for Traditional Chinese, so the 6393-T
+    // variant names itself in the form the endpoint accepts.
+    const targetLang =
+      langConfig.targetCode === "cmn-Hant" ? "zh-Hant" : ISO6393_TO_6391[langConfig.targetCode]
+    if (!targetLang) {
+      throw new Error(`Invalid target language code: ${langConfig.targetCode}`)
+    }
+    translatedText = await doubaoTranslate(preparedText, targetLang, providerConfig, {
+      signal: options?.signal,
+    })
   } else if (isLLMProviderConfig(providerConfig)) {
     const targetLangName = LANG_CODE_TO_EN_NAME[langConfig.targetCode]
     translatedText = await aiTranslate(

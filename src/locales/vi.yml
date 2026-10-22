@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: Tùy chọn
         endpointFormat: Định dạng điểm cuối
+        cookie: Cookie
       duplicate: Sao chép
       delete: Xóa
       deleteDialog:
@@ -98,10 +99,6 @@ options:
       featureWouldLoseProvider: 'Không thể xóa: "$1" sẽ không còn nhà cung cấp nào có thể chạy được.'
       duplicateProviderName: 'Tên nhà cung cấp trùng lặp "$1"'
       models:
-        translate:
-          title: Mô hình dịch
-          customTitle: Mô hình dịch tùy chỉnh
-          placeholder: Chọn mô hình
         fetchModels: Lấy các mô hình có sẵn
         fetchError: Không thể lấy mô hình
         clickToRetry: Nhấp để thử lại
@@ -110,7 +107,6 @@ options:
         searchModels: Tìm kiếm mô hình...
         noModelsFound: Không tìm thấy mô hình
         label: Mô hình
-        enterCustomModel: Nhập tên mô hình tùy chỉnh
       advancedOptions: Tùy chọn nâng cao
       temperature: Nhiệt độ
       temperatureHint: Kiểm soát tính ngẫu nhiên trong phản hồi. Giá trị thấp (0) mang tính xác định hơn, giá trị cao mang tính sáng tạo hơn. Phạm vi thay đổi theo nhà cung cấp. Để trống để sử dụng giá trị mặc định của nhà cung cấp.
@@ -124,12 +120,14 @@ options:
       headersHint: "Header HTTP bổ sung cho mọi yêu cầu, áp dụng cho mọi nhà cung cấp. {{apiKey}} được thay bằng khóa API; để trống nếu không muốn gửi."
       providerOptions: Tùy chọn nhà cung cấp
       providerOptionsHint: Các tùy chọn dành riêng cho nhà cung cấp cho các tính năng API không chuẩn như chế độ suy nghĩ/lập luận. Xem tài liệu Vercel AI SDK hoặc tài liệu chính thức của nhà cung cấp để biết chi tiết cấu hình.
-      providerOptionsRecommendationTrigger: Xem tùy chọn nhà cung cấp được đề xuất
-      providerOptionsRecommendationTitle: Đã phát hiện tùy chọn nhà cung cấp được đề xuất
-      providerOptionsRecommendationDescription: Hãy xem lại và tự áp dụng cấu hình được đề xuất.
-      providerOptionsRecommendationApply: Áp dụng
-      providerOptionsRecommendationApplied: Đã áp dụng
       invalidJson: Định dạng JSON không hợp lệ
+      showCookie: Hiển thị cookie
+      fetchCookie: Lấy cookie
+      cookieFetching: Đang lấy...
+      cookieFilled: Đã điền cookie Doubao
+      cookieNotLoggedIn: Không thấy trạng thái đăng nhập Doubao. Hãy đăng nhập ở thẻ vừa mở rồi nhấn "Lấy cookie" lần nữa
+      cookieFetchFailed: Không đọc được cookie Doubao
+      cookieHint: Đăng nhập tại www.doubao.com rồi nhấn "Lấy cookie" để đọc cookie đăng nhập từ trình duyệt này và điền vào. Để dán thủ công, mở DevTools → Network → một yêu cầu bất kỳ tới doubao.com → sao chép header Cookie.
     providers:
       description:
         bilibiliTranslate: Mô hình Index miễn phí của Bilibili cho dịch và các tính năng AI, không cần khóa API
@@ -138,6 +136,7 @@ options:
         deepl: API chính thức của DeepL; có thể sửa điểm cuối nên proxy hay máy chủ miễn phí cũng dùng được
         googleTranslate: Dịch máy Google, không cần khóa API
         microsoftTranslate: Dịch máy Microsoft, không cần khóa API
+        doubaoTranslate: Dịch web Doubao; xác thực bằng cookie Doubao của trình duyệt thay vì khóa API
     apiKey:
       showAPIKey: Hiển thị API Key
     testConnection:
@@ -382,7 +381,6 @@ options:
   selectionToolbar:
     title: Thanh công cụ chọn
     pageDescription: Đặt các thao tác xuất hiện khi bạn chọn văn bản và nơi hiển thị thanh công cụ.
-    demoImageAlt: Demo thanh công cụ chọn văn bản
     enable:
       title: Bật thanh công cụ chọn văn bản
       description: Hiển thị thanh công cụ khi chọn văn bản trên trang web để dịch nhanh, đọc to và dùng các hành động AI
@@ -1038,13 +1036,6 @@ subtitles:
     needsSubtitles: Video này không có phụ đề.
     menu:
       label: Học tập
-    summary:
-      tab: Tóm tắt AI
-      generating: Đang tạo bản tóm tắt…
-      failedTitle: Không tạo được
-      retry: Thử lại
-      needsModel: Hãy chọn một mô hình LLM cho phụ đề để tóm tắt video này.
-      openSettings: Mở cài đặt
     transcript:
       tab: Phụ đề
       failedTitle: Không tải được phụ đề

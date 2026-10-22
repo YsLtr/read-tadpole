@@ -4,8 +4,6 @@ import { useCallback } from "react"
 import { HelpTooltip } from "@/components/help-tooltip"
 import { isLLMProviderConfig } from "@/types/config/provider"
 import { i18n } from "@/utils/i18n"
-import { resolveModelId } from "@/utils/providers/model-id"
-import { getRecommendedProviderOptions } from "@/utils/providers/options"
 import { AutosavedJsonCodeEditorField } from "./components/autosaved-json-code-editor-field"
 import { withForm } from "./form"
 
@@ -43,14 +41,6 @@ export const ProviderOptionsField = withForm({
       return null
     }
 
-    const modelId = resolveModelId(providerConfig.model)
-    const placeholderText = (() => {
-      const recommendedOptions = getRecommendedProviderOptions(modelId ?? "")
-      return recommendedOptions
-        ? JSON.stringify(recommendedOptions, null, 2)
-        : JSON.stringify({ field: "value" }, null, 2)
-    })()
-
     return (
       <AutosavedJsonCodeEditorField
         value={providerConfig.providerOptions}
@@ -59,7 +49,7 @@ export const ProviderOptionsField = withForm({
         serialize={toJson}
         onCommit={handleProviderOptionsCommit}
         editorAriaLabel="provider-options-editor"
-        placeholder={placeholderText}
+        placeholder={JSON.stringify({ field: "value", forceReasoning: true }, null, 2)}
         label={
           <div className="flex items-center gap-1.5">
             <span>{i18n.t("options.apiProviders.form.providerOptions")}</span>

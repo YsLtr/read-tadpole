@@ -93,6 +93,7 @@ options:
         baseURL: ベースURL
         optional: オプション
         endpointFormat: エンドポイント形式
+        cookie: Cookie
       duplicate: 複製
       delete: 削除
       deleteDialog:
@@ -104,10 +105,6 @@ options:
       featureWouldLoseProvider: "削除できません:「$1」を実行できるプロバイダーがなくなります。"
       duplicateProviderName: '重複するプロバイダー名 "$1"'
       models:
-        translate:
-          title: 翻訳モデル
-          customTitle: カスタム翻訳モデル
-          placeholder: モデルを選択してください
         fetchModels: 利用可能なモデルを取得
         fetchError: モデルの取得に失敗しました
         clickToRetry: クリックして再試行
@@ -116,7 +113,6 @@ options:
         searchModels: モデルを検索...
         noModelsFound: モデルが見つかりません
         label: モデル
-        enterCustomModel: カスタムモデル名を入力
       advancedOptions: 詳細オプション
       temperature: 温度
       temperatureHint: 応答のランダム性を制御します。低い値（0）はより決定的で、高い値はより創造的です。範囲はプロバイダーによって異なります。空欄の場合はプロバイダーのデフォルト値を使用します。
@@ -130,12 +126,14 @@ options:
       headersHint: "すべてのリクエストに付与するカスタム HTTP ヘッダーです。すべてのプロバイダーに適用されます。{{apiKey}} は API キーに置き換わります。空欄の場合は何も送信しません。"
       providerOptions: プロバイダーオプション
       providerOptionsHint: 思考/推論モードなどの非標準API機能のためのプロバイダー固有オプション。詳細はVercel AI SDKドキュメントまたはプロバイダーの公式ドキュメントをご覧ください。
-      providerOptionsRecommendationTrigger: 推奨プロバイダーオプションを表示
-      providerOptionsRecommendationTitle: 推奨プロバイダーオプションが見つかりました
-      providerOptionsRecommendationDescription: 推奨設定を確認し、手動で適用してください。
-      providerOptionsRecommendationApply: 適用
-      providerOptionsRecommendationApplied: 適用済み
       invalidJson: 無効なJSON形式
+      showCookie: Cookie を表示
+      fetchCookie: Cookie を取得
+      cookieFetching: 取得中...
+      cookieFilled: 豆包の Cookie を取り込みました
+      cookieNotLoggedIn: 豆包へのログインが見つかりません。開いたタブでログインしてから、もう一度「Cookie を取得」を押してください
+      cookieFetchFailed: 豆包の Cookie を読み取れませんでした
+      cookieHint: www.doubao.com にログインしてから「Cookie を取得」を押すと、このブラウザのログイン Cookie を読み取って入力します。手動で貼り付ける場合は、開発者ツール → Network → 任意の doubao.com リクエスト → Cookie リクエストヘッダーをコピーしてください。
     providers:
       description:
         bilibiliTranslate: 翻訳と AI 機能に使える Bilibili の無料 Index モデル。API キー不要
@@ -144,6 +142,7 @@ options:
         deepl: DeepL 公式 API。エンドポイントは変更できるため、プロキシや無料版のホストも使えます
         googleTranslate: Google 機械翻訳。API キー不要
         microsoftTranslate: Microsoft 機械翻訳。API キー不要
+        doubaoTranslate: 豆包のウェブ翻訳。API キーの代わりにブラウザの豆包 Cookie で認証します
     apiKey:
       showAPIKey: APIキーを表示
     testConnection:
@@ -388,7 +387,6 @@ options:
   selectionToolbar:
     title: 選択ツールバー
     pageDescription: テキストを選択したときに表示するアクションと、ツールバーを表示するサイトを設定します。
-    demoImageAlt: 選択ツールバーデモ
     enable:
       title: 選択ツールバーを有効化
       description: ウェブページでテキストを選択したときにツールバーを表示し、すばやく翻訳・読み上げ・AIアクションを実行します
@@ -1044,13 +1042,6 @@ subtitles:
     needsSubtitles: この動画には字幕がありません。
     menu:
       label: 学習
-    summary:
-      tab: AI 要約
-      generating: 要約を生成しています…
-      failedTitle: 生成できませんでした
-      retry: 再試行
-      needsModel: この動画を要約するには、字幕用の LLM モデルを選んでください。
-      openSettings: 設定を開く
     transcript:
       tab: 字幕
       failedTitle: 字幕を読み込めませんでした
