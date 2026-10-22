@@ -39,6 +39,15 @@ export const DEFAULT_LLM_PROVIDER_MODELS: LLMProviderModels = {
 
 export const BILIBILI_PRESET_LOGO = "https://www.bilibili.com/favicon.ico"
 
+/**
+ * Doubao's own 128px favicon: the largest of the three marks its CDN serves, so
+ * it still resolves crisply at the largest icon size on a 3x display. The other
+ * two are the same artwork at 80 and 76px. Its own host also beats a third-party
+ * icon CDN for the audience this provider serves.
+ */
+export const DOUBAO_PROVIDER_LOGO =
+  "https://lf-flow-web-cdn.doubao.com/obj/flow-doubao/favicon/128x128.png"
+
 export const PROVIDER_ITEMS: Record<
   AllProviderTypes,
   {
@@ -67,9 +76,7 @@ export const PROVIDER_ITEMS: Record<
     name: NON_API_TRANSLATE_PROVIDERS_MAP["microsoft-translate"],
   },
   "doubao-translate": {
-    // Same brand-mark source as the other vendor translators: doubao.com's own
-    // /favicon.ico answers with the SPA shell, so it cannot be an <img> src.
-    logo: getLobeIconsCDNUrlFn("doubao-color"),
+    logo: () => DOUBAO_PROVIDER_LOGO,
     name: "Doubao Translate",
   },
 }
