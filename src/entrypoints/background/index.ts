@@ -27,7 +27,6 @@ import { proxyFetch } from "./proxy-fetch"
 import { setupSubtitlesTranslationHandlers } from "./subtitles-translation"
 import { translationMessage } from "./translation-signal"
 import { setupTTSPlaybackMessageHandlers } from "./tts-playback"
-import { setupVideoSummaryHandlers } from "./video-summary"
 
 export default defineBackground({
   type: "module",
@@ -94,11 +93,10 @@ export default defineBackground({
     // Initialize action icons asynchronously
     void initializeActionIcons()
 
-    // Synchronous: all translation and summary handlers register in the first turn of
-    // the SW so wake-triggering messages are never dropped during init.
+    // Synchronous: all translation handlers register in the first turn of the SW
+    // so wake-triggering messages are never dropped during init.
     setupPageTranslationHandlers()
     setupSubtitlesTranslationHandlers()
-    setupVideoSummaryHandlers()
     void setUpDatabaseCleanup()
     setUpConfigBackup()
 

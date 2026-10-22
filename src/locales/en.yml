@@ -1046,13 +1046,6 @@ subtitles:
     needsSubtitles: This video has no subtitles.
     menu:
       label: Learning
-    summary:
-      tab: AI summary
-      generating: Generating the summary…
-      failedTitle: Could not generate
-      retry: Try again
-      needsModel: Pick an LLM model for video subtitles to summarize this video.
-      openSettings: Open settings
     transcript:
       tab: Subtitles
       failedTitle: Could not load subtitles

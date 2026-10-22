@@ -1036,13 +1036,6 @@ subtitles:
     needsSubtitles: У этого видео нет субтитров.
     menu:
       label: Обучение
-    summary:
-      tab: Сводка ИИ
-      generating: Создаём сводку…
-      failedTitle: Не удалось создать
-      retry: Повторить
-      needsModel: Выберите LLM-модель для субтитров, чтобы получить сводку этого видео.
-      openSettings: Открыть настройки
     transcript:
       tab: Субтитры
       failedTitle: Не удалось загрузить субтитры

@@ -12,9 +12,9 @@ const MAX_TITLE_LENGTH = 200
 /**
  * Generate a brief summary of article content for translation context.
  *
- * `generateTextForProviderRef` runs the call on the user's own provider. The
- * same function serves the page summary and the video summary, which is why the
- * feature is a parameter rather than a constant.
+ * The summary is prompt context, not something a reader sees: page translation
+ * and subtitle translation both call it through
+ * `getOrGenerateTranslationContextSummary`.
  */
 export async function generateArticleSummary(
   title: string,

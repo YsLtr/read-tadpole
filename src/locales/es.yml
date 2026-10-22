@@ -1041,13 +1041,6 @@ subtitles:
     needsSubtitles: "Este video no tiene subtítulos."
     menu:
       label: Aprendizaje
-    summary:
-      tab: Resumen de IA
-      generating: Generando el resumen…
-      failedTitle: No se pudo generar
-      retry: Reintentar
-      needsModel: Elige un modelo LLM para los subtítulos y así resumir este video.
-      openSettings: Abrir ajustes
     transcript:
       tab: Subtítulos
       failedTitle: No se pudieron cargar los subtítulos

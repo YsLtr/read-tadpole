@@ -1046,13 +1046,6 @@ subtitles:
     needsSubtitles: 当前视频没有字幕。
     menu:
       label: 学习
-    summary:
-      tab: AI 总结
-      generating: 正在生成总结…
-      failedTitle: 生成失败
-      retry: 重试
-      needsModel: 请先为视频字幕选择一个 LLM 模型，才能总结这个视频。
-      openSettings: 去设置
     transcript:
       tab: 字幕
       failedTitle: 字幕加载失败

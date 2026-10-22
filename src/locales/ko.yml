@@ -1036,13 +1036,6 @@ subtitles:
     needsSubtitles: 이 동영상에는 자막이 없습니다.
     menu:
       label: 학습
-    summary:
-      tab: AI 요약
-      generating: 요약을 생성하는 중…
-      failedTitle: 생성하지 못했습니다
-      retry: 다시 시도
-      needsModel: 이 동영상을 요약하려면 자막에 사용할 LLM 모델을 선택하세요.
-      openSettings: 설정 열기
     transcript:
       tab: 자막
       failedTitle: 자막을 불러오지 못했습니다

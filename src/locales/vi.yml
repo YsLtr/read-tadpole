@@ -1036,13 +1036,6 @@ subtitles:
     needsSubtitles: Video này không có phụ đề.
     menu:
       label: Học tập
-    summary:
-      tab: Tóm tắt AI
-      generating: Đang tạo bản tóm tắt…
-      failedTitle: Không tạo được
-      retry: Thử lại
-      needsModel: Hãy chọn một mô hình LLM cho phụ đề để tóm tắt video này.
-      openSettings: Mở cài đặt
     transcript:
       tab: Phụ đề
       failedTitle: Không tải được phụ đề

@@ -97,17 +97,6 @@ interface ProtocolMap {
     subtitlesContext: string
     providerRef: PromptableProviderRef
   }) => Promise<string | null>
-  getCachedVideoSummary: (data: {
-    transcript: string
-    targetLanguage: string
-    providerRef: PromptableProviderRef
-  }) => Promise<string | null>
-  saveVideoSummary: (data: {
-    transcript: string
-    targetLanguage: string
-    providerRef: PromptableProviderRef
-    summary: string
-  }) => Promise<void>
   backgroundGenerateText: (
     data: BackgroundGenerateTextPayload,
   ) => Promise<BackgroundGenerateTextResponse>

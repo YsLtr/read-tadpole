@@ -78,7 +78,7 @@ export function SubtitlesSidebarItem() {
         const message =
           error instanceof OverlaySubtitlesError
             ? error.message
-            : i18n.t("subtitles.sidebar.summary.failedTitle")
+            : i18n.t("subtitles.sidebar.transcript.failedTitle")
         showAnchoredSubtitlesToast(message, anchor.current)
       }
     } finally {

@@ -532,11 +532,10 @@ async function createLocalTextPartStream(
  * One text generation against the caller's own provider, collected into a
  * string.
  *
- * Four callers are non-streaming `generateText` calls — the page summary, the
- * video summary, subtitle segmentation, and language detection — and rather
- * than each keeping its own copy of the model plumbing, they all collapse onto
- * this: it validates the ref, applies the generation params captured with the
- * config, and hands back the trimmed text.
+ * Two callers are non-streaming `generateText` calls — subtitle segmentation and
+ * language detection — and rather than each keeping its own copy of the model
+ * plumbing, they all collapse onto this: it validates the ref, applies the
+ * generation params captured with the config, and hands back the trimmed text.
  */
 export async function generateTextForProviderRef(
   payload: BackgroundGenerateTextPayload,

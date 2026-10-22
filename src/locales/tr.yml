@@ -1036,13 +1036,6 @@ subtitles:
     needsSubtitles: Bu videoda altyazı yok.
     menu:
       label: Öğrenme
-    summary:
-      tab: AI özeti
-      generating: Özet oluşturuluyor…
-      failedTitle: Oluşturulamadı
-      retry: Tekrar dene
-      needsModel: Bu videoyu özetlemek için altyazılara bir LLM modeli seçin.
-      openSettings: Ayarları aç
     transcript:
       tab: Altyazılar
       failedTitle: Altyazılar yüklenemedi

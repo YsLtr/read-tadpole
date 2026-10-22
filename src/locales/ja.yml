@@ -1042,13 +1042,6 @@ subtitles:
     needsSubtitles: この動画には字幕がありません。
     menu:
       label: 学習
-    summary:
-      tab: AI 要約
-      generating: 要約を生成しています…
-      failedTitle: 生成できませんでした
-      retry: 再試行
-      needsModel: この動画を要約するには、字幕用の LLM モデルを選んでください。
-      openSettings: 設定を開く
     transcript:
       tab: 字幕
       failedTitle: 字幕を読み込めませんでした
