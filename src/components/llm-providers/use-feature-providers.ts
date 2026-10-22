@@ -7,6 +7,7 @@ import { useCallback, useMemo } from "react"
 import { configAtom, configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
 import { getProviderConfigById } from "@/utils/config/helpers"
 import {
+  buildFeatureProviderAssignment,
   buildFeatureProviderPatch,
   FEATURE_PROVIDER_DEFS,
 } from "@/utils/constants/feature-providers"
@@ -44,7 +45,9 @@ export function useFeatureProvider(featureKey: FeatureKey): FeatureProviderBindi
   }, [featureKey, providersConfig, hideTranslationOnlyUnsupported])
 
   const setProviderId = useCallback(
-    (id: string) => void setConfig(buildFeatureProviderPatch({ [featureKey]: id })),
+    // No provider is the feature's "off": keeps its own switch in step too, so
+    // the rest of the UI (and an import/export round trip) reads the same.
+    (id: string) => void setConfig(buildFeatureProviderAssignment(featureKey, id)),
     [featureKey, setConfig],
   )
 
@@ -57,10 +60,11 @@ export function useFeatureProvider(featureKey: FeatureKey): FeatureProviderBindi
 }
 
 export interface CustomActionProvidersBinding {
-  /** Only the actions the user can actually trigger, so disabled ones stay out of the UI. */
+  /** Every action, off ones included: the picker reports an off action as "none". */
   actions: SelectionToolbarCustomAction[]
   providers: ProviderSelectorOption[]
-  getProviderConfig: (action: SelectionToolbarCustomAction) => ProviderConfig | null
+  /** The provider to show for an action: empty when the action is off. */
+  getActionProviderId: (action: SelectionToolbarCustomAction) => string
   setActionProviderId: (actionId: string, providerId: string) => void
 }
 
@@ -76,28 +80,28 @@ export function useCustomActionProviders(): CustomActionProvidersBinding {
   )
 
   const actions = useMemo(
-    () =>
-      getSelectionToolbarActions(config.selectionToolbar).filter(
-        (action) => action.enabled !== false,
-      ),
+    () => getSelectionToolbarActions(config.selectionToolbar),
     [config.selectionToolbar],
   )
 
   const setActionProviderId = useCallback(
     (actionId: string, providerId: string) =>
       void setConfig({
-        selectionToolbar: patchSelectionToolbarAction(config.selectionToolbar, actionId, {
-          providerId,
-        }),
+        selectionToolbar: patchSelectionToolbarAction(
+          config.selectionToolbar,
+          actionId,
+          // An action cannot run without a provider, so "none" is the action's own
+          // switch. Its last provider is kept: picking one again restores it.
+          providerId === "" ? { enabled: false } : { enabled: true, providerId },
+        ),
       }),
     [config.selectionToolbar, setConfig],
   )
 
-  const getProviderConfig = useCallback(
-    (action: SelectionToolbarCustomAction) =>
-      getProviderConfigById(providersConfig, action.providerId) ?? null,
-    [providersConfig],
+  const getActionProviderId = useCallback(
+    (action: SelectionToolbarCustomAction) => (action.enabled === false ? "" : action.providerId),
+    [],
   )
 
-  return { actions, providers, getProviderConfig, setActionProviderId }
+  return { actions, providers, getActionProviderId, setActionProviderId }
 }

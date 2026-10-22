@@ -20,8 +20,6 @@ import {
 } from "@/utils/config/helpers"
 import {
   buildFeatureProviderPatch,
-  FEATURE_KEYS,
-  FEATURE_PROVIDER_DEFS,
   getFeatureLabelI18nKey,
 } from "@/utils/constants/feature-providers"
 import { getSelectionToolbarActions } from "@/utils/custom-actions"
@@ -103,8 +101,9 @@ function EditableProviderConfig({ providerConfig }: { providerConfig: APIProvide
     const unsatisfied = findFeatureMissingProvider(updatedAllProviders, config)
     if (unsatisfied) {
       // Name the feature. The block is worth nothing if the user cannot tell
-      // which slot it is protecting — and it fires for switched-off features
-      // too, whose stored providerId would otherwise be left dangling.
+      // which slot it is protecting — and it fires even for a feature turned off
+      // by its own switch, whose stored providerId would otherwise dangle.
+      // (A feature set to no provider is not protected: it has nothing to lose.)
       toastManager.add({
         type: "error",
         title: i18n.t("options.apiProviders.form.featureWouldLoseProvider", [
@@ -174,10 +173,6 @@ function EditableProviderConfig({ providerConfig }: { providerConfig: APIProvide
 
   const providerType = providerConfig.provider
   const hasTranslationModelFields = isTranslateProvider(providerType) && isLLMProvider(providerType)
-  const hasAdvancedFields = isLLMProvider(providerType)
-  const hasAssignments =
-    hasAdvancedFields ||
-    FEATURE_KEYS.some((featureKey) => FEATURE_PROVIDER_DEFS[featureKey].isProvider(providerType))
 
   return (
     <AutosaveBoundary session={toAutosaveSession(autosave)}>
@@ -195,13 +190,6 @@ function EditableProviderConfig({ providerConfig }: { providerConfig: APIProvide
               <ProviderEditor.DescriptionField />
               <ProviderEditor.ConnectionFields />
               {hasTranslationModelFields && <ProviderEditor.TranslationModelFields />}
-              {hasAssignments && (
-                <ProviderEditor.Assignments>
-                  <ProviderEditor.CompatibleFeatureAssignments />
-                  <ProviderEditor.LanguageDetectionAssignment />
-                  <ProviderEditor.CustomActionAssignments />
-                </ProviderEditor.Assignments>
-              )}
               {/* Headers are honoured by every adapter, so this section is not LLM-only;
                   the temperature and options fields inside it hide themselves. */}
               <ProviderEditor.AdvancedFields />

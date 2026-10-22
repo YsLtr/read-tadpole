@@ -1,9 +1,7 @@
 import type { AutosaveController } from "@/components/form/autosave-controller"
 import type { APIProviderConfig } from "@/types/config/provider"
-import type { FeatureKey } from "@/utils/constants/feature-providers"
-import { Icon } from "@iconify/react"
 import { useSelector } from "@tanstack/react-store"
-import { useAtomValue, useSetAtom } from "jotai"
+import { useAtomValue } from "jotai"
 import { createContext, use, useState } from "react"
 import { useAutosave } from "@/components/form/use-autosave"
 import ProviderIcon from "@/components/provider-icon"
@@ -20,25 +18,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/base-ui/alert-dialog"
 import { Button } from "@/components/ui/base-ui/button"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/base-ui/collapsible"
-import { Switch } from "@/components/ui/base-ui/switch"
-import { isLLMProvider } from "@/types/config/provider"
-import { configAtom, configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
-import {
-  buildFeatureProviderPatch,
-  FEATURE_KEYS,
-  FEATURE_PROVIDER_DEFS,
-  getFeatureLabelI18nKey,
-} from "@/utils/constants/feature-providers"
+import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { getProviderLogo } from "@/utils/providers/provider-display"
-import { getSelectionToolbarActions, patchSelectionToolbarAction } from "@/utils/custom-actions"
 import { i18n } from "@/utils/i18n"
-import { providerSupportsTranslationOnlyMode } from "@/utils/providers/translation-only-gate"
-import { cn } from "@/utils/styles/utils"
 import { APIKeyField } from "./provider-config-form/api-key-field"
 import { AdvancedOptionsSection } from "./provider-config-form/components/advanced-options-section"
 import { ConfigHeader as ProviderConfigHeader } from "./provider-config-form/config-header"
@@ -60,15 +42,8 @@ interface ProviderIdentity {
 interface ProviderEditorContextValue {
   state: {
     identity: ProviderIdentity
-    assignmentTarget: {
-      providerId: string
-      providerType?: APIProviderConfig["provider"]
-    }
   }
   actions: {
-    assignFeature: (featureKey: FeatureKey) => Promise<void>
-    assignLanguageDetection: () => Promise<void>
-    assignCustomAction: (actionId: string) => Promise<void>
     duplicate?: () => Promise<void>
     delete?: () => Promise<void>
   }
@@ -94,67 +69,18 @@ function useRequiredProviderCommand(command: "duplicate" | "delete") {
 
 function useProviderEditorValue({
   identity,
-  providerType,
   duplicate,
   delete: deleteProvider,
 }: {
   identity: ProviderIdentity
-  providerType?: APIProviderConfig["provider"]
   duplicate?: () => Promise<void>
   delete?: () => Promise<void>
 }): ProviderEditorContextValue {
-  const config = useAtomValue(configAtom)
-  const setConfig = useSetAtom(writeConfigAtom)
-  const providerId = identity.id
-
-  const getEnabledProvidersConfig = () => {
-    const provider = config.providersConfig.find((item) => item.id === providerId)
-    if (!provider || provider.enabled) {
-      return undefined
-    }
-
-    return config.providersConfig.map((item) =>
-      item.id === providerId ? { ...item, enabled: true } : item,
-    )
-  }
-
-  const getAssignmentProvidersPatch = () => {
-    const providersConfig = getEnabledProvidersConfig()
-    return providersConfig ? { providersConfig } : {}
-  }
-
   return {
     state: {
       identity,
-      assignmentTarget: {
-        providerId,
-        ...(providerType ? { providerType } : {}),
-      },
     },
     actions: {
-      assignFeature: async (featureKey) => {
-        await setConfig({
-          ...buildFeatureProviderPatch({ [featureKey]: providerId }),
-          ...getAssignmentProvidersPatch(),
-        })
-      },
-      assignLanguageDetection: async () => {
-        await setConfig({
-          languageDetection: {
-            mode: "llm",
-            providerId,
-          },
-          ...getAssignmentProvidersPatch(),
-        })
-      },
-      assignCustomAction: async (actionId) => {
-        await setConfig({
-          selectionToolbar: patchSelectionToolbarAction(config.selectionToolbar, actionId, {
-            providerId,
-          }),
-          ...getAssignmentProvidersPatch(),
-        })
-      },
       ...(duplicate ? { duplicate } : {}),
       ...(deleteProvider ? { delete: deleteProvider } : {}),
     },
@@ -217,7 +143,6 @@ function CustomProvider({
       logo: getProviderLogo(providerConfig, theme),
       name: providerConfig.name,
     },
-    providerType: providerConfig.provider,
     duplicate,
     delete: deleteProvider,
   })
@@ -325,152 +250,6 @@ function AdvancedFields() {
   )
 }
 
-function Assignments({
-  children,
-  defaultOpen = false,
-}: {
-  children: React.ReactNode
-  defaultOpen?: boolean
-}) {
-  const [isOpen, setIsOpen] = useState(defaultOpen)
-
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="flex cursor-pointer items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground">
-        <Icon
-          icon="tabler:chevron-right"
-          className={cn("size-4 transition-transform duration-200", isOpen && "rotate-90")}
-        />
-        <span>{i18n.t("options.apiProviders.featureProviders.title")}</span>
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className="flex flex-col gap-3">{children}</div>
-      </CollapsibleContent>
-    </Collapsible>
-  )
-}
-
-function AssignmentRow({
-  checked,
-  children,
-  disabled = false,
-  onCheckedChange,
-}: {
-  checked: boolean
-  children: React.ReactNode
-  disabled?: boolean
-  onCheckedChange: (checked: boolean) => void
-}) {
-  return (
-    // A wrapping label gives the switch its accessible name and makes the text
-    // itself a click target.
-    <label className="flex w-fit items-center gap-2">
-      <Switch checked={checked} disabled={checked || disabled} onCheckedChange={onCheckedChange} />
-      <span className="text-sm">{children}</span>
-    </label>
-  )
-}
-
-function CompatibleFeatureAssignments() {
-  const {
-    state: {
-      assignmentTarget: { providerId, providerType },
-    },
-    actions,
-  } = useProviderEditor()
-  const config = useAtomValue(configAtom)
-
-  if (!providerType) {
-    return null
-  }
-
-  return FEATURE_KEYS.filter(
-    (featureKey) =>
-      FEATURE_PROVIDER_DEFS[featureKey].isProvider(providerType) &&
-      // While translationOnly page mode is active, providers without markup
-      // support cannot take the page-translate assignment (translation-only-gate.ts).
-      !(
-        featureKey === "pageTranslation" &&
-        config.pageTranslation.mode === "translationOnly" &&
-        !providerSupportsTranslationOnlyMode(providerType)
-      ),
-  ).map((featureKey) => {
-    const isAssigned = FEATURE_PROVIDER_DEFS[featureKey].getProviderId(config) === providerId
-    return (
-      <AssignmentRow
-        key={featureKey}
-        checked={isAssigned}
-        onCheckedChange={(checked) => {
-          if (checked) void actions.assignFeature(featureKey)
-        }}
-      >
-        {i18n.t(getFeatureLabelI18nKey(featureKey))}
-      </AssignmentRow>
-    )
-  })
-}
-
-function LanguageDetectionAssignment({ disabled = false }: { disabled?: boolean } = {}) {
-  const {
-    state: {
-      assignmentTarget: { providerId, providerType },
-    },
-    actions,
-  } = useProviderEditor()
-  const config = useAtomValue(configAtom)
-
-  // Only a model can detect language, so a pure translate provider cannot take
-  // this assignment.
-  if (providerType && !isLLMProvider(providerType)) {
-    return null
-  }
-
-  const isAssigned =
-    config.languageDetection.mode === "llm" && config.languageDetection.providerId === providerId
-
-  return (
-    <AssignmentRow
-      checked={isAssigned}
-      disabled={disabled}
-      onCheckedChange={(checked) => {
-        if (checked) void actions.assignLanguageDetection()
-      }}
-    >
-      {i18n.t("options.apiProviders.languageDetection.title")}
-    </AssignmentRow>
-  )
-}
-
-function CustomActionAssignments({ disabled = false }: { disabled?: boolean }) {
-  const {
-    state: {
-      assignmentTarget: { providerId, providerType },
-    },
-    actions,
-  } = useProviderEditor()
-  const config = useAtomValue(configAtom)
-
-  if (providerType && !isLLMProvider(providerType)) {
-    return null
-  }
-
-  return getSelectionToolbarActions(config.selectionToolbar).map((action) => {
-    const isAssigned = action.providerId === providerId
-    return (
-      <AssignmentRow
-        key={action.id}
-        checked={isAssigned}
-        disabled={disabled}
-        onCheckedChange={(checked) => {
-          if (checked) void actions.assignCustomAction(action.id)
-        }}
-      >
-        {action.name}
-      </AssignmentRow>
-    )
-  })
-}
-
 function DuplicateButton() {
   const duplicate = useRequiredProviderCommand("duplicate")
   return (
@@ -521,11 +300,6 @@ export const ProviderEditor = {
   ConnectionFields,
   TranslationModelFields,
   AdvancedFields,
-  Assignments,
-  AssignmentRow,
-  CompatibleFeatureAssignments,
-  LanguageDetectionAssignment,
-  CustomActionAssignments,
   DuplicateButton,
   DeleteButton,
 }

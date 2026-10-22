@@ -41,9 +41,10 @@ const languageSchema = z.object({
     .transform((): LangLevel => DEFAULT_LANGUAGE_LEVEL),
 })
 
+// An empty providerId means the feature has no provider, i.e. it is off.
 const selectionToolbarFeatureSchema = z.object({
   enabled: z.boolean(),
-  providerId: z.string().nonempty(),
+  providerId: z.string(),
   shortcut: shortcutSchema,
 })
 
@@ -113,7 +114,7 @@ const inputTranslationLangSchema = z.union([
 // input translation schema (triple-space trigger)
 const inputTranslationSchema = z.object({
   enabled: z.boolean(),
-  providerId: z.string().nonempty(),
+  providerId: z.string(),
   fromLang: inputTranslationLangSchema,
   toLang: inputTranslationLangSchema,
   enableCycle: z.boolean(),
@@ -161,6 +162,9 @@ export const configSchema = z
     for (const featureKey of FEATURE_KEYS) {
       const def = FEATURE_PROVIDER_DEFS[featureKey]
       const providerId = def.getProviderId(data)
+
+      // No provider is the reader's "off": there is nothing to validate.
+      if (!providerId) continue
 
       if (
         !doesProviderSupportsCapability(featureKey, data.providersConfig, providerId, {

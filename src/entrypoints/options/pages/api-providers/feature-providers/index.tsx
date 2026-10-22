@@ -69,6 +69,7 @@ function FeatureProviderItem({ featureKey }: { featureKey: FeatureKey }) {
         value={providerId}
         onChange={setProviderId}
         triggerSize="sm"
+        allowNone
         selectContentProps={SELECT_CONTENT_PROPS}
       />
     </ConfigItem>
@@ -76,19 +77,16 @@ function FeatureProviderItem({ featureKey }: { featureKey: FeatureKey }) {
 }
 
 function CustomActionProviderItems() {
-  const { actions, providers, setActionProviderId } = useCustomActionProviders()
+  const { actions, providers, getActionProviderId, setActionProviderId } = useCustomActionProviders()
 
   return actions.map((action) => (
-    <ConfigItem
-      key={action.id}
-      title={action.name}
-      description={toSystemPromptPreview(action)}
-    >
+    <ConfigItem key={action.id} title={action.name} description={toSystemPromptPreview(action)}>
       <ProviderSelector
         providers={providers}
-        value={action.providerId}
+        value={getActionProviderId(action)}
         onChange={(id) => setActionProviderId(action.id, id)}
         triggerSize="sm"
+        allowNone
         selectContentProps={SELECT_CONTENT_PROPS}
         placeholder={i18n.t("options.selectionToolbar.customActions.form.selectProvider")}
       />

@@ -41,7 +41,12 @@ export function getSelectionToolbarItems(
   return order.flatMap((id): SelectionToolbarItem[] => {
     const pinned = !unpinnedIds.has(id)
     if (isFeatureId(id)) {
-      return [{ kind: "feature", id, enabled: selectionToolbar.features[id].enabled, pinned }]
+      // No provider is "off": the feature's own switch may still be on after an
+      // old config or an import, but there is nothing to run it.
+      const enabled =
+        selectionToolbar.features[id].enabled &&
+        (id !== "translate" || selectionToolbar.features.translate.providerId !== "")
+      return [{ kind: "feature", id, enabled, pinned }]
     }
     const action = actions.get(id)
     return action ? [{ kind: "action", id, enabled: action.enabled !== false, pinned, action }] : []

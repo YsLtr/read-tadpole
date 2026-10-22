@@ -146,6 +146,9 @@ export function findFeatureMissingProvider(
   config?: Config,
 ): FeatureKey | "languageDetection" | null {
   for (const key of FEATURE_KEYS) {
+    // A feature set to none has no provider to lose: nothing to reassign, and
+    // nothing left dangling, so it must not block deleting the last provider.
+    if (config && !FEATURE_PROVIDER_DEFS[key].getProviderId(config)) continue
     if (!getUsableProviderIdsForCapability(key, remainingProviders)[0]) {
       return key
     }

@@ -391,6 +391,8 @@ function repairProviderReferences(draft: Config): Config {
   for (const featureKey of FEATURE_KEYS) {
     const def = FEATURE_PROVIDER_DEFS[featureKey]
     const providerId = def.getProviderId(config)
+    // An empty provider is the reader's "off"; it is not a reference to repair.
+    if (!providerId) continue
     const isUsable = doesProviderSupportsCapability(featureKey, providersConfig, providerId, {
       requireEnable: true,
     })

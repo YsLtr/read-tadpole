@@ -60,7 +60,8 @@ export const videoSubtitlesSchema = z.object({
   enabled: z.boolean(),
   autoStart: subtitlesAutoStartSchema,
   toggleShortcut: shortcutSchema,
-  providerId: z.string().nonempty(),
+  // Empty means subtitle translation has no provider, i.e. it is off.
+  providerId: z.string(),
   style: subtitlesStyleSchema,
   aiSegmentation: z.boolean(),
   requestQueueConfig: requestQueueConfigSchema,

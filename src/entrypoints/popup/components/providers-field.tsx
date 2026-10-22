@@ -117,7 +117,7 @@ export default function ProvidersField() {
       </div>
       <DrawerContent>
         <DrawerBody className="p-4" data-base-ui-swipe-ignore="">
-          <FeatureProviderSelectorList providerSelectorTriggerSize="sm" />
+          <FeatureProviderSelectorList providerSelectorTriggerSize="sm" allowNone />
         </DrawerBody>
       </DrawerContent>
     </Drawer>

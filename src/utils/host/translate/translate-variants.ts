@@ -222,7 +222,8 @@ export async function translateTextForInput(
     config.inputTranslation.providerId,
   )
   if (!resolved) {
-    throw new Error(`No input translation provider for id "${config.inputTranslation.providerId}"`)
+    // No provider is the feature's "off" state: there is nothing to translate.
+    return ""
   }
 
   const resolvedFromLang = await resolveInputLang(fromLang, config.language)

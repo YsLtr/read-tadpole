@@ -151,6 +151,7 @@ options:
       title: Proveedores de funciones
       description: Elige qué proveedor usar para cada función
       chooseProvider: Elegir un proveedor
+      none: Ninguno
       features:
         pageTranslation: Traducción de página
         selectionTranslation: Traducción de la barra de selección

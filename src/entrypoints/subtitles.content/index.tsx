@@ -19,7 +19,8 @@ export default defineContentScript({
     window.__READ_TADPOLE_SUBTITLES_INJECTED__ = true
 
     const config = await getLocalConfig()
-    if (!config?.videoSubtitles?.enabled) {
+    // No provider is the feature's "off" state, even if the switch is still on.
+    if (!config?.videoSubtitles?.enabled || !config.videoSubtitles.providerId) {
       window.__READ_TADPOLE_SUBTITLES_INJECTED__ = false
       return
     }

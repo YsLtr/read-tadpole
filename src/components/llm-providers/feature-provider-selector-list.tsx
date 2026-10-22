@@ -14,16 +14,20 @@ interface FeatureProviderSelectorListProps {
   providerSelectorClassName?: string
   providerSelectorTriggerSize?: ProviderSelectorTriggerSize
   includeCustomActions?: boolean
+  /** Let a feature be set to none, which turns it off. */
+  allowNone?: boolean
 }
 
 function FeatureProviderField({
   featureKey,
   providerSelectorClassName,
   providerSelectorTriggerSize,
+  allowNone,
 }: {
   featureKey: FeatureKey
   providerSelectorClassName?: string
   providerSelectorTriggerSize?: ProviderSelectorTriggerSize
+  allowNone: boolean
 }) {
   const { providers, providerId, setProviderId } = useFeatureProvider(featureKey)
 
@@ -36,6 +40,7 @@ function FeatureProviderField({
         onChange={setProviderId}
         className={providerSelectorClassName}
         triggerSize={providerSelectorTriggerSize}
+        allowNone={allowNone}
       />
     </Field>
   )
@@ -44,11 +49,13 @@ function FeatureProviderField({
 function CustomActionProviderFields({
   providerSelectorClassName,
   providerSelectorTriggerSize,
+  allowNone,
 }: {
   providerSelectorClassName?: string
   providerSelectorTriggerSize?: ProviderSelectorTriggerSize
+  allowNone: boolean
 }) {
-  const { actions, providers, setActionProviderId } = useCustomActionProviders()
+  const { actions, providers, getActionProviderId, setActionProviderId } = useCustomActionProviders()
 
   if (actions.length === 0) {
     return null
@@ -64,10 +71,11 @@ function CustomActionProviderFields({
           <FieldTitle>{action.name}</FieldTitle>
           <ProviderSelector
             providers={providers}
-            value={action.providerId}
+            value={getActionProviderId(action)}
             onChange={(id) => setActionProviderId(action.id, id)}
             className={providerSelectorClassName}
             triggerSize={providerSelectorTriggerSize}
+            allowNone={allowNone}
             placeholder={i18n.t("options.selectionToolbar.customActions.form.selectProvider")}
           />
         </Field>
@@ -81,6 +89,7 @@ export function FeatureProviderSelectorList({
   providerSelectorClassName = "w-full",
   providerSelectorTriggerSize,
   includeCustomActions = true,
+  allowNone = false,
 }: FeatureProviderSelectorListProps) {
   return (
     <FieldGroup className={cn("gap-4", className)}>
@@ -90,12 +99,14 @@ export function FeatureProviderSelectorList({
           featureKey={featureKey}
           providerSelectorClassName={providerSelectorClassName}
           providerSelectorTriggerSize={providerSelectorTriggerSize}
+          allowNone={allowNone}
         />
       ))}
       {includeCustomActions && (
         <CustomActionProviderFields
           providerSelectorClassName={providerSelectorClassName}
           providerSelectorTriggerSize={providerSelectorTriggerSize}
+          allowNone={allowNone}
         />
       )}
     </FieldGroup>

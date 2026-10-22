@@ -150,6 +150,7 @@ options:
       title: Провайдеры функций
       description: Выберите провайдера для каждой функции
       chooseProvider: Выбрать провайдера
+      none: Нет
       features:
         pageTranslation: Перевод страницы
         selectionTranslation: Перевод выделения

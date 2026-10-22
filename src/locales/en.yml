@@ -151,6 +151,7 @@ options:
       title: Feature providers
       description: Choose which provider to use for each feature
       chooseProvider: Choose a provider
+      none: None
       features:
         pageTranslation: Page translation
         selectionTranslation: Selection toolbar translation

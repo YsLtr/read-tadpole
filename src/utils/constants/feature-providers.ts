@@ -83,6 +83,30 @@ export function resolveProviderConfigOrNull(
 }
 
 /**
+ * Where a feature's own on/off switch lives, for the features that have one.
+ * Page translation is started from its shortcuts, so it has no switch: clearing
+ * its provider is what turns it off.
+ */
+const FEATURE_ENABLED_CONFIG_PATHS = {
+  videoSubtitles: ["videoSubtitles", "enabled"],
+  selectionTranslation: ["selectionToolbar", "features", "translate", "enabled"],
+  inputTranslation: ["inputTranslation", "enabled"],
+} as const satisfies Partial<Record<FeatureKey, readonly string[]>>
+
+/** Build a nested Partial<Config> patch from a config path and the value to set there. */
+function buildConfigPathPatch(path: readonly string[], value: unknown): Partial<Config> {
+  let patch: Record<string, unknown> = {}
+  let current = patch
+  for (let i = 0; i < path.length - 1; i++) {
+    const next: Record<string, unknown> = {}
+    current[path[i]!] = next
+    current = next
+  }
+  current[path[path.length - 1]!] = value
+  return patch as Partial<Config>
+}
+
+/**
  * Convert a feature→providerId mapping into a Partial<Config> using FEATURE_PROVIDER_DEFS.configPath.
  * Generic — works for any scenario that assigns provider IDs to features.
  */
@@ -90,25 +114,38 @@ export function resolveProviderConfigOrNull(
 export function buildFeatureProviderPatch(
   assignments: Partial<Record<FeatureKey, string>>,
 ): Partial<Config> {
-  let patch: Record<string, unknown> = {}
+  let patch: Partial<Config> = {}
 
   for (const key of FEATURE_KEYS) {
     const newId = assignments[key]
     if (newId === undefined) continue
 
     const def = FEATURE_PROVIDER_DEFS[key]
-
-    const fragment: Record<string, unknown> = {}
-    let current: Record<string, unknown> = fragment
-    for (let i = 0; i < def.configPath.length - 1; i++) {
-      const next: Record<string, unknown> = {}
-      current[def.configPath[i]!] = next
-      current = next
-    }
-    current[def.configPath[def.configPath.length - 1]!] = newId
-
-    patch = mergeWithArrayOverwrite(patch, fragment)
+    patch = mergeWithArrayOverwrite(patch, buildConfigPathPatch(def.configPath, newId))
   }
 
   return patch
+}
+
+/** The feature's own on/off state, for the features that have one. */
+function buildFeatureEnabledPatch(featureKey: FeatureKey, enabled: boolean): Partial<Config> {
+  const path = (FEATURE_ENABLED_CONFIG_PATHS as Partial<Record<FeatureKey, readonly string[]>>)[
+    featureKey
+  ]
+  return path ? buildConfigPathPatch(path, enabled) : {}
+}
+
+/**
+ * Assign a feature's provider, keeping the feature's own switch in step: an empty
+ * provider means the feature is off. Merged rather than spread, because both
+ * halves can live under the same top-level key (`videoSubtitles`).
+ */
+export function buildFeatureProviderAssignment(
+  featureKey: FeatureKey,
+  providerId: string,
+): Partial<Config> {
+  return mergeWithArrayOverwrite(
+    buildFeatureProviderPatch({ [featureKey]: providerId }),
+    buildFeatureEnabledPatch(featureKey, providerId !== ""),
+  )
 }

@@ -528,6 +528,8 @@ export function SelectionTranslationProvider({ children }: { children: ReactNode
 
   useEffect(() => {
     const shortcut = selectionToolbar.features.translate.shortcut
+    // No provider means the feature is off, so its shortcut must do nothing.
+    if (!selectionToolbar.features.translate.providerId) return undefined
     if (isShortcutEmpty(shortcut) || !isValidShortcut(shortcut)) {
       return undefined
     }
@@ -547,7 +549,11 @@ export function SelectionTranslationProvider({ children }: { children: ReactNode
     return () => {
       registration.unregister()
     }
-  }, [openFromShortcut, selectionToolbar.features.translate.shortcut])
+  }, [
+    openFromShortcut,
+    selectionToolbar.features.translate.providerId,
+    selectionToolbar.features.translate.shortcut,
+  ])
 
   const contextValue = useMemo<SelectionTranslationContextValue>(
     () => ({

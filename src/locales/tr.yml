@@ -150,6 +150,7 @@ options:
       title: Özellik sağlayıcıları
       description: Her özellik için kullanılacak sağlayıcıyı seçin
       chooseProvider: Sağlayıcı seç
+      none: Yok
       features:
         pageTranslation: Sayfa çevirisi
         selectionTranslation: Seçim araç çubuğu çevirisi

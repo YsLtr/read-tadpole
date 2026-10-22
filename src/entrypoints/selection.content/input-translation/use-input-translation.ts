@@ -213,7 +213,7 @@ export function useInputTranslation() {
   )
 
   useEffect(() => {
-    if (!inputTranslationConfig.enabled) return undefined
+    if (!inputTranslationConfig.enabled || !inputTranslationConfig.providerId) return undefined
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only process space key
@@ -267,5 +267,10 @@ export function useInputTranslation() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown, true)
     }
-  }, [inputTranslationConfig.enabled, inputTranslationConfig.timeThreshold, handleTranslation])
+  }, [
+    inputTranslationConfig.enabled,
+    inputTranslationConfig.providerId,
+    inputTranslationConfig.timeThreshold,
+    handleTranslation,
+  ])
 }

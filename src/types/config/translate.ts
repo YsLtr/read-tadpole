@@ -172,7 +172,8 @@ export const pageCustomPromptsConfigSchema = createCustomPromptsConfigSchema(
 export const customPromptsConfigSchema = pageCustomPromptsConfigSchema
 
 export const translateConfigSchema = z.object({
-  providerId: z.string().nonempty(),
+  // Empty means page translation has no provider, i.e. it is off.
+  providerId: z.string(),
   mode: translationModeSchema,
   modeShortcut: shortcutSchema,
   node: z.object({
