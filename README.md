@@ -2,7 +2,24 @@
 
 **readfrog lite · 阅读蛙青春版** — 开源的 AI 浏览器扩展，做双语网页翻译与视频字幕。
 
-ReadTadpole 把网页、YouTube / Netflix / X 上的内容翻成你的母语，保留原文对照，让你在真实语境里读外语。翻译走你自己配置的 AI 服务商（内置模型、纯翻译服务或自建端点），扩展本身不锁死任何一家。
+本仓库是 [阅读蛙（read-frog）](https://github.com/mengxi-ream/read-frog) 的精简版，只保留核心的网页与字幕翻译。
+
+## 🔗 上游完整版
+
+**完整版：[mengxi-ream/read-frog](https://github.com/mengxi-ream/read-frog)** — 功能齐全、持续维护。
+
+本仓库不接收 issue、PR 或其他贡献；问题反馈、功能建议与参与开发，请统一前往上游仓库。
+
+## 📦 安装
+
+从 [Releases](https://github.com/YsLtr/read-tadpole/releases) 下载对应浏览器的 zip：`read-tadpole-<版本>-chrome.zip`、`-edge.zip`、`-firefox.zip`。
+
+zip 根目录就是扩展本体（直接是 `manifest.json`、`assets/` 等），解压后：
+
+- **Chrome / Edge**：打开 `chrome://extensions`，开启「开发者模式」→「加载已解压的扩展程序」→ 选中解压出来的目录。
+- **Firefox**：打开 `about:debugging#/runtime/this-firefox` →「临时载入附加组件」→ 选目录里的 `manifest.json`。
+
+从源码构建见 [AGENTS.md](./AGENTS.md)。
 
 ## ✨ Features
 
@@ -13,42 +30,7 @@ ReadTadpole 把网页、YouTube / Netflix / X 上的内容翻成你的母语，�
 - **朗读（TTS）**：用系统语音朗读原文或译文，可按语言挑选音色。
 - **自定义样式与站点规则**：译文外观（含自定义 CSS）、站点适配规则、快捷键与界面语言均可调。
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 22+
-- pnpm 12
-
-### Installation
-
-源码构建：
-
-```bash
-pnpm install
-pnpm build
-```
-
-然后在 `chrome://extensions` 打开开发者模式，选择「加载已解压的扩展程序」，指向 `.output/chrome-mv3`。
-
-### Development
-
-```bash
-pnpm install
-pnpm dev            # 开发模式，wxt 自动加载扩展
-pnpm build          # 生产构建（Chrome）
-pnpm build:edge     # Edge
-pnpm build:firefox  # Firefox
-pnpm zip            # 打包成商店上传用的 zip
-```
-
-## 🤝 Contributing
-
-- 提交信息遵循 conventional commit（如 `fix(subtitles): ...`），PR 标题同样使用该格式。
-- 面向用户的改动请在 `.changeset/` 下补一条 `@read-tadpole/extension` 的 changeset。
-- 构建说明见 [AGENTS.md](./AGENTS.md)。
-
-### 品牌素材
+## 🎨 品牌素材
 
 图标与应用内标志都由脚本生成，改配色或改形状后重跑即可，不要手改 PNG：
 

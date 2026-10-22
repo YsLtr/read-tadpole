@@ -79,8 +79,11 @@ export default defineConfig({
     }),
   }),
   zip: {
-    includeSources: ["**/*", ".env.production"],
-    excludeSources: ["docs/**/*", "assets/**/*", "repos/**/*"],
+    // Release assets are named read-tadpole-<version>-<browser>.zip; the default
+    // derives "read-tadpoleextension" from the scoped package name.
+    artifactTemplate: "read-tadpole-{{packageVersion}}-{{browser}}.zip",
+    // No AMO publishing here, and the sources zip would be the whole tree.
+    zipSources: false,
   },
   hooks: {
     "vite:build:extendConfig": (entrypoints, viteConfig) => {
