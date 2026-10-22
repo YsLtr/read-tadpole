@@ -14,11 +14,18 @@ import { runSelectionContent } from "../selection.content/main"
 const RUNNERS: Record<ContentRuntimePart, (ctx: ContentScriptContext) => Promise<void>> = {
   host: runHostContent,
   selection: runSelectionContent,
+  // Lazy on purpose: subtitles ship as their own content-runtime chunk, fetched
+  // only when the matching-site content script asks for them.
+  subtitles: async (ctx) => {
+    const { bootstrapSubtitlesRuntime } = await import("@/entrypoints/subtitles.content/runtime")
+    await bootstrapSubtitlesRuntime(ctx)
+  },
 }
 
 function isPartRunning(part: ContentRuntimePart) {
   if (part === "host") return window.__READ_TADPOLE_HOST_INJECTED__ === true
-  return window.__READ_TADPOLE_SELECTION_INJECTED__ === true
+  if (part === "selection") return window.__READ_TADPOLE_SELECTION_INJECTED__ === true
+  return window.__READ_TADPOLE_SUBTITLES_INJECTED__ === true
 }
 
 async function runContentParts(parts: readonly ContentRuntimePart[]) {

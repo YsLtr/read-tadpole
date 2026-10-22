@@ -1,37 +1,18 @@
-import "@/utils/zod-config"
-import { defineContentScript } from "#imports"
-import { getLocalConfig } from "@/utils/config/storage"
-import { initI18n } from "@/utils/i18n"
+import { browser, defineContentScript } from "#imports"
+import { CONTENT_RUNTIME_MODULE_FILE } from "@/utils/content-runtime/parts"
 import { subtitlesContentScriptMatches } from "./content-script-matches"
 
-declare global {
-  interface Window {
-    __READ_TADPOLE_SUBTITLES_INJECTED__?: boolean
-  }
-}
-
+// Kept as its own manifest entry (`allFrames`): the background only injects the
+// host/selection parts into iframes, so embedded players rely on this script to
+// request the subtitles part from the shared content runtime.
 export default defineContentScript({
   matches: subtitlesContentScriptMatches,
   allFrames: true,
-  cssInjectionMode: "manifest",
-  async main(ctx) {
+  async main() {
     if (window.__READ_TADPOLE_SUBTITLES_INJECTED__) return
-    window.__READ_TADPOLE_SUBTITLES_INJECTED__ = true
-
-    const config = await getLocalConfig()
-    // No provider is the feature's "off" state, even if the switch is still on.
-    if (!config?.videoSubtitles?.enabled || !config.videoSubtitles.providerId) {
-      window.__READ_TADPOLE_SUBTITLES_INJECTED__ = false
-      return
-    }
-
-    await initI18n(config.uiLanguage)
-
-    ctx.onInvalidated(() => {
-      window.__READ_TADPOLE_SUBTITLES_INJECTED__ = false
-    })
-
-    const { bootstrapSubtitlesRuntime } = await import("./runtime")
-    bootstrapSubtitlesRuntime(ctx)
+    const runtimeModule = await import(
+      /* @vite-ignore */ browser.runtime.getURL(CONTENT_RUNTIME_MODULE_FILE)
+    )
+    await (await runtimeModule.default).runContentParts(["subtitles"])
   },
 })
