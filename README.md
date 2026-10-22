@@ -14,10 +14,12 @@
 
 从 [Releases](https://github.com/YsLtr/read-tadpole/releases) 下载对应浏览器的 zip：`read-tadpole-<版本>-chrome.zip`、`-edge.zip`、`-firefox.zip`。
 
-zip 根目录就是扩展本体（直接是 `manifest.json`、`assets/` 等），解压后：
+zip 根目录就是扩展本体，解压后：
 
 - **Chrome / Edge**：打开 `chrome://extensions`，开启「开发者模式」→「加载已解压的扩展程序」→ 选中解压出来的目录。
 - **Firefox**：打开 `about:debugging#/runtime/this-firefox` →「临时载入附加组件」→ 选目录里的 `manifest.json`。
+
+不解压也行，打开开发者模式直接把zip拖进去就能安装。
 
 从源码构建见 [AGENTS.md](./AGENTS.md)。
 
@@ -29,17 +31,6 @@ zip 根目录就是扩展本体（直接是 `manifest.json`、`assets/` 等）�
 - **输入框翻译**：在网页评论框、编辑器里直接翻译你正在写的内容。
 - **朗读（TTS）**：用系统语音朗读原文或译文，可按语言挑选音色。
 - **自定义样式与站点规则**：译文外观（含自定义 CSS）、站点适配规则、快捷键与界面语言均可调。
-
-## 🎨 品牌素材
-
-图标与应用内标志都由脚本生成，改配色或改形状后重跑即可，不要手改 PNG：
-
-```bash
-python scripts/generate-icons.py     # public/icon/*.png 与 src/assets/icons/read-tadpole.png
-python scripts/refresh-demo-art.py   # src/assets/demo/*.png 里的标志
-```
-
-蝌蚪（圆头 + 渐细摆尾）用深青画在米白底上；工具栏激活态换成品牌金底，对比度仍在 4.9:1 以上。
 
 ## 📜 License
 
