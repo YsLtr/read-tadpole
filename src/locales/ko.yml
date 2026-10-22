@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: 선택사항
         endpointFormat: 엔드포인트 형식
+        cookie: Cookie
       duplicate: 복제
       delete: 삭제
       deleteDialog:
@@ -130,6 +131,13 @@ options:
       providerOptionsRecommendationApply: 적용
       providerOptionsRecommendationApplied: 적용됨
       invalidJson: 잘못된 JSON 형식
+      showCookie: Cookie 표시
+      fetchCookie: Cookie 가져오기
+      cookieFetching: 가져오는 중...
+      cookieFilled: 더우바오 쿠키를 채웠습니다
+      cookieNotLoggedIn: 더우바오 로그인을 찾지 못했습니다. 방금 열린 탭에서 로그인한 뒤 "Cookie 가져오기"를 다시 누르세요
+      cookieFetchFailed: 더우바오 쿠키를 읽지 못했습니다
+      cookieHint: www.doubao.com에 로그인한 뒤 "Cookie 가져오기"를 누르면 이 브라우저의 로그인 쿠키를 읽어 채웁니다. 직접 붙여넣으려면 개발자 도구 → 네트워크 → 아무 doubao.com 요청 → Cookie 요청 헤더를 복사하세요.
     providers:
       description:
         bilibiliTranslate: 번역과 AI 기능을 위한 Bilibili 무료 Index 모델. API 키 불필요
@@ -138,6 +146,7 @@ options:
         deepl: DeepL 공식 API입니다. 엔드포인트를 변경할 수 있어 프록시나 무료 호스트도 사용할 수 있습니다
         googleTranslate: Google 기계 번역. API 키 불필요
         microsoftTranslate: Microsoft 기계 번역. API 키 불필요
+        doubaoTranslate: API 키 대신 브라우저의 더우바오 쿠키로 인증하는 더우바오 웹 번역
     apiKey:
       showAPIKey: API Key 표시
     testConnection:

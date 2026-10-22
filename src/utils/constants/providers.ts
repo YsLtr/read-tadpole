@@ -15,6 +15,7 @@ import { DEFAULT_BUILT_IN_ACTION_PROVIDER_ID } from "@/types/config/selection-to
 import {
   DEEPL_OFFICIAL_ENDPOINT,
   DEEPLX_DEFAULT_ENDPOINT,
+  DOUBAO_TRANSLATE_ENDPOINT,
   GOOGLE_TRANSLATE_HTML_URL,
   MICROSOFT_TRANSLATE_URL,
 } from "@/utils/constants/provider-endpoints"
@@ -65,6 +66,12 @@ export const PROVIDER_ITEMS: Record<
     logo: getLobeIconsCDNUrlFn("microsoft-color"),
     name: NON_API_TRANSLATE_PROVIDERS_MAP["microsoft-translate"],
   },
+  "doubao-translate": {
+    // Same brand-mark source as the other vendor translators: doubao.com's own
+    // /favicon.ico answers with the SPA shell, so it cannot be an <img> src.
+    logo: getLobeIconsCDNUrlFn("doubao-color"),
+    name: "Doubao Translate",
+  },
 }
 
 export const DEFAULT_PROVIDER_CONFIG = {
@@ -103,6 +110,14 @@ export const DEFAULT_PROVIDER_CONFIG = {
     name: PROVIDER_ITEMS["microsoft-translate"].name,
     enabled: true,
     provider: "microsoft-translate",
+  },
+  "doubao-translate": {
+    id: "doubao-translate-default",
+    name: PROVIDER_ITEMS["doubao-translate"].name,
+    enabled: true,
+    provider: "doubao-translate",
+    baseURL: DOUBAO_TRANSLATE_ENDPOINT,
+    cookie: "",
   },
 } as const satisfies Record<AllProviderTypes, ProviderConfig>
 
@@ -202,6 +217,13 @@ export const PROVIDER_PRESETS: readonly ProviderPreset[] = [
     config: DEFAULT_PROVIDER_CONFIG["microsoft-translate"],
     description: () => getDefaultProviderDescription("microsoft-translate"),
   },
+  {
+    id: "doubao-translate",
+    name: PROVIDER_ITEMS["doubao-translate"].name,
+    logo: PROVIDER_ITEMS["doubao-translate"].logo,
+    config: DEFAULT_PROVIDER_CONFIG["doubao-translate"],
+    description: () => getDefaultProviderDescription("doubao-translate"),
+  },
 ]
 
 /**
@@ -220,6 +242,7 @@ export const PROVIDER_URL_PLACEHOLDERS: Partial<Record<APIProviderTypes, string>
   deepl: DEFAULT_PROVIDER_CONFIG.deepl.baseURL,
   "google-translate": GOOGLE_TRANSLATE_HTML_URL,
   "microsoft-translate": MICROSOFT_TRANSLATE_URL,
+  "doubao-translate": DOUBAO_TRANSLATE_ENDPOINT,
 }
 
 export const DEFAULT_PROVIDER_CONFIG_LIST: ProvidersConfig = [BILIBILI_PRESET_PROVIDER_CONFIG]

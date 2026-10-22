@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: 可选
         endpointFormat: 端点格式
+        cookie: Cookie
       duplicate: 复制
       delete: 删除
       deleteDialog:
@@ -131,6 +132,13 @@ options:
       providerOptionsRecommendationApply: 应用
       providerOptionsRecommendationApplied: 已应用
       invalidJson: JSON 格式无效
+      showCookie: 显示 Cookie
+      fetchCookie: 一键获取
+      cookieFetching: 获取中...
+      cookieFilled: 已填入豆包 Cookie
+      cookieNotLoggedIn: 未检测到豆包登录状态，已打开登录页；登录后再点一次「一键获取」
+      cookieFetchFailed: 读取豆包 Cookie 失败
+      cookieHint: 先在 www.doubao.com 登录，再点「一键获取」从本浏览器读取登录 Cookie 并填入；也可手动粘贴：开发者工具 → 网络 → 任意 doubao.com 请求 → 复制 Cookie 请求头。
     providers:
       description:
         bilibiliTranslate: Bilibili 免费 Index 模型，支持翻译与 AI 功能，无需 API Key
@@ -139,6 +147,7 @@ options:
         deepl: 官方 DeepL API；端点可修改，也适用于代理或免费版服务器
         googleTranslate: Google 机器翻译，无需 API Key
         microsoftTranslate: Microsoft 机器翻译，无需 API Key
+        doubaoTranslate: 豆包网页翻译接口，用浏览器里的豆包 Cookie 鉴权，无需 API Key
     apiKey:
       showAPIKey: 显示 API Key
     testConnection:

@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: Opcional
         endpointFormat: Formato del endpoint
+        cookie: Cookie
       duplicate: Duplicar
       delete: Eliminar
       deleteDialog:
@@ -131,6 +132,13 @@ options:
       providerOptionsRecommendationApply: Aplicar
       providerOptionsRecommendationApplied: Aplicado
       invalidJson: Formato JSON no válido
+      showCookie: Mostrar cookie
+      fetchCookie: Obtener cookie
+      cookieFetching: Obteniendo...
+      cookieFilled: Cookie de Doubao capturada
+      cookieNotLoggedIn: No se encontró una sesión de Doubao. Inicia sesión en la pestaña que se acaba de abrir y pulsa «Obtener cookie» otra vez
+      cookieFetchFailed: No se pudo leer la cookie de Doubao
+      cookieHint: Inicia sesión en www.doubao.com y pulsa «Obtener cookie» para leer la cookie de sesión de este navegador y rellenarla. Para pegarla a mano, abre DevTools → Network → cualquier petición a doubao.com → copia la cabecera Cookie.
     providers:
       description:
         bilibiliTranslate: Modelo Index gratuito de Bilibili para traducción y funciones de IA, sin clave API
@@ -139,6 +147,7 @@ options:
         deepl: API oficial de DeepL; el endpoint es editable, así que también sirve un proxy o el host gratuito
         googleTranslate: Traducción automática de Google, sin clave API
         microsoftTranslate: Traducción automática de Microsoft, sin clave API
+        doubaoTranslate: Traducción web de Doubao; se autentica con la cookie de Doubao del navegador en lugar de una clave API
     apiKey:
       showAPIKey: Mostrar clave API
     testConnection:

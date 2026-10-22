@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: Tùy chọn
         endpointFormat: Định dạng điểm cuối
+        cookie: Cookie
       duplicate: Sao chép
       delete: Xóa
       deleteDialog:
@@ -130,6 +131,13 @@ options:
       providerOptionsRecommendationApply: Áp dụng
       providerOptionsRecommendationApplied: Đã áp dụng
       invalidJson: Định dạng JSON không hợp lệ
+      showCookie: Hiển thị cookie
+      fetchCookie: Lấy cookie
+      cookieFetching: Đang lấy...
+      cookieFilled: Đã điền cookie Doubao
+      cookieNotLoggedIn: Không thấy trạng thái đăng nhập Doubao. Hãy đăng nhập ở thẻ vừa mở rồi nhấn "Lấy cookie" lần nữa
+      cookieFetchFailed: Không đọc được cookie Doubao
+      cookieHint: Đăng nhập tại www.doubao.com rồi nhấn "Lấy cookie" để đọc cookie đăng nhập từ trình duyệt này và điền vào. Để dán thủ công, mở DevTools → Network → một yêu cầu bất kỳ tới doubao.com → sao chép header Cookie.
     providers:
       description:
         bilibiliTranslate: Mô hình Index miễn phí của Bilibili cho dịch và các tính năng AI, không cần khóa API
@@ -138,6 +146,7 @@ options:
         deepl: API chính thức của DeepL; có thể sửa điểm cuối nên proxy hay máy chủ miễn phí cũng dùng được
         googleTranslate: Dịch máy Google, không cần khóa API
         microsoftTranslate: Dịch máy Microsoft, không cần khóa API
+        doubaoTranslate: Dịch web Doubao; xác thực bằng cookie Doubao của trình duyệt thay vì khóa API
     apiKey:
       showAPIKey: Hiển thị API Key
     testConnection:

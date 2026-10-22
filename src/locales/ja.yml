@@ -93,6 +93,7 @@ options:
         baseURL: ベースURL
         optional: オプション
         endpointFormat: エンドポイント形式
+        cookie: Cookie
       duplicate: 複製
       delete: 削除
       deleteDialog:
@@ -136,6 +137,13 @@ options:
       providerOptionsRecommendationApply: 適用
       providerOptionsRecommendationApplied: 適用済み
       invalidJson: 無効なJSON形式
+      showCookie: Cookie を表示
+      fetchCookie: Cookie を取得
+      cookieFetching: 取得中...
+      cookieFilled: 豆包の Cookie を取り込みました
+      cookieNotLoggedIn: 豆包へのログインが見つかりません。開いたタブでログインしてから、もう一度「Cookie を取得」を押してください
+      cookieFetchFailed: 豆包の Cookie を読み取れませんでした
+      cookieHint: www.doubao.com にログインしてから「Cookie を取得」を押すと、このブラウザのログイン Cookie を読み取って入力します。手動で貼り付ける場合は、開発者ツール → Network → 任意の doubao.com リクエスト → Cookie リクエストヘッダーをコピーしてください。
     providers:
       description:
         bilibiliTranslate: 翻訳と AI 機能に使える Bilibili の無料 Index モデル。API キー不要
@@ -144,6 +152,7 @@ options:
         deepl: DeepL 公式 API。エンドポイントは変更できるため、プロキシや無料版のホストも使えます
         googleTranslate: Google 機械翻訳。API キー不要
         microsoftTranslate: Microsoft 機械翻訳。API キー不要
+        doubaoTranslate: 豆包のウェブ翻訳。API キーの代わりにブラウザの豆包 Cookie で認証します
     apiKey:
       showAPIKey: APIキーを表示
     testConnection:

@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: Необязательно
         endpointFormat: Формат эндпоинта
+        cookie: Cookie
       duplicate: Дублировать
       delete: Удалить
       deleteDialog:
@@ -130,6 +131,13 @@ options:
       providerOptionsRecommendationApply: Применить
       providerOptionsRecommendationApplied: Применено
       invalidJson: Неверный формат JSON
+      showCookie: Показать cookie
+      fetchCookie: Получить cookie
+      cookieFetching: Получение...
+      cookieFilled: Cookie Doubao получен
+      cookieNotLoggedIn: Вход в Doubao не найден. Войдите во вкладке, которая только что открылась, и снова нажмите «Получить cookie»
+      cookieFetchFailed: Не удалось прочитать cookie Doubao
+      cookieHint: Войдите на www.doubao.com, затем нажмите «Получить cookie», чтобы прочитать cookie входа из этого браузера и подставить его. Чтобы вставить вручную, откройте DevTools → Network → любой запрос к doubao.com → скопируйте заголовок Cookie.
     providers:
       description:
         bilibiliTranslate: Бесплатная модель Bilibili Index для перевода и функций ИИ, без API-ключа
@@ -138,6 +146,7 @@ options:
         deepl: "Официальный API DeepL; эндпоинт можно изменить, поэтому подойдёт и прокси, или бесплатный хост"
         googleTranslate: Машинный перевод Google, без API-ключа
         microsoftTranslate: Машинный перевод Microsoft, без API-ключа
+        doubaoTranslate: Веб-перевод Doubao; вход по cookie Doubao из браузера вместо API-ключа
     apiKey:
       showAPIKey: Показать API-ключ
     testConnection:

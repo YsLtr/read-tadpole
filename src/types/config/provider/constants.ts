@@ -14,6 +14,7 @@ export const TRANSLATE_PROVIDER_TYPES = [
   "deepl",
   "google-translate",
   "microsoft-translate",
+  "doubao-translate",
 ] as const satisfies Readonly<
   (keyof typeof LLM_PROVIDER_MODELS | (typeof PURE_TRANSLATE_PROVIDERS)[number])[]
 >
@@ -72,6 +73,7 @@ export const ALL_PROVIDER_TYPES = [
   "openai-compatible",
   "google-translate",
   "microsoft-translate",
+  "doubao-translate",
 ] as const satisfies Readonly<TranslateProviderTypes[]>
 export type AllProviderTypes = (typeof ALL_PROVIDER_TYPES)[number]
 

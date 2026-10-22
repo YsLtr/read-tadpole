@@ -48,10 +48,10 @@ export default function AddProviderDialog({ onClose }: { onClose: () => void }) 
       <DialogHeader>
         <DialogTitle>{i18n.t("options.apiProviders.dialog.title")}</DialogTitle>
       </DialogHeader>
-      {/* Six entries, three to a row: the grid is here to keep the tiles the same
+      {/* One tile per preset: the grid is here to keep the tiles the same
           size, not to hold a catalogue. Two tiles write the same custom-endpoint
           type (Bilibili is that type pre-filled), two are the DeepL-family
-          translators, and the last two are the keyless vendor translators. */}
+          translators, and the rest are the vendor translators. */}
       <div className="my-2.5">
         <div className="grid grid-cols-2 gap-1.5 py-2 sm:grid-cols-3">
           {PROVIDER_PRESETS.map((preset) => (

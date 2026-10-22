@@ -12,3 +12,8 @@ export const DEEPL_FREE_ENDPOINT = "https://api-free.deepl.com/v2/translate"
 export const DEEPLX_DEFAULT_ENDPOINT = "http://localhost:1188"
 export const GOOGLE_TRANSLATE_HTML_URL = "https://translate-pa.googleapis.com/v1/translateHtml"
 export const MICROSOFT_TRANSLATE_URL = "https://edge.microsoft.com/translate/translatetext"
+// The endpoint the Doubao browser plugin calls, and the page that can sign the
+// user in when its cookie is missing.
+export const DOUBAO_TRANSLATE_ENDPOINT =
+  "https://www.doubao.com/samantha/plugin/stream_article_translate"
+export const DOUBAO_LOGIN_URL = "https://www.doubao.com/chat/"

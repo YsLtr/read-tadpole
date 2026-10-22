@@ -24,6 +24,7 @@ import { i18n } from "@/utils/i18n"
 import { APIKeyField } from "./provider-config-form/api-key-field"
 import { AdvancedOptionsSection } from "./provider-config-form/components/advanced-options-section"
 import { ConfigHeader as ProviderConfigHeader } from "./provider-config-form/config-header"
+import { DoubaoCookieField } from "./provider-config-form/doubao-cookie-field"
 import { EndpointFormatField } from "./provider-config-form/endpoint-format-field"
 import { formOpts, useAppForm } from "./provider-config-form/form"
 import { ProviderHeadersField } from "./provider-config-form/provider-headers-field"
@@ -220,9 +221,13 @@ function DescriptionField() {
 
 function ConnectionFields() {
   const form = useApiProviderForm()
+  const providerType = useSelector(form.store, (state) => state.values.provider)
+  // Doubao has no key to type: the credential it wants is the browser's own
+  // Doubao login cookie, which the cookie field captures.
+  const isDoubao = providerType === "doubao-translate"
   return (
     <>
-      <APIKeyField form={form} />
+      {isDoubao ? <DoubaoCookieField form={form} /> : <APIKeyField form={form} />}
       <ProviderURLField form={form} />
       <EndpointFormatField form={form} />
     </>

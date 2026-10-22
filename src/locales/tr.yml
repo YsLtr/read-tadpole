@@ -87,6 +87,7 @@ options:
         baseURL: Base URL
         optional: İsteğe Bağlı
         endpointFormat: Uç nokta biçimi
+        cookie: Çerez
       duplicate: Çoğalt
       delete: Sil
       deleteDialog:
@@ -130,6 +131,13 @@ options:
       providerOptionsRecommendationApply: Uygula
       providerOptionsRecommendationApplied: Uygulandı
       invalidJson: Geçersiz JSON formatı
+      showCookie: Çerezi göster
+      fetchCookie: Çerezi al
+      cookieFetching: Alınıyor...
+      cookieFilled: Doubao çerezi alındı
+      cookieNotLoggedIn: Doubao oturumu bulunamadı. Açılan sekmede giriş yapıp "Çerezi al" düğmesine tekrar basın
+      cookieFetchFailed: Doubao çerezi okunamadı
+      cookieHint: www.doubao.com adresinde giriş yapın, ardından "Çerezi al" düğmesine basarak bu tarayıcıdaki oturum çerezini okuyup doldurun. Elle yapıştırmak için Geliştirici araçları → Network → herhangi bir doubao.com isteği → Cookie istek başlığını kopyalayın.
     providers:
       description:
         bilibiliTranslate: Çeviri ve yapay zekâ özellikleri için ücretsiz Bilibili Index modeli; API anahtarı gerekmez
@@ -138,6 +146,7 @@ options:
         deepl: DeepL'nin resmi API'si; uç nokta değiştirilebilir, bu yüzden proxy veya ücretsiz sunucu da çalışır
         googleTranslate: Google makine çevirisi; API anahtarı gerekmez
         microsoftTranslate: Microsoft makine çevirisi; API anahtarı gerekmez
+        doubaoTranslate: Doubao web çevirisi; API anahtarı yerine tarayıcıdaki Doubao çereziyle kimlik doğrular
     apiKey:
       showAPIKey: API anahtarını göster
     testConnection:

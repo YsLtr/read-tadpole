@@ -55,6 +55,7 @@ export const PURE_TRANSLATE_PROVIDERS = [
   ...NON_API_TRANSLATE_PROVIDERS,
   "deeplx",
   "deepl",
+  "doubao-translate",
 ] as const
 
 const OPENAI_GPT5_REASONING_EFFORT_POLICIES: OpenAIGPT5ReasoningEffortPolicy[] = [

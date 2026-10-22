@@ -32,6 +32,9 @@ export default defineConfig({
       "identity",
       "scripting",
       "webNavigation",
+      // Doubao's session cookies are HttpOnly, so the "Get cookie" button has to
+      // read them through the cookie store instead of `document.cookie`.
+      "cookies",
       ...(browser !== "firefox" ? ["offscreen"] : []),
     ],
     host_permissions: [
