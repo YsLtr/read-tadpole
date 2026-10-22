@@ -1,6 +1,6 @@
 name: ReadTadpole
-extName: "ReadTadpole - ИИ-перевод и субтитры"
-extDescription: "readfrog lite 阅读蛙青春版 — Двуязычный ИИ-перевод веб-страниц и субтитров YouTube, Netflix и X на выбранном вами провайдере ИИ."
+extName: "ReadTadpole"
+extDescription: "Read Frog, молодёжная версия"
 dataTypes:
   string: Текст
   number: Число
@@ -10,9 +10,9 @@ popup:
   sourceLang: Исходный
   targetLang: Целевой
   providers:
-    title: Providers
-    description: Choose which provider to use for each feature
-    open: Open provider settings
+    title: Провайдеры
+    description: Выберите провайдера для каждой функции
+    open: Открыть настройки провайдеров
   translate: Перевести
   showOriginal: Показать оригинал
   alwaysTranslate: Всегда переводить этот сайт
@@ -97,6 +97,7 @@ options:
         cancel: Отмена
       atLeastOneLLMProvider: Требуется как минимум один LLM-провайдер перевода.
       featureWouldLoseProvider: "Невозможно удалить: у функции «$1» не останется ни одного работающего провайдера."
+      providerInUseCannotDisable: 'Невозможно отключить «$1»: сейчас его используют функции ($2).'
       duplicateProviderName: 'Дублирующееся имя провайдера "$1"'
       models:
         fetchModels: Получить доступные модели
@@ -182,7 +183,7 @@ options:
   patterns:
     duplicate: Этот шаблон уже в списке
     gluedWildcard: «*» должна заменять часть адреса целиком, например *.example.com или example.*
-    unsupported: ReadTadpole не может сопоставить этот адрес. Порты и схемы, кроме http и https, не поддерживаются.
+    unsupported: Этот адрес не удаётся сопоставить. Порты и схемы, кроме http и https, не поддерживаются.
   preference:
     title: Предпочтения
     pageDescription: Задайте внешний вид ReadTadpole, места его работы, а также синхронизацию и резервное копирование конфигурации.
@@ -202,7 +203,7 @@ options:
       title: Языки перевода
       sourceCode:
         title: Исходный язык
-        description: Язык оригинала страниц. При автоопределении язык берётся с самой страницы.
+        description: Язык оригинала страниц. При автоопределении ReadTadpole берёт его с самой страницы.
         auto: Автоопределение
       targetCode:
         title: Язык перевода
@@ -410,6 +411,11 @@ options:
       description: Добавляйте собственные структурированные AI-действия для выделенного текста
       configTitle: Настройка действий
       builtIn: Встроенное
+      badges:
+        new: Новое
+        updated: Обновлено
+        createdFrom: Создано из $1
+        updatedFrom: Обновлено из $1
       add: Добавить AI-действие
       edit: Редактировать AI-действие
       empty: Пока нет пользовательских AI-действий
@@ -543,6 +549,8 @@ options:
           confirm: Удалить
           cancel: Отмена
       templates:
+        dialogTitle: Выберите шаблон
+        dialogDescription: Выберите шаблон, чтобы быстро создать новое AI-действие, или начните с пустого.
         dictionary:
           name: "Словарь"
           description: "Поиск слов с определениями, транскрипцией и переводом абзацев"
@@ -630,6 +638,8 @@ options:
           fieldDifficulty: "Сложность"
           fieldDifficultyDescription: "Оценка уровня сложности CEFR: A1, A2, B1, B2, C1 или C2."
         blank:
+          name: Пустой
+          description: Начать с пустого действия
           prompt: |-
             ## Ввод
             Выделение: {{selection}}

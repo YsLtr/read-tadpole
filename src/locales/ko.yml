@@ -1,6 +1,6 @@
 name: ReadTadpole
-extName: "ReadTadpole - AI 이중 번역·동영상 자막"
-extDescription: "readfrog lite 阅读蛙青春版 — 웹페이지와 YouTube·Netflix·X 동영상 자막을 AI로 이중 번역합니다. 설정한 AI 제공자를 사용합니다."
+extName: "ReadTadpole"
+extDescription: "Read Frog 청춘판"
 dataTypes:
   string: 텍스트
   number: 숫자
@@ -10,9 +10,9 @@ popup:
   sourceLang: 원본
   targetLang: 대상
   providers:
-    title: Providers
-    description: Choose which provider to use for each feature
-    open: Open provider settings
+    title: 제공업체
+    description: 각 기능에 사용할 제공업체를 선택하세요
+    open: 제공업체 설정 열기
   translate: 번역
   showOriginal: 원문 보기
   alwaysTranslate: 이 사이트 항상 번역
@@ -97,6 +97,7 @@ options:
         cancel: 취소
       atLeastOneLLMProvider: 최소 하나의 LLM 번역 제공업체가 필요합니다.
       featureWouldLoseProvider: '삭제할 수 없습니다: "$1"을(를) 실행할 수 있는 제공업체가 없어집니다.'
+      providerInUseCannotDisable: '"$1"은(는) 현재 $2개 기능에서 사용 중이므로 비활성화할 수 없습니다.'
       duplicateProviderName: '중복된 제공업체 이름 "$1"'
       models:
         fetchModels: 사용 가능한 모델 가져오기
@@ -202,7 +203,7 @@ options:
       title: 번역 언어
       sourceCode:
         title: 원본 언어
-        description: 웹페이지 원문의 언어입니다. '자동 감지'를 선택하면 페이지 자체에서 판별합니다.
+        description: 웹페이지 원문의 언어입니다. '자동 감지'를 선택하면 ReadTadpole가 페이지 자체에서 판별합니다.
         auto: 자동 감지
       targetCode:
         title: 대상 언어
@@ -410,6 +411,11 @@ options:
       description: 선택한 텍스트에 대한 구조화된 AI 작업을 직접 추가하세요
       configTitle: 액션 구성
       builtIn: 기본 제공
+      badges:
+        new: 신규
+        updated: 업데이트됨
+        createdFrom: $1에서 생성
+        updatedFrom: $1에서 업데이트
       add: AI 액션 추가
       edit: AI 액션 편집
       empty: 아직 커스텀 AI 액션이 없습니다
@@ -543,6 +549,8 @@ options:
           confirm: 삭제
           cancel: 취소
       templates:
+        dialogTitle: 템플릿 선택
+        dialogDescription: 템플릿을 골라 새 AI 액션을 빠르게 만들거나 빈 상태에서 시작하세요.
         dictionary:
           name: "사전"
           description: "뜻, 발음, 문단 번역과 함께 단어 찾기"
@@ -630,6 +638,8 @@ options:
           fieldDifficulty: "난이도"
           fieldDifficultyDescription: "추정 CEFR 난이도: A1, A2, B1, B2, C1 또는 C2."
         blank:
+          name: 비어 있음
+          description: 빈 액션으로 처음부터 시작합니다
           prompt: |-
             ## 입력
             선택 텍스트: {{selection}}

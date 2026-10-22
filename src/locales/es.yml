@@ -1,6 +1,6 @@
 name: ReadTadpole
-extName: "ReadTadpole - Traducción con IA y subtítulos"
-extDescription: "readfrog lite 阅读蛙青春版 — Traducción bilingüe con IA para webs y subtítulos de YouTube, Netflix y X, con el proveedor de IA que configures."
+extName: "ReadTadpole"
+extDescription: "Read Frog, edición juvenil"
 dataTypes:
   string: Texto
   number: Número
@@ -10,9 +10,9 @@ popup:
   sourceLang: Origen
   targetLang: Destino
   providers:
-    title: Providers
-    description: Choose which provider to use for each feature
-    open: Open provider settings
+    title: Proveedores
+    description: Elige qué proveedor usar para cada función
+    open: Abrir los ajustes de proveedores
   translate: Traducir
   showOriginal: Mostrar original
   alwaysTranslate: Traducir siempre este sitio
@@ -183,7 +183,7 @@ options:
   patterns:
     duplicate: Este patrón ya está en la lista
     gluedWildcard: Un "*" debe sustituir una parte completa de la dirección, como *.example.com o example.*
-    unsupported: ReadTadpole no puede hacer coincidir esta dirección. No se admiten los puertos ni los esquemas distintos de http y https.
+    unsupported: No se puede hacer coincidir esta dirección. No se admiten los puertos ni los esquemas distintos de http y https.
   preference:
     title: Preferencias
     pageDescription: Define la apariencia de ReadTadpole, dónde se ejecuta y cómo se sincroniza y respalda tu configuración.
@@ -203,14 +203,14 @@ options:
       title: Idiomas de traducción
       sourceCode:
         title: Idioma de origen
-        description: El idioma desde el que se traducen las páginas. La detección automática lo deduce de la propia página.
+        description: El idioma desde el que se traducen las páginas. La detección automática deja que ReadTadpole lo deduzca de la propia página.
         auto: Detección automática
       targetCode:
         title: Idioma de destino
         description: El idioma al que se traducen las páginas.
     extensionActivation:
       title: Activación de la extensión
-      description: Si ReadTadpole se ejecuta en todas partes salvo en los sitios que indiques, o solo en los sitios que indiques
+      description: Si la extensión se ejecuta en todas partes salvo en los sitios que indiques, o solo en los sitios que indiques
       manageSites: Gestionar sitios
       mode:
         title: Modo de activación
@@ -411,6 +411,11 @@ options:
       description: Añade tus propias acciones AI estructuradas para texto seleccionado
       configTitle: Configuración de acciones
       builtIn: Integrada
+      badges:
+        new: Nueva
+        updated: Actualizada
+        createdFrom: Creada desde $1
+        updatedFrom: Actualizada desde $1
       add: Añadir acción AI
       edit: Editar acción AI
       empty: Aún no hay acciones AI personalizadas
@@ -702,7 +707,7 @@ options:
       customCSS:
         editor:
           placeholder: |
-            /* Example: Custom style with color and background */
+            /* Ejemplo: estilo personalizado con color y fondo */
             [data-read-tadpole-custom-translation-style='custom'] {
               color: #414535;
               background-color: light-dark(#F2E3BC, #C19875);

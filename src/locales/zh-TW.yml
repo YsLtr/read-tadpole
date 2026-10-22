@@ -1,6 +1,6 @@
 name: 閱讀蝌蚪
-extName: "閱讀蝌蚪 ReadTadpole - AI 雙語翻譯與影片字幕"
-extDescription: "readfrog lite 阅读蛙青春版。用 AI 雙語對照翻譯網頁，以及 YouTube、Netflix、X 的影片字幕。使用你設定的 AI 服務提供者。"
+extName: "閱讀蝌蚪"
+extDescription: "閱讀蛙青春版"
 dataTypes:
   string: 文字
   number: 數字

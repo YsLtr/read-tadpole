@@ -1,6 +1,6 @@
 name: ReadTadpole
-extName: "ReadTadpole - Dịch AI và phụ đề"
-extDescription: "readfrog lite 阅读蛙青春版 — Dịch song ngữ bằng AI cho trang web và phụ đề YouTube, Netflix, X, dùng nhà cung cấp AI bạn tự cấu hình."
+extName: "ReadTadpole"
+extDescription: "Read Frog bản thanh xuân"
 dataTypes:
   string: Văn bản
   number: Số
@@ -10,9 +10,9 @@ popup:
   sourceLang: Nguồn
   targetLang: Đích
   providers:
-    title: Providers
-    description: Choose which provider to use for each feature
-    open: Open provider settings
+    title: Nhà cung cấp
+    description: Chọn nhà cung cấp cho từng tính năng
+    open: Mở cài đặt nhà cung cấp
   translate: Dịch
   showOriginal: Hiển thị bản gốc
   alwaysTranslate: Luôn dịch trang web này
@@ -97,6 +97,7 @@ options:
         cancel: Hủy
       atLeastOneLLMProvider: Cần ít nhất một nhà cung cấp dịch LLM.
       featureWouldLoseProvider: 'Không thể xóa: "$1" sẽ không còn nhà cung cấp nào có thể chạy được.'
+      providerInUseCannotDisable: 'Không thể tắt "$1" vì hiện có $2 tính năng đang dùng nó.'
       duplicateProviderName: 'Tên nhà cung cấp trùng lặp "$1"'
       models:
         fetchModels: Lấy các mô hình có sẵn
@@ -182,7 +183,7 @@ options:
   patterns:
     duplicate: Mẫu này đã có trong danh sách
     gluedWildcard: Dấu "*" phải thay cho trọn một phần của địa chỉ, ví dụ *.example.com hoặc example.*
-    unsupported: ReadTadpole không khớp được địa chỉ này. Cổng và các giao thức ngoài http, https đều không được hỗ trợ.
+    unsupported: Không khớp được địa chỉ này. Cổng và các giao thức ngoài http, https đều không được hỗ trợ.
   preference:
     title: Tùy chọn
     pageDescription: Đặt giao diện của ReadTadpole, nơi tiện ích hoạt động và cách cấu hình được đồng bộ, sao lưu.
@@ -202,7 +203,7 @@ options:
       title: Ngôn ngữ dịch
       sourceCode:
         title: Ngôn ngữ nguồn
-        description: Ngôn ngữ gốc của trang web. Tự động phát hiện sẽ nhận diện từ chính trang đó.
+        description: Ngôn ngữ gốc của trang web. Tự động phát hiện để ReadTadpole nhận diện từ chính trang đó.
         auto: Tự động phát hiện
       targetCode:
         title: Ngôn ngữ đích
@@ -410,6 +411,11 @@ options:
       description: Thêm các hành động AI có cấu trúc của riêng bạn cho văn bản được chọn
       configTitle: Cấu hình hành động
       builtIn: Tích hợp
+      badges:
+        new: Mới
+        updated: Đã cập nhật
+        createdFrom: Tạo từ $1
+        updatedFrom: Cập nhật từ $1
       add: Thêm hành động AI
       edit: Chỉnh sửa hành động AI
       empty: Chưa có hành động AI tùy chỉnh
@@ -543,6 +549,8 @@ options:
           confirm: Xóa
           cancel: Hủy
       templates:
+        dialogTitle: Chọn mẫu
+        dialogDescription: Chọn một mẫu để nhanh chóng tạo hành động AI mới, hoặc bắt đầu từ trống.
         dictionary:
           name: "Từ điển"
           description: "Tra từ kèm định nghĩa, phiên âm và bản dịch đoạn văn"
@@ -630,6 +638,8 @@ options:
           fieldDifficulty: "Độ khó"
           fieldDifficultyDescription: "Cấp độ khó CEFR ước tính: A1, A2, B1, B2, C1 hoặc C2."
         blank:
+          name: Trống
+          description: Bắt đầu từ đầu với một hành động trống
           prompt: |-
             ## Đầu vào
             Văn bản chọn: {{selection}}

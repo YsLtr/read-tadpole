@@ -1,6 +1,6 @@
 name: ReadTadpole
-extName: "ReadTadpole - AI Translation & Subtitles"
-extDescription: "readfrog lite 阅读蛙青春版 — Bilingual AI translation for web pages and YouTube, Netflix and X subtitles, powered by the AI provider you configure."
+extName: "ReadTadpole"
+extDescription: "Read Frog Lite"
 dataTypes:
   string: Text
   number: Number
@@ -183,7 +183,7 @@ options:
   patterns:
     duplicate: This pattern is already in the list
     gluedWildcard: A "*" has to stand for a whole part of the address, like *.example.com or example.*
-    unsupported: ReadTadpole cannot match this address. Ports and schemes other than http and https are not supported.
+    unsupported: This address cannot be matched. Ports and schemes other than http and https are not supported.
   preference:
     title: Preferences
     pageDescription: Set how ReadTadpole looks, where it runs, and how your config is synced and backed up.
@@ -203,14 +203,14 @@ options:
       title: Translation languages
       sourceCode:
         title: Source language
-        description: The language pages are translated from. Auto-detect reads it from the page itself.
+        description: The language pages are translated from. Auto-detect lets ReadTadpole read it from the page itself.
         auto: Auto-detect
       targetCode:
         title: Target language
         description: The language pages are translated into.
     extensionActivation:
       title: Extension activation
-      description: Whether ReadTadpole runs everywhere except the sites you list, or only on the sites you list
+      description: Whether the extension runs everywhere except the sites you list, or only on the sites you list
       manageSites: Manage sites
       mode:
         title: Activation mode
@@ -1062,7 +1062,7 @@ subtitles:
     downloadTranslatedComplete: Translated subtitles downloaded
     downloadSource: Download source subtitles
   state:
-    loading: ReadTadpole loading captions
+    loading: ReadTadpole is loading captions
     translating: Translating…
     error: Error occurred
   errors:

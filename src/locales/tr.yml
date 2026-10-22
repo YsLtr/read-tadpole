@@ -1,6 +1,6 @@
 name: ReadTadpole
-extName: "ReadTadpole - Yapay Zekâ Çeviri ve Altyazı"
-extDescription: "readfrog lite 阅读蛙青春版 — Web sayfaları ve YouTube, Netflix, X altyazıları için yapay zekâ ile iki dilli çeviri. Kendi yapay zekâ sağlayıcınızı kullanın."
+extName: "ReadTadpole"
+extDescription: "Read Frog gençlik sürümü"
 dataTypes:
   string: Metin
   number: Sayı
@@ -10,9 +10,9 @@ popup:
   sourceLang: Kaynak
   targetLang: Hedef
   providers:
-    title: Providers
-    description: Choose which provider to use for each feature
-    open: Open provider settings
+    title: Sağlayıcılar
+    description: Her özellik için kullanılacak sağlayıcıyı seçin
+    open: Sağlayıcı ayarlarını aç
   translate: Çevir
   showOriginal: Orijinali Göster
   alwaysTranslate: Bu siteyi her zaman çevir
@@ -97,6 +97,7 @@ options:
         cancel: İptal
       atLeastOneLLMProvider: En az bir LLM çeviri sağlayıcısı gereklidir.
       featureWouldLoseProvider: 'Silinemiyor: "$1" özelliğini çalıştırabilecek hiçbir sağlayıcı kalmayacak.'
+      providerInUseCannotDisable: '"$1" şu anda $2 özellik tarafından kullanıldığı için devre dışı bırakılamıyor.'
       duplicateProviderName: 'Yinelenen sağlayıcı adı "$1"'
       models:
         fetchModels: Mevcut modelleri getir
@@ -182,7 +183,7 @@ options:
   patterns:
     duplicate: Bu desen zaten listede
     gluedWildcard: '"*" adresin bir bölümünün tamamının yerini almalıdır, örneğin *.example.com veya example.*'
-    unsupported: ReadTadpole bu adresi eşleştiremiyor. Bağlantı noktaları ile http ve https dışındaki şemalar desteklenmiyor.
+    unsupported: Bu adres eşleştirilemiyor. Bağlantı noktaları ile http ve https dışındaki şemalar desteklenmiyor.
   preference:
     title: Tercihler
     pageDescription: ReadTadpole'un görünümünü, nerede çalışacağını ve yapılandırmanızın nasıl eşitlenip yedekleneceğini ayarlayın.
@@ -202,14 +203,14 @@ options:
       title: Çeviri dilleri
       sourceCode:
         title: Kaynak dil
-        description: Sayfaların çevrildiği kaynak dil. Otomatik algılama bunu sayfanın kendisinden okur.
+        description: Sayfaların çevrildiği kaynak dil. Otomatik algılama bunu ReadTadpole'un sayfanın kendisinden okumasını sağlar.
         auto: Otomatik algıla
       targetCode:
         title: Hedef dil
         description: Sayfaların çevrileceği dil.
     extensionActivation:
       title: Uzantı etkinleştirme
-      description: ReadTadpole listelediğiniz siteler dışında her yerde mi, yoksa yalnızca listelediğiniz sitelerde mi çalışsın
+      description: Uzantı listelediğiniz siteler dışında her yerde mi, yoksa yalnızca listelediğiniz sitelerde mi çalışsın
       manageSites: Siteleri yönet
       mode:
         title: Etkinleştirme modu
@@ -410,6 +411,11 @@ options:
       description: Seçilen metin için kendi yapılandırılmış AI eylemlerinizi ekleyin
       configTitle: Eylem yapılandırması
       builtIn: Yerleşik
+      badges:
+        new: Yeni
+        updated: Güncellendi
+        createdFrom: $1 kaynağından oluşturuldu
+        updatedFrom: $1 kaynağından güncellendi
       add: AI eylemi ekle
       edit: AI eylemini düzenle
       empty: Henüz özel AI eylemi yok
@@ -543,6 +549,8 @@ options:
           confirm: Sil
           cancel: İptal
       templates:
+        dialogTitle: Şablon seçin
+        dialogDescription: Yeni bir AI eylemini hızlıca oluşturmak için bir şablon seçin veya sıfırdan başlayın.
         dictionary:
           name: "Sözlük"
           description: "Sözcükleri tanım, okunuş ve paragraf çevirisiyle arayın"
@@ -630,6 +638,8 @@ options:
           fieldDifficulty: "Zorluk"
           fieldDifficultyDescription: "Tahmini CEFR zorluk düzeyi: A1, A2, B1, B2, C1 veya C2."
         blank:
+          name: Boş
+          description: Boş bir eylemle sıfırdan başlayın
           prompt: |-
             ## Girdi
             Seçim: {{selection}}

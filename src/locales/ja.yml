@@ -1,6 +1,6 @@
 name: ReadTadpole
-extName: "ReadTadpole - AI対訳翻訳・動画字幕"
-extDescription: "readfrog lite 阅读蛙青春版 — ウェブページと YouTube・Netflix・X の動画字幕を AI で対訳翻訳。お使いの AI プロバイダーを設定して利用します。"
+extName: "ReadTadpole"
+extDescription: "Read Frog 青春版"
 dataTypes:
   string: テキスト
   number: 数値
@@ -10,9 +10,9 @@ popup:
   sourceLang: ソース言語
   targetLang: 翻訳言語
   providers:
-    title: Providers
-    description: Choose which provider to use for each feature
-    open: Open provider settings
+    title: プロバイダー
+    description: 各機能で使用するプロバイダーを選択します
+    open: プロバイダー設定を開く
   translate: 翻訳
   showOriginal: 原文を表示
   alwaysTranslate: このサイトを常に翻訳する
@@ -29,12 +29,6 @@ popup:
       translationOnly:
         current: 現在は翻訳のみ
         action: クリックしてバイリンガルへ切り替え
-  hub:
-    tooltip: 複数の翻訳モデルで同時にテキストを翻訳
-  discord:
-    tooltip: Discordに参加して開発者とつながり、新機能を先行体験しましょう
-  blog:
-    notification: ReadTadpole の最新情報
   aiSmartContext: AI スマートコンテキスト
   aiSmartContextDescription: ウェブページのコンテキストを使用して翻訳品質を向上させます。LLM翻訳プロバイダーが必要です。
 errorRecovery:
@@ -103,6 +97,7 @@ options:
         cancel: キャンセル
       atLeastOneLLMProvider: 最低1つのLLM翻訳プロバイダーが必要です。
       featureWouldLoseProvider: "削除できません:「$1」を実行できるプロバイダーがなくなります。"
+      providerInUseCannotDisable: '「$1」は現在 $2 個の機能で使用されているため無効にできません。'
       duplicateProviderName: '重複するプロバイダー名 "$1"'
       models:
         fetchModels: 利用可能なモデルを取得
@@ -208,7 +203,7 @@ options:
       title: 翻訳言語
       sourceCode:
         title: 翻訳元の言語
-        description: ウェブページの原文の言語です。「自動検出」を選ぶとページ自体から判定します。
+        description: ウェブページの原文の言語です。「自動検出」を選ぶと ReadTadpole がページ自体から判定します。
         auto: 自動検出
       targetCode:
         title: 翻訳先の言語
@@ -416,6 +411,11 @@ options:
       description: 選択テキスト向けに独自の構造化 AI アクションを追加
       configTitle: アクション設定
       builtIn: 組み込み
+      badges:
+        new: 新規
+        updated: 更新済み
+        createdFrom: $1 から作成
+        updatedFrom: $1 から更新
       add: AI アクションを追加
       edit: AI アクションを編集
       empty: カスタム AI アクションはまだありません
@@ -549,6 +549,8 @@ options:
           confirm: 削除
           cancel: キャンセル
       templates:
+        dialogTitle: テンプレートを選択
+        dialogDescription: テンプレートを選んで新しい AI アクションをすばやく作成するか、空白から始めます。
         dictionary:
           name: "辞書"
           description: "意味・発音・段落の翻訳付きで単語を調べる"
@@ -636,6 +638,8 @@ options:
           fieldDifficulty: "難易度"
           fieldDifficultyDescription: "推定 CEFR 難易度：A1、A2、B1、B2、C1、C2。"
         blank:
+          name: 空白
+          description: 空のアクションから新規作成します
           prompt: |-
             ## 入力
             選択テキスト：{{selection}}
