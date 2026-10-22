@@ -1,9 +1,6 @@
-import type { ReactNode } from "react"
-import type { ProviderConfig } from "@/types/config/provider"
 import type { SelectionToolbarCustomAction } from "@/types/config/selection-toolbar"
 import type { FeatureKey } from "@/utils/constants/feature-providers"
 import ProviderSelector from "@/components/llm-providers/provider-selector"
-import { SetApiKeyWarning } from "@/components/llm-providers/set-api-key-warning"
 import {
   useCustomActionProviders,
   useFeatureProvider,
@@ -59,31 +56,12 @@ export function toSystemPromptPreview(action: SelectionToolbarCustomAction): str
   return `${singleLine.slice(0, end).replace(TRAILING_SEPARATORS_RE, "")}…`
 }
 
-function FeatureProviderTitle({
-  children,
-  providerConfig,
-}: {
-  children: ReactNode
-  providerConfig: ProviderConfig | null
-}) {
-  return (
-    <span className="flex flex-wrap items-center gap-2">
-      {children}
-      <SetApiKeyWarning providerConfig={providerConfig} />
-    </span>
-  )
-}
-
 function FeatureProviderItem({ featureKey }: { featureKey: FeatureKey }) {
-  const { providers, providerId, providerConfig, setProviderId } = useFeatureProvider(featureKey)
+  const { providers, providerId, setProviderId } = useFeatureProvider(featureKey)
 
   return (
     <ConfigItem
-      title={
-        <FeatureProviderTitle providerConfig={providerConfig}>
-          {i18n.t(getFeatureLabelI18nKey(featureKey))}
-        </FeatureProviderTitle>
-      }
+      title={i18n.t(getFeatureLabelI18nKey(featureKey))}
       description={i18n.t(getFeatureDescriptionI18nKey(featureKey))}
     >
       <ProviderSelector
@@ -98,16 +76,12 @@ function FeatureProviderItem({ featureKey }: { featureKey: FeatureKey }) {
 }
 
 function CustomActionProviderItems() {
-  const { actions, providers, getProviderConfig, setActionProviderId } = useCustomActionProviders()
+  const { actions, providers, setActionProviderId } = useCustomActionProviders()
 
   return actions.map((action) => (
     <ConfigItem
       key={action.id}
-      title={
-        <FeatureProviderTitle providerConfig={getProviderConfig(action)}>
-          {action.name}
-        </FeatureProviderTitle>
-      }
+      title={action.name}
       description={toSystemPromptPreview(action)}
     >
       <ProviderSelector

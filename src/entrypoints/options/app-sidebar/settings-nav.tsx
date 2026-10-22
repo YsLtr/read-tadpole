@@ -24,7 +24,7 @@ export function SettingsNav() {
               isActive={pathname === "/api-providers" || pathname === "/"}
               tooltip={i18n.t("options.apiProviders.title")}
             >
-              <Icon icon="tabler:api" />
+              <Icon icon="tabler:plug-connected" />
               <span>{i18n.t("options.apiProviders.title")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

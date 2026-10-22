@@ -1,5 +1,7 @@
 import type { TranslationTextFormat } from "@/types/config/translate"
 import { escapeText } from "entities"
+import { MICROSOFT_TRANSLATE_URL } from "@/utils/constants/provider-endpoints"
+import { resolveProviderHeaders } from "@/utils/providers/headers"
 import { attachRequestErrorMeta } from "@/utils/request/retry-policy"
 
 // Unauthenticated successor to the api-edge.cognitive.microsofttranslator.com
@@ -7,25 +9,42 @@ import { attachRequestErrorMeta } from "@/utils/request/retry-policy"
 // upstream in 2026-07. Body is a bare JSON string array — the server rejects
 // the old [{ Text }] shape — and `from`/`to` are the only honored parameters
 // (`textType` no longer exists; see the html guard below).
-const MICROSOFT_TRANSLATE_URL = "https://edge.microsoft.com/translate/translatetext"
+
+interface MicrosoftTranslateOptions {
+  textFormat?: TranslationTextFormat
+  signal?: AbortSignal
+  /** The row's own endpoint, key and headers; the app's defaults stand in when blank. */
+  baseURL?: string
+  apiKey?: string
+  headers?: Record<string, unknown>
+}
+
+/** A hand-typed endpoint is a trust boundary: say what is wrong instead of throwing at the parser. */
+function getTranslateURL(baseURL: string | undefined): URL {
+  try {
+    return new URL(baseURL?.trim() || MICROSOFT_TRANSLATE_URL)
+  } catch {
+    throw new Error(`Invalid Microsoft translate endpoint: ${baseURL}`)
+  }
+}
 
 export async function microsoftTranslate(
   source: string,
   fromLang: string,
   toLang: string,
-  options?: { textFormat?: TranslationTextFormat; signal?: AbortSignal },
+  options?: MicrosoftTranslateOptions,
 ): Promise<string>
 export async function microsoftTranslate(
   source: string[],
   fromLang: string,
   toLang: string,
-  options?: { textFormat?: TranslationTextFormat; signal?: AbortSignal },
+  options?: MicrosoftTranslateOptions,
 ): Promise<string[]>
 export async function microsoftTranslate(
   source: string | string[],
   fromLang: string,
   toLang: string,
-  options?: { textFormat?: TranslationTextFormat; signal?: AbortSignal },
+  options?: MicrosoftTranslateOptions,
 ): Promise<string | string[]> {
   const isSingle = typeof source === "string"
   const texts = isSingle ? [source] : source
@@ -52,17 +71,22 @@ export async function microsoftTranslate(
   // verbatim and normalizeTranslationOutput decodes exactly once.
   const requestTexts = texts.map((text) => escapeText(text))
 
-  const resp = await fetch(
-    `${MICROSOFT_TRANSLATE_URL}?from=${encodeURIComponent(effectiveFromLang)}&to=${encodeURIComponent(toLang)}&isEnterpriseClient=false`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestTexts),
-      signal: options?.signal,
+  // Resolved through URL so a base URL that already carries a query string keeps
+  // it, instead of being handed a second "?".
+  const url = getTranslateURL(options?.baseURL)
+  url.searchParams.set("from", effectiveFromLang)
+  url.searchParams.set("to", toLang)
+  url.searchParams.set("isEnterpriseClient", "false")
+
+  const resp = await fetch(url.toString(), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...resolveProviderHeaders(options?.headers, options?.apiKey),
     },
-  ).catch((error) => {
+    body: JSON.stringify(requestTexts),
+    signal: options?.signal,
+  }).catch((error) => {
     throw attachRequestErrorMeta(
       new Error(`Network error during Microsoft translation: ${error.message}`),
       { kind: "network", isRetryable: true },

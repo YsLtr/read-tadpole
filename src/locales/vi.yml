@@ -70,13 +70,11 @@ options:
     features: Tính năng
     translation: Dịch
   apiProviders:
-    title: Nhà cung cấp API
-    pageDescription: Kết nối các dịch vụ AI mà ReadTadpole sử dụng và chọn dịch vụ cho từng tính năng.
-    description: Chọn nhà cung cấp mà ReadTadpole có thể gọi — mô hình tích hợp miễn phí, nhà cung cấp chỉ dịch, hoặc điểm cuối của riêng bạn.
+    title: Nhà cung cấp
+    pageDescription: Kết nối các dịch vụ dịch và AI mà ReadTadpole sử dụng, rồi chọn dịch vụ cho từng tính năng.
+    description: Chọn nhà cung cấp mà ReadTadpole có thể gọi — mô hình tích hợp miễn phí, máy dịch không cần khóa API, hoặc điểm cuối của riêng bạn.
     configTitle: Cấu hình nhà cung cấp
     addProvider: Thêm nhà cung cấp
-    setApiKeyWarning:
-      message: Hãy đặt API Key ở trang $1
     badges:
       featureCount: $1 tính năng
     dialog:
@@ -109,7 +107,6 @@ options:
         clickToRetry: Nhấp để thử lại
         noModels: Không có mô hình nào
         selectModel: Chọn mô hình
-        apiKeyRequired: Vui lòng thêm khóa API trước
         searchModels: Tìm kiếm mô hình...
         noModelsFound: Không tìm thấy mô hình
         label: Mô hình
@@ -124,7 +121,7 @@ options:
         chat: Chat Completions
         responses: Responses API
       headers: Header
-      headersHint: Header HTTP tùy chỉnh được gửi khi tạo client nhà cung cấp AI. Để trống để dùng mặc định của nhà cung cấp; dùng {} để tắt mặc định.
+      headersHint: "Header HTTP bổ sung cho mọi yêu cầu, áp dụng cho mọi nhà cung cấp. {{apiKey}} được thay bằng khóa API; để trống nếu không muốn gửi."
       providerOptions: Tùy chọn nhà cung cấp
       providerOptionsHint: Các tùy chọn dành riêng cho nhà cung cấp cho các tính năng API không chuẩn như chế độ suy nghĩ/lập luận. Xem tài liệu Vercel AI SDK hoặc tài liệu chính thức của nhà cung cấp để biết chi tiết cấu hình.
       providerOptionsRecommendationTrigger: Xem tùy chọn nhà cung cấp được đề xuất
@@ -137,8 +134,10 @@ options:
       description:
         bilibiliTranslate: Mô hình Index miễn phí của Bilibili cho dịch và các tính năng AI, không cần khóa API
         openaiCompatible: Kết nối với endpoint tùy chỉnh tương thích với OpenAI Chat Completions API
-        deeplx: API DeepL không chính thức
-        deepl: API DeepL chính thức
+        deeplx: API DeepL không chính thức cho máy chủ DeepLX tự dựng; bạn tự đặt điểm cuối
+        deepl: API chính thức của DeepL; có thể sửa điểm cuối nên proxy hay máy chủ miễn phí cũng dùng được
+        googleTranslate: Dịch máy Google, không cần khóa API
+        microsoftTranslate: Dịch máy Microsoft, không cần khóa API
     apiKey:
       showAPIKey: Hiển thị API Key
     testConnection:
@@ -1011,8 +1010,6 @@ languageLevels:
   beginner: Người mới bắt đầu
   intermediate: Trung cấp
   advanced: Nâng cao
-noAPIKeyConfig:
-  warning: Nếu bạn muốn sử dụng mô hình AI, vui lòng đặt API key trên trang tùy chọn trước
 languageDetection:
   llmFailed: Phát hiện ngôn ngữ LLM thất bại, đã chuyển về phát hiện cơ bản
 translation:

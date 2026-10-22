@@ -1,6 +1,8 @@
 import type { LLMProviderTypes } from "@/types/config/provider"
 import { FORCED_PROVIDER_HEADERS } from "@/utils/constants/providers"
 
+const API_KEY_PLACEHOLDER_RE = /\{\{apiKey\}\}/g
+
 function compactStringRecord(
   record?: Readonly<Record<string, unknown>>,
 ): Record<string, string> | undefined {
@@ -16,6 +18,38 @@ function compactStringRecord(
   )
 
   return Object.keys(compacted).length > 0 ? compacted : undefined
+}
+
+/**
+ * The headers a row's own config contributes, for the hand-written translator
+ * adapters that build their request directly instead of going through the AI SDK.
+ *
+ * `{{apiKey}}` is filled from the row's key, the same placeholder a DeepLX base URL
+ * already takes. A header left empty by the substitution is dropped rather than sent
+ * blank: `Authorization: DeepL-Auth-Key ` carries the scheme but no credential, which
+ * reads as a malformed request instead of a missing key.
+ */
+export function resolveProviderHeaders(
+  userHeaders?: Record<string, unknown>,
+  apiKey?: string,
+): Record<string, string> | undefined {
+  const configured = compactStringRecord(userHeaders)
+  if (!configured) {
+    return undefined
+  }
+
+  const key = apiKey?.trim()
+  const resolved = Object.entries(configured).flatMap(([name, value]) => {
+    if (!value.includes("{{apiKey}}")) {
+      return [[name, value] as const]
+    }
+    if (!key) {
+      return []
+    }
+    return [[name, value.replace(API_KEY_PLACEHOLDER_RE, key)] as const]
+  })
+
+  return resolved.length > 0 ? Object.fromEntries(resolved) : undefined
 }
 
 export function getForcedProviderHeaders(

@@ -1,6 +1,8 @@
 import type { LangCodeISO6391 } from "@read-frog/definitions"
 import type { ProviderConfig } from "@/types/config/provider"
 import type { TranslationTextFormat } from "@/types/config/translate"
+import { DEEPL_FREE_ENDPOINT, DEEPL_OFFICIAL_ENDPOINT } from "@/utils/constants/provider-endpoints"
+import { resolveProviderHeaders } from "@/utils/providers/headers"
 
 type DeepLProviderConfig = Extract<ProviderConfig, { provider: "deepl" }>
 
@@ -9,6 +11,16 @@ interface DeepLLanguagePair {
   target: string
 }
 
+/**
+ * DeepL's own API.
+ *
+ * The endpoint is the row's `baseURL`, in full — DeepL's paid host, its free one,
+ * or a proxy in front of either. A row that carries no endpoint falls back to the
+ * host its key belongs to, because DeepL accepts a `:fx` key on its free host only.
+ *
+ * Nothing here refuses to run without a key: a missing one is DeepL's 403, reported
+ * as the request error it is rather than as a form the reader cannot submit.
+ */
 export async function deeplTranslate(
   sourceText: string,
   fromLang: LangCodeISO6391 | "auto",
@@ -39,12 +51,7 @@ async function requestDeepLTranslations(
   options?: { textFormat?: TranslationTextFormat; signal?: AbortSignal },
 ): Promise<string[]> {
   const apiKey = providerConfig.apiKey?.trim()
-  if (!apiKey) {
-    throw new Error("DeepL API key is not configured")
-  }
-
-  const baseURL = getDeepLBaseURL(apiKey)
-  const url = `${baseURL}/v2/translate`
+  const url = providerConfig.baseURL || getDeepLBaseURL(apiKey)
   const normalizedLanguages = normalizeDeepLLanguages(fromLang, toLang)
 
   const requestBody = JSON.stringify({
@@ -54,23 +61,34 @@ async function requestDeepLTranslations(
     ...(options?.textFormat === "html" ? { tag_handling: "html" } : {}),
   })
 
-  const fetchResponse = await fetchDirect(url, apiKey, requestBody, options?.signal)
+  const fetchResponse = await fetchDirect(
+    url,
+    apiKey,
+    requestBody,
+    providerConfig.headers,
+    options?.signal,
+  )
 
   return await parseDeepLResponse(fetchResponse, sourceTexts.length)
 }
 
 async function fetchDirect(
   url: string,
-  apiKey: string,
+  apiKey: string | undefined,
   body: string,
+  userHeaders: Record<string, unknown> | undefined,
   signal?: AbortSignal,
 ): Promise<Response> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" }
+  if (apiKey) {
+    headers.Authorization = `DeepL-Auth-Key ${apiKey}`
+  }
+
   const resp = await fetch(url, {
     method: "POST",
-    headers: {
-      Authorization: `DeepL-Auth-Key ${apiKey}`,
-      "Content-Type": "application/json",
-    },
+    // The row's own headers go last: a proxy in front of DeepL may need its own
+    // Authorization scheme, and only the reader knows that.
+    headers: { ...headers, ...resolveProviderHeaders(userHeaders, apiKey) },
     body,
     signal,
   }).catch((error) => {
@@ -114,8 +132,9 @@ async function parseDeepLResponse(resp: Response, expectedCount: number): Promis
   }
 }
 
-export function getDeepLBaseURL(apiKey: string): string {
-  return apiKey.endsWith(":fx") ? "https://api-free.deepl.com" : "https://api.deepl.com"
+/** The host a key belongs to, for a row that carries no endpoint of its own. */
+function getDeepLBaseURL(apiKey: string | undefined): string {
+  return apiKey?.endsWith(":fx") ? DEEPL_FREE_ENDPOINT : DEEPL_OFFICIAL_ENDPOINT
 }
 
 export function normalizeDeepLLanguages(

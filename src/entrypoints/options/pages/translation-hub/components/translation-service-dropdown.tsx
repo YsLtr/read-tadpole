@@ -13,11 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/base-ui/select"
+import { isLLMProviderConfig } from "@/types/config/provider"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import {
   filterEnabledProvidersConfig,
   getLLMProvidersConfig,
-  getPureAPIProvidersConfig,
   getTranslateProvidersConfig,
 } from "@/utils/config/helpers"
 import { PROVIDER_ITEMS } from "@/utils/constants/providers"
@@ -42,7 +42,11 @@ export function TranslationServiceDropdown() {
   }
 
   const llmProviders = getLLMProvidersConfig(filteredProvidersConfig)
-  const pureAPIProviders = getPureAPIProvidersConfig(filteredProvidersConfig)
+  // Everything that is not a chat model translates through its own service:
+  // DeepLX and DeepL with the reader's key, Google and Microsoft with none.
+  const nonLLMProviders = filteredProvidersConfig.filter(
+    (provider) => !isLLMProviderConfig(provider),
+  )
 
   return (
     <div className="flex min-w-0 items-center gap-2">
@@ -74,10 +78,10 @@ export function TranslationServiceDropdown() {
               ))}
             </SelectGroup>
           )}
-          {pureAPIProviders.length > 0 && (
+          {nonLLMProviders.length > 0 && (
             <SelectGroup>
               <SelectLabel>{i18n.t("translateService.normalTranslator")}</SelectLabel>
-              {pureAPIProviders.map(({ id, name, provider }) => (
+              {nonLLMProviders.map(({ id, name, provider }) => (
                 <SelectItem key={id} value={id}>
                   <ProviderIcon logo={PROVIDER_ITEMS[provider].logo(theme)} name={name} size="sm" />
                 </SelectItem>

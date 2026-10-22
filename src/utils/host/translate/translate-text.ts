@@ -8,13 +8,12 @@ import type { PromptableProviderRef, SerializableProviderRef } from "@/utils/pro
 import type { ResolvedProviderRef } from "@/utils/providers/provider-registry"
 import { LANG_CODE_TO_EN_NAME } from "@read-frog/definitions"
 import { toastManager } from "@/components/ui/base-ui/toast"
-import { isAPIProviderConfig, isLLMProviderConfig } from "@/types/config/provider"
+import { isLLMProviderConfig } from "@/types/config/provider"
 import { isNoTranslationSentinel } from "@/utils/constants/prompt"
 import { detectLanguage } from "@/utils/content/language"
 import { i18n } from "@/utils/i18n"
 import { logger } from "@/utils/logger"
 import { getTranslatePrompt } from "@/utils/prompts/translate"
-import { providerNeedsApiKey } from "@/utils/providers/provider-auth"
 import { serializeProviderRef } from "@/utils/providers/provider-ref"
 import { resolveProviderRefForCapability } from "@/utils/providers/provider-registry"
 import { TranslationCancelledError } from "@/utils/request/cancellation"
@@ -307,17 +306,7 @@ export function validateTranslationConfigAndToast(
     return false
   }
 
-  // check if the API key is configured
-  if (
-    provider.kind === "local" &&
-    isAPIProviderConfig(provider.config) &&
-    providerNeedsApiKey(provider.config.provider, provider.config.baseURL) &&
-    !provider.config.apiKey?.trim()
-  ) {
-    toastManager.add({ type: "error", title: i18n.t("noAPIKeyConfig.warning") })
-    logger.info("validateTranslationConfig: returning false (no API key)")
-    return false
-  }
-
+  // No key check: whether a provider needs one is the provider's answer to give,
+  // and it gives it as a failed request when the key is missing or wrong.
   return true
 }

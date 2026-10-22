@@ -70,13 +70,11 @@ options:
     features: Funciones
     translation: Traducción
   apiProviders:
-    title: Proveedores de API
-    pageDescription: Conecta los servicios de IA que usa ReadTadpole y elige cuál se encarga de cada función.
-    description: Elige qué proveedores puede llamar ReadTadpole — el modelo integrado gratuito, los traductores puros o tu propio endpoint.
+    title: Proveedores
+    pageDescription: Conecta los servicios de traducción e IA que usa ReadTadpole y elige cuál se encarga de cada función.
+    description: Elige qué proveedores puede llamar ReadTadpole — el modelo integrado gratuito, traductores automáticos sin clave API o tu propio endpoint.
     configTitle: Configuración de proveedores
     addProvider: Añadir proveedor
-    setApiKeyWarning:
-      message: Configura tu clave de API en la página $1
     badges:
       featureCount: $1 funciones
     dialog:
@@ -110,7 +108,6 @@ options:
         clickToRetry: Haz clic para reintentar
         noModels: No hay modelos disponibles
         selectModel: Selecciona un modelo
-        apiKeyRequired: Añade primero una clave API
         searchModels: Buscar modelos...
         noModelsFound: No se encontraron modelos
         label: Modelo
@@ -125,7 +122,7 @@ options:
         chat: Chat Completions
         responses: Responses API
       headers: Encabezados
-      headersHint: Encabezados HTTP personalizados enviados al crear el cliente del proveedor de IA. Déjalo vacío para usar los valores predeterminados; usa {} para desactivarlos.
+      headersHint: "Encabezados HTTP adicionales enviados con cada solicitud, para todos los proveedores. {{apiKey}} se sustituye por la clave API; déjalo vacío para no enviar ninguno."
       providerOptions: Opciones del proveedor
       providerOptionsHint: Opciones específicas del proveedor para funciones API no estándar, como el modo thinking/reasoning. Consulta la documentación de Vercel AI SDK o la documentación oficial de tu proveedor para ver detalles de configuración.
       providerOptionsRecommendationTrigger: Ver opciones recomendadas del proveedor
@@ -138,8 +135,10 @@ options:
       description:
         bilibiliTranslate: Modelo Index gratuito de Bilibili para traducción y funciones de IA, sin clave API
         openaiCompatible: Conecta un endpoint personalizado compatible con la API Chat Completions de OpenAI
-        deeplx: API de DeepL no oficial
-        deepl: API oficial de DeepL
+        deeplx: API de DeepL no oficial para un servidor DeepLX propio; configura tú mismo el endpoint
+        deepl: API oficial de DeepL; el endpoint es editable, así que también sirve un proxy o el host gratuito
+        googleTranslate: Traducción automática de Google, sin clave API
+        microsoftTranslate: Traducción automática de Microsoft, sin clave API
     apiKey:
       showAPIKey: Mostrar clave API
     testConnection:
@@ -1016,8 +1015,6 @@ languageLevels:
   beginner: Principiante
   intermediate: Intermedio
   advanced: Avanzado
-noAPIKeyConfig:
-  warning: Si quieres usar modelos AI, primero configura la clave API en la página de opciones
 languageDetection:
   llmFailed: Falló la detección de idioma LLM; se recurrió a la detección básica
 translation:

@@ -61,38 +61,11 @@ export function isCustomModelOnlyProvider(
   return CUSTOM_MODEL_ONLY_PROVIDER_TYPES.includes(provider)
 }
 
-export const API_PROVIDER_TYPES = [
-  "openai-compatible",
-  "deeplx",
-  "deepl",
-] as const satisfies Readonly<(keyof typeof LLM_PROVIDER_MODELS | "deeplx" | "deepl")[]>
-export type APIProviderTypes = (typeof API_PROVIDER_TYPES)[number]
-export function isAPIProvider(provider: string): provider is APIProviderTypes {
-  return API_PROVIDER_TYPES.includes(provider)
-}
-
-export const PURE_API_PROVIDER_TYPES = ["deeplx", "deepl"] as const satisfies Readonly<
-  Exclude<APIProviderTypes, LLMProviderTypes>[]
->
-export type PureAPIProviderTypes = (typeof PURE_API_PROVIDER_TYPES)[number]
-export function isPureAPIProvider(provider: string): provider is PureAPIProviderTypes {
-  return PURE_API_PROVIDER_TYPES.includes(provider)
-}
-
 /**
- * Translators that need no configuration beyond being switched on: they call a
- * public vendor endpoint and hold no key, base URL or model.
+ * Every provider name. A keyless translator is an ordinary provider row — its
+ * key, endpoint and model are just empty — so the set of API-shaped configs and
+ * the set of provider types are the same set.
  */
-export const NON_API_PROVIDER_TYPES = [
-  "google-translate",
-  "microsoft-translate",
-] as const satisfies Readonly<Exclude<TranslateProviderTypes, APIProviderTypes>[]>
-export type NonAPIProviderTypes = (typeof NON_API_PROVIDER_TYPES)[number]
-export function isNonAPIProvider(provider: string): provider is NonAPIProviderTypes {
-  return NON_API_PROVIDER_TYPES.includes(provider)
-}
-
-// all provider names
 export const ALL_PROVIDER_TYPES = [
   "deeplx",
   "deepl",
@@ -101,6 +74,12 @@ export const ALL_PROVIDER_TYPES = [
   "microsoft-translate",
 ] as const satisfies Readonly<TranslateProviderTypes[]>
 export type AllProviderTypes = (typeof ALL_PROVIDER_TYPES)[number]
+
+export const API_PROVIDER_TYPES = ALL_PROVIDER_TYPES
+export type APIProviderTypes = AllProviderTypes
+export function isAPIProvider(provider: string): provider is APIProviderTypes {
+  return (ALL_PROVIDER_TYPES as readonly string[]).includes(provider)
+}
 
 export function isPureTranslateProvider(
   provider: TranslateProviderTypes,

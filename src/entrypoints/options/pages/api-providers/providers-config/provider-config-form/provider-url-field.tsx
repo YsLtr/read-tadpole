@@ -10,10 +10,6 @@ export const ProviderURLField = withForm({
     const providerConfig = useSelector(form.store, (state) => state.values)
     const providerType = providerConfig.provider
 
-    if (providerType === "deepl") {
-      return null
-    }
-
     return (
       <form.AppField name="baseURL">
         {(field) => (

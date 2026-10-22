@@ -1,20 +1,16 @@
 import type {
   APIProviderConfig,
   LLMProviderConfig,
-  NonAPIProviderConfig,
   OpenAICompatibleLLMProviderConfig,
   ProtocolCompatibleLLMProviderConfig,
   ProviderConfig,
-  PureAPIProviderConfig,
   TranslateProviderConfig,
 } from "./schemas"
 import {
   isAPIProvider,
   isLLMProvider,
-  isNonAPIProvider,
   isOpenAICompatibleLLMProvider,
   isProtocolCompatibleLLMProvider,
-  isPureAPIProvider,
   isPureTranslateProvider,
   isTranslateProvider,
 } from "./constants"
@@ -46,14 +42,6 @@ export function isProtocolCompatibleLLMProviderConfig(
 
 export function isAPIProviderConfig(config: ProviderConfig): config is APIProviderConfig {
   return isAPIProvider(config.provider)
-}
-
-export function isNonAPIProviderConfig(config: ProviderConfig): config is NonAPIProviderConfig {
-  return isNonAPIProvider(config.provider)
-}
-
-export function isPureAPIProviderConfig(config: ProviderConfig): config is PureAPIProviderConfig {
-  return isPureAPIProvider(config.provider)
 }
 
 export function isPureTranslateProviderConfig(config: ProviderConfig): boolean {

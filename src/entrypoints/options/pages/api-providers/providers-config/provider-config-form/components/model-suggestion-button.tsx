@@ -16,7 +16,6 @@ import { extractErrorMessage } from "@/utils/error/extract-message"
 import { i18n } from "@/utils/i18n"
 import { getProviderConnectionURL } from "@/utils/providers/connection-url"
 import { getProviderModelsURL } from "@/utils/providers/models-url"
-import { providerNeedsApiKey } from "@/utils/providers/provider-auth"
 
 interface ModelsResponse {
   object: string
@@ -42,10 +41,6 @@ export function ModelSuggestionButton({
       errorDescription: i18n.t("options.apiProviders.form.models.fetchError"),
     },
     mutationFn: async () => {
-      if (!apiKey && providerNeedsApiKey(providerConfig.provider, connectionURL)) {
-        throw new Error(i18n.t("options.apiProviders.form.models.apiKeyRequired"))
-      }
-
       const response = await fetch(getProviderModelsURL(providerConfig), {
         headers: apiKey ? { Authorization: `Bearer ${apiKey}` } : {},
       })

@@ -202,7 +202,9 @@ function EditableProviderConfig({ providerConfig }: { providerConfig: APIProvide
                   <ProviderEditor.CustomActionAssignments />
                 </ProviderEditor.Assignments>
               )}
-              {hasAdvancedFields && <ProviderEditor.AdvancedFields />}
+              {/* Headers are honoured by every adapter, so this section is not LLM-only;
+                  the temperature and options fields inside it hide themselves. */}
+              <ProviderEditor.AdvancedFields />
             </EntityEditor.Body>
             <EntityEditor.Footer>
               <ProviderEditor.DuplicateButton />

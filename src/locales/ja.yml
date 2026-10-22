@@ -76,13 +76,11 @@ options:
     features: 機能
     translation: 翻訳
   apiProviders:
-    title: APIプロバイダー
-    pageDescription: ReadTadpole が呼び出す AI サービスを接続し、各機能で使うものを選びます。
-    description: ReadTadpole が呼び出せるプロバイダーを選びます — 無料の内蔵モデル、翻訳専用プロバイダー、またはご自身のエンドポイント。
+    title: プロバイダー
+    pageDescription: ReadTadpole が呼び出す翻訳・AI サービスを接続し、各機能で使うものを選びます。
+    description: ReadTadpole が呼び出せるプロバイダーを選びます — 無料の内蔵モデル、API キー不要の機械翻訳、またはご自身のエンドポイント。
     configTitle: プロバイダー設定
     addProvider: プロバイダーを追加
-    setApiKeyWarning:
-      message: API キーは $1 ページで設定してください
     badges:
       featureCount: $1 件の機能
     dialog:
@@ -115,7 +113,6 @@ options:
         clickToRetry: クリックして再試行
         noModels: 利用可能なモデルがありません
         selectModel: モデルを選択
-        apiKeyRequired: 先にAPIキーを追加してください
         searchModels: モデルを検索...
         noModelsFound: モデルが見つかりません
         label: モデル
@@ -130,7 +127,7 @@ options:
         chat: Chat Completions
         responses: Responses API
       headers: ヘッダー
-      headersHint: AIプロバイダークライアント作成時に送信するカスタムHTTPヘッダー。空欄の場合はプロバイダーのデフォルトを使用し、{} でデフォルトを無効化します。
+      headersHint: "すべてのリクエストに付与するカスタム HTTP ヘッダーです。すべてのプロバイダーに適用されます。{{apiKey}} は API キーに置き換わります。空欄の場合は何も送信しません。"
       providerOptions: プロバイダーオプション
       providerOptionsHint: 思考/推論モードなどの非標準API機能のためのプロバイダー固有オプション。詳細はVercel AI SDKドキュメントまたはプロバイダーの公式ドキュメントをご覧ください。
       providerOptionsRecommendationTrigger: 推奨プロバイダーオプションを表示
@@ -143,8 +140,10 @@ options:
       description:
         bilibiliTranslate: 翻訳と AI 機能に使える Bilibili の無料 Index モデル。API キー不要
         openaiCompatible: OpenAI Chat Completions API 互換のカスタムエンドポイントに接続
-        deeplx: 非公式 DeepL API
-        deepl: 公式 DeepL API
+        deeplx: 自前の DeepLX サーバー向けの非公式 DeepL API。エンドポイントは自分で設定します
+        deepl: DeepL 公式 API。エンドポイントは変更できるため、プロキシや無料版のホストも使えます
+        googleTranslate: Google 機械翻訳。API キー不要
+        microsoftTranslate: Microsoft 機械翻訳。API キー不要
     apiKey:
       showAPIKey: APIキーを表示
     testConnection:
@@ -1017,8 +1016,6 @@ languageLevels:
   beginner: 初級
   intermediate: 中級
   advanced: 上級
-noAPIKeyConfig:
-  warning: AIモデルを使用するには、まずオプションページでAPIキーを設定してください
 languageDetection:
   llmFailed: LLM言語検出に失敗しました。基本検出にフォールバックしました
 translation:

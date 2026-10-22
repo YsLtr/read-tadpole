@@ -1,11 +1,20 @@
 import type { LangCodeISO6391 } from "@read-frog/definitions"
 import type { ProviderConfig } from "@/types/config/provider"
 import type { TranslationTextFormat } from "@/types/config/translate"
-import { DEFAULT_PROVIDER_CONFIG } from "@/utils/constants/providers"
+import { DEEPLX_DEFAULT_ENDPOINT } from "@/utils/constants/provider-endpoints"
+import { resolveProviderHeaders } from "@/utils/providers/headers"
 
 type DeepLXProviderConfig = Extract<ProviderConfig, { provider: "deeplx" }>
 const API_KEY_PLACEHOLDER_RE = /\{\{apiKey\}\}/g
 
+/**
+ * A DeepLX server — the unofficial, self-hosted DeepL-compatible API.
+ *
+ * Its endpoint is the row's `baseURL` in full, and the key, when there is one,
+ * travels in that URL through the `{{apiKey}}` placeholder rather than in a
+ * header. A missing key is not refused here: a server that wants one answers with
+ * its own error.
+ */
 export async function deeplxTranslate(
   sourceText: string,
   fromLang: LangCodeISO6391 | "auto",
@@ -13,21 +22,11 @@ export async function deeplxTranslate(
   providerConfig: DeepLXProviderConfig,
   options?: { textFormat?: TranslationTextFormat; signal?: AbortSignal },
 ): Promise<string> {
-  const baseURL = providerConfig.baseURL || DEFAULT_PROVIDER_CONFIG.deeplx.baseURL
-  const apiKey = providerConfig.apiKey
+  // A row that carries no endpoint of its own — an imported config, say — still
+  // has somewhere to go, because `baseURL` is optional in the schema.
+  const baseURL = providerConfig.baseURL || DEEPLX_DEFAULT_ENDPOINT
 
-  if (!baseURL) {
-    throw new Error("DeepLX baseURL is not configured")
-  }
-
-  const formatLang = (lang: LangCodeISO6391 | "auto") => {
-    if (lang === "auto") return "auto"
-    let formattedLang = lang.toUpperCase()
-    if (formattedLang === "ZH-TW") formattedLang = "ZH-HANT"
-    return formattedLang
-  }
-
-  const url = buildDeepLXUrl(baseURL, apiKey)
+  const url = buildDeepLXUrl(baseURL, providerConfig.apiKey)
 
   const requestBody = JSON.stringify({
     text: sourceText,
@@ -36,15 +35,37 @@ export async function deeplxTranslate(
     ...(options?.textFormat === "html" ? { tag_handling: "html" } : {}),
   })
 
-  const fetchResponse = await fetchDirect(url, requestBody, options?.signal)
+  const fetchResponse = await fetchDirect(
+    url,
+    requestBody,
+    providerConfig.headers,
+    providerConfig.apiKey,
+    options?.signal,
+  )
 
   return parseDeepLXResponse(fetchResponse)
 }
 
-async function fetchDirect(url: string, body: string, signal?: AbortSignal) {
+function formatLang(lang: LangCodeISO6391 | "auto"): string {
+  if (lang === "auto") return "auto"
+  let formattedLang = lang.toUpperCase()
+  if (formattedLang === "ZH-TW") formattedLang = "ZH-HANT"
+  return formattedLang
+}
+
+async function fetchDirect(
+  url: string,
+  body: string,
+  userHeaders: Record<string, unknown> | undefined,
+  apiKey: string | undefined,
+  signal?: AbortSignal,
+) {
   const resp = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...resolveProviderHeaders(userHeaders, apiKey),
+    },
     body,
     signal,
   }).catch((error) => {

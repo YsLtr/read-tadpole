@@ -12,7 +12,12 @@ import customProviderLogo from "@/assets/providers/custom-provider.svg?url&no-in
 import deeplxLogoDark from "@/assets/providers/deeplx-dark.svg?url&no-inline"
 import deeplxLogoLight from "@/assets/providers/deeplx-light.svg?url&no-inline"
 import { DEFAULT_BUILT_IN_ACTION_PROVIDER_ID } from "@/types/config/selection-toolbar"
-import { isAPIProviderConfig } from "@/types/config/provider"
+import {
+  DEEPL_OFFICIAL_ENDPOINT,
+  DEEPLX_DEFAULT_ENDPOINT,
+  GOOGLE_TRANSLATE_HTML_URL,
+  MICROSOFT_TRANSLATE_URL,
+} from "@/utils/constants/provider-endpoints"
 import { i18n } from "@/utils/i18n"
 import { getLobeIconsCDNUrlFn } from "@/utils/logo"
 import {
@@ -76,7 +81,7 @@ export const DEFAULT_PROVIDER_CONFIG = {
     name: PROVIDER_ITEMS.deeplx.name,
     enabled: true,
     provider: "deeplx",
-    baseURL: "http://localhost:1188",
+    baseURL: DEEPLX_DEFAULT_ENDPOINT,
     apiKey: "",
   },
   deepl: {
@@ -84,6 +89,7 @@ export const DEFAULT_PROVIDER_CONFIG = {
     name: PROVIDER_ITEMS.deepl.name,
     enabled: true,
     provider: "deepl",
+    baseURL: DEEPL_OFFICIAL_ENDPOINT,
     apiKey: "",
   },
   "google-translate": {
@@ -211,6 +217,9 @@ export const FORCED_PROVIDER_HEADERS: Partial<Record<AllProviderTypes, Record<st
 export const PROVIDER_URL_PLACEHOLDERS: Partial<Record<APIProviderTypes, string>> = {
   "openai-compatible": DEFAULT_PROVIDER_CONFIG["openai-compatible"].baseURL,
   deeplx: DEFAULT_PROVIDER_CONFIG.deeplx.baseURL,
+  deepl: DEFAULT_PROVIDER_CONFIG.deepl.baseURL,
+  "google-translate": GOOGLE_TRANSLATE_HTML_URL,
+  "microsoft-translate": MICROSOFT_TRANSLATE_URL,
 }
 
 export const DEFAULT_PROVIDER_CONFIG_LIST: ProvidersConfig = [BILIBILI_PRESET_PROVIDER_CONFIG]

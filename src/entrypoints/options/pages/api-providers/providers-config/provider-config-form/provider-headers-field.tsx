@@ -2,7 +2,6 @@ import type { APIProviderConfig } from "@/types/config/provider"
 import { useSelector } from "@tanstack/react-store"
 import { useCallback } from "react"
 import { HelpTooltip } from "@/components/help-tooltip"
-import { isLLMProviderConfig } from "@/types/config/provider"
 import { i18n } from "@/utils/i18n"
 import { AutosavedJsonCodeEditorField } from "./components/autosaved-json-code-editor-field"
 import { withForm } from "./form"
@@ -40,13 +39,13 @@ function toJson(headers: APIProviderConfig["headers"]) {
 
 const EXAMPLE_HEADERS_PLACEHOLDER = {
   "X-Custom-Header": "value",
+  Authorization: "Bearer {{apiKey}}",
 }
 
 export const ProviderHeadersField = withForm({
   ...{ defaultValues: {} as APIProviderConfig },
   render: function Render({ form }) {
     const providerConfig = useSelector(form.store, (state) => state.values)
-    const isLLMProvider = isLLMProviderConfig(providerConfig)
 
     const handleHeadersCommit = useCallback(
       (value: Record<string, unknown> | undefined) => {
@@ -55,10 +54,8 @@ export const ProviderHeadersField = withForm({
       [form],
     )
 
-    if (!isLLMProvider) {
-      return null
-    }
-
+    // No provider guard: every adapter reads this field — the AI SDK clients and
+    // the four hand-written translator requests alike.
     // Only ever an example now: headers a provider starts with are seeded into its config, so
     // they show up as real editable values rather than as a hint the user has to retype. Forced
     // headers are deliberately absent — they are sent regardless, and offering them here would

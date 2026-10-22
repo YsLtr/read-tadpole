@@ -3,7 +3,7 @@ import type { Config } from "@/types/config/config"
 import type { ProviderConfig } from "@/types/config/provider"
 import type { TranslationTextFormat } from "@/types/config/translate"
 import { ISO6393_TO_6391, LANG_CODE_TO_EN_NAME } from "@read-frog/definitions"
-import { isLLMProviderConfig, isNonAPIProvider, isPureAPIProvider } from "@/types/config/provider"
+import { isLLMProviderConfig } from "@/types/config/provider"
 import { aiTranslate } from "./api/ai"
 import { deeplTranslate } from "./api/deepl"
 import { deeplxTranslate } from "./api/deeplx"
@@ -39,43 +39,44 @@ export async function executeTranslate<TContext>(
   const { provider } = providerConfig
   let translatedText = ""
 
-  if (isNonAPIProvider(provider)) {
+  if (provider === "google-translate" || provider === "microsoft-translate") {
     const sourceLang =
       langConfig.sourceCode === "auto" ? "auto" : (ISO6393_TO_6391[langConfig.sourceCode] ?? "auto")
     const targetLang = ISO6393_TO_6391[langConfig.targetCode]
     if (!targetLang) {
       throw new Error(`Invalid target language code: ${langConfig.targetCode}`)
     }
+    const { baseURL, apiKey, headers } = providerConfig
     if (provider === "google-translate") {
       translatedText = await googleTranslate(preparedText, sourceLang, targetLang, {
         textFormat: options?.textFormat,
         preserveLineBreaks: options?.preserveLineBreaks,
         signal: options?.signal,
+        baseURL,
+        apiKey,
+        headers,
       })
     } else {
       translatedText = await microsoftTranslate(preparedText, sourceLang, targetLang, {
         textFormat: options?.textFormat,
         signal: options?.signal,
+        baseURL,
+        apiKey,
+        headers,
       })
     }
-  } else if (isPureAPIProvider(provider)) {
+  } else if (provider === "deeplx" || provider === "deepl") {
     const sourceLang =
       langConfig.sourceCode === "auto" ? "auto" : (ISO6393_TO_6391[langConfig.sourceCode] ?? "auto")
     const targetLang = ISO6393_TO_6391[langConfig.targetCode]
     if (!targetLang) {
       throw new Error(`Invalid target language code: ${langConfig.targetCode}`)
     }
-    if (provider === "deeplx") {
-      translatedText = await deeplxTranslate(preparedText, sourceLang, targetLang, providerConfig, {
-        textFormat: options?.textFormat,
-        signal: options?.signal,
-      })
-    } else if (provider === "deepl") {
-      translatedText = await deeplTranslate(text, sourceLang, targetLang, providerConfig, {
-        textFormat: options?.textFormat,
-        signal: options?.signal,
-      })
-    }
+    const requestOptions = { textFormat: options?.textFormat, signal: options?.signal }
+    translatedText =
+      provider === "deeplx"
+        ? await deeplxTranslate(preparedText, sourceLang, targetLang, providerConfig, requestOptions)
+        : await deeplTranslate(preparedText, sourceLang, targetLang, providerConfig, requestOptions)
   } else if (isLLMProviderConfig(providerConfig)) {
     const targetLangName = LANG_CODE_TO_EN_NAME[langConfig.targetCode]
     translatedText = await aiTranslate(

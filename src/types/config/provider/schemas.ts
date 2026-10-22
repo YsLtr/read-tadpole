@@ -1,10 +1,8 @@
 import type {
   APIProviderTypes,
   LLMProviderTypes,
-  NonAPIProviderTypes,
   OpenAICompatibleLLMProviderTypes,
   ProtocolCompatibleLLMProviderTypes,
-  PureAPIProviderTypes,
   TranslateProviderTypes,
 } from "./constants"
 import { z } from "zod"
@@ -58,7 +56,7 @@ const llmProviderConfigSchemaList = [
   }),
 ] as const
 
-const apiProviderConfigSchemaList = [
+export const providerConfigSchemaList = [
   ...llmProviderConfigSchemaList,
   baseAPIProviderConfigSchema.extend({
     provider: z.literal("deeplx"),
@@ -66,24 +64,15 @@ const apiProviderConfigSchemaList = [
   baseAPIProviderConfigSchema.extend({
     provider: z.literal("deepl"),
   }),
-] as const
-
-/**
- * Keyless vendor translators. They hold nothing but an identity and an enable
- * flag — there is no endpoint, key or model the reader could set.
- */
-const nonApiProviderConfigSchemaList = [
-  baseProviderConfigSchema.extend({
+  // Keyless vendor translators. Their row is the ordinary provider row with the
+  // key, endpoint and model left empty — filling them in does nothing, but it is
+  // the reader's config to fill.
+  baseAPIProviderConfigSchema.extend({
     provider: z.literal("google-translate"),
   }),
-  baseProviderConfigSchema.extend({
+  baseAPIProviderConfigSchema.extend({
     provider: z.literal("microsoft-translate"),
   }),
-] as const
-
-export const providerConfigSchemaList = [
-  ...apiProviderConfigSchemaList,
-  ...nonApiProviderConfigSchemaList,
 ] as const
 
 export const llmProviderConfigItemSchema = z.discriminatedUnion(
@@ -92,7 +81,7 @@ export const llmProviderConfigItemSchema = z.discriminatedUnion(
 )
 export const apiProviderConfigItemSchema = z.discriminatedUnion(
   "provider",
-  apiProviderConfigSchemaList,
+  providerConfigSchemaList,
 )
 export const providerConfigItemSchema = z.discriminatedUnion("provider", providerConfigSchemaList)
 
@@ -125,10 +114,7 @@ export const providersConfigSchema = z
   })
 export type ProvidersConfig = z.infer<typeof providersConfigSchema>
 export type ProviderConfig = ProvidersConfig[number]
-export type NonAPIProviderConfig = Extract<ProviderConfig, { provider: NonAPIProviderTypes }>
-export type PureProviderConfig = Extract<ProviderConfig, { provider: PureAPIProviderTypes }>
 export type APIProviderConfig = Extract<ProviderConfig, { provider: APIProviderTypes }>
-export type PureAPIProviderConfig = Extract<ProviderConfig, { provider: PureAPIProviderTypes }>
 export type LLMProviderConfig = Extract<ProviderConfig, { provider: LLMProviderTypes }>
 export type TranslateProviderConfig = Extract<ProviderConfig, { provider: TranslateProviderTypes }>
 export type OpenAICompatibleLLMProviderConfig = Extract<

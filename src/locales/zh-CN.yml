@@ -70,13 +70,11 @@ options:
     features: 功能
     translation: 翻译
   apiProviders:
-    title: API 提供商
-    pageDescription: 接入 ReadTadpole 调用的 AI 服务，并为每项功能指定使用哪一个。
-    description: 选择阅读蝌蚪可以调用的提供商：免费内置模型、纯翻译，或你自己的端点。
+    title: 提供商
+    pageDescription: 接入阅读蝌蚪调用的翻译与 AI 服务，并为每项功能指定使用哪一个。
+    description: 选择阅读蝌蚪可以调用的提供商：免费内置模型、无需 API Key 的机器翻译，或你自己的端点。
     configTitle: 提供商配置
     addProvider: 添加提供商
-    setApiKeyWarning:
-      message: 请在 $1 页面设置 API Key
     badges:
       featureCount: $1 个功能
     dialog:
@@ -110,7 +108,6 @@ options:
         clickToRetry: 点击重试
         noModels: 没有可用的模型
         selectModel: 选择模型
-        apiKeyRequired: 请先添加 API 密钥
         searchModels: 搜索模型...
         noModelsFound: 未找到模型
         label: 模型
@@ -125,7 +122,7 @@ options:
         chat: Chat Completions
         responses: Responses API
       headers: 请求头
-      headersHint: 创建 AI 提供商客户端时发送的自定义 HTTP 请求头。留空则使用提供商默认值；填写 {} 可禁用默认值。
+      headersHint: "每次请求都会附带的自定义 HTTP 请求头，对所有提供商生效。{{apiKey}} 会替换为 API Key；留空则不发送。"
       providerOptions: 提供商选项
       providerOptionsHint: 用于非标准 API 功能（如思考/推理模式）的提供商特定选项。详情请参阅 Vercel AI SDK 文档或您的提供商官方文档。
       providerOptionsRecommendationTrigger: 查看推荐的提供商选项
@@ -138,8 +135,10 @@ options:
       description:
         bilibiliTranslate: Bilibili 免费 Index 模型，支持翻译与 AI 功能，无需 API Key
         openaiCompatible: 连接兼容 OpenAI Chat Completions API 的自定义端点
-        deeplx: 非官方 DeepL API
-        deepl: 官方 DeepL API
+        deeplx: 非官方 DeepL API，供自建 DeepLX 服务器使用；端点由你自行设置
+        deepl: 官方 DeepL API；端点可修改，也适用于代理或免费版服务器
+        googleTranslate: Google 机器翻译，无需 API Key
+        microsoftTranslate: Microsoft 机器翻译，无需 API Key
     apiKey:
       showAPIKey: 显示 API Key
     testConnection:
@@ -1021,8 +1020,6 @@ languageLevels:
   beginner: 初级
   intermediate: 中级
   advanced: 高级
-noAPIKeyConfig:
-  warning: 如果想要使用 AI 模型，请先在选项页设置 API Key
 languageDetection:
   llmFailed: LLM 语言检测失败，已回退到基础检测
 translation:

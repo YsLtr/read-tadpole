@@ -70,13 +70,11 @@ options:
     features: Функции
     translation: Перевод
   apiProviders:
-    title: API-провайдеры
-    pageDescription: Подключите ИИ-сервисы, которые вызывает ReadTadpole, и выберите провайдера для каждой функции.
-    description: Выберите, каких провайдеров может вызывать ReadTadpole — бесплатную встроенную модель, чистые переводчики или собственный эндпоинт.
+    title: Провайдеры
+    pageDescription: Подключите сервисы перевода и ИИ, которые вызывает ReadTadpole, и выберите провайдера для каждой функции.
+    description: Выберите, каких провайдеров может вызывать ReadTadpole — бесплатную встроенную модель, машинные переводчики без API-ключа или собственный эндпоинт.
     configTitle: Настройка провайдеров
     addProvider: Добавить провайдера
-    setApiKeyWarning:
-      message: Укажите API-ключ на странице $1
     badges:
       featureCount: $1 функций
     dialog:
@@ -109,7 +107,6 @@ options:
         clickToRetry: Нажмите для повтора
         noModels: Нет доступных моделей
         selectModel: Выбрать модель
-        apiKeyRequired: Сначала добавьте API ключ
         searchModels: Поиск моделей...
         noModelsFound: Модели не найдены
         label: Модель
@@ -124,7 +121,7 @@ options:
         chat: Chat Completions
         responses: Responses API
       headers: Заголовки
-      headersHint: Пользовательские HTTP-заголовки для создания клиента AI-провайдера. Оставьте пустым для значений провайдера по умолчанию; используйте {}, чтобы отключить их.
+      headersHint: "Дополнительные HTTP-заголовки для каждого запроса, для всех провайдеров. {{apiKey}} заменяется на API-ключ; оставьте пустым, чтобы ничего не отправлять."
       providerOptions: Параметры провайдера
       providerOptionsHint: Специфические параметры провайдера для нестандартных функций API, таких как режим размышления/рассуждения. Подробнее см. документацию Vercel AI SDK или официальную документацию вашего провайдера.
       providerOptionsRecommendationTrigger: Показать рекомендуемые параметры провайдера
@@ -137,8 +134,10 @@ options:
       description:
         bilibiliTranslate: Бесплатная модель Bilibili Index для перевода и функций ИИ, без API-ключа
         openaiCompatible: Подключение к пользовательской конечной точке, совместимой с OpenAI Chat Completions API
-        deeplx: Неофициальный DeepL API
-        deepl: Официальный DeepL API
+        deeplx: "Неофициальный DeepL API для вашего сервера DeepLX; эндпоинт задаёте сами"
+        deepl: "Официальный API DeepL; эндпоинт можно изменить, поэтому подойдёт и прокси, или бесплатный хост"
+        googleTranslate: Машинный перевод Google, без API-ключа
+        microsoftTranslate: Машинный перевод Microsoft, без API-ключа
     apiKey:
       showAPIKey: Показать API-ключ
     testConnection:
@@ -1011,8 +1010,6 @@ languageLevels:
   beginner: Начинающий
   intermediate: Средний
   advanced: Продвинутый
-noAPIKeyConfig:
-  warning: Если вы хотите использовать ИИ-модели, сначала установите API-ключ на странице настроек
 languageDetection:
   llmFailed: Определение языка через LLM не удалось, выполнен откат к базовому определению
 translation:

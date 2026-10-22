@@ -5,7 +5,6 @@ import { Field, FieldGroup, FieldTitle } from "@/components/ui/base-ui/field"
 import { FEATURE_KEYS, getFeatureLabelI18nKey } from "@/utils/constants/feature-providers"
 import { i18n } from "@/utils/i18n"
 import { cn } from "@/utils/styles/utils"
-import { SetApiKeyWarning } from "./set-api-key-warning"
 import { useCustomActionProviders, useFeatureProvider } from "./use-feature-providers"
 
 type ProviderSelectorTriggerSize = ComponentProps<typeof ProviderSelector>["triggerSize"]
@@ -26,14 +25,11 @@ function FeatureProviderField({
   providerSelectorClassName?: string
   providerSelectorTriggerSize?: ProviderSelectorTriggerSize
 }) {
-  const { providers, providerId, providerConfig, setProviderId } = useFeatureProvider(featureKey)
+  const { providers, providerId, setProviderId } = useFeatureProvider(featureKey)
 
   return (
     <Field>
-      <FieldTitle className="flex flex-wrap items-center gap-2">
-        {i18n.t(getFeatureLabelI18nKey(featureKey))}
-        <SetApiKeyWarning providerConfig={providerConfig} />
-      </FieldTitle>
+      <FieldTitle>{i18n.t(getFeatureLabelI18nKey(featureKey))}</FieldTitle>
       <ProviderSelector
         providers={providers}
         value={providerId}
@@ -52,7 +48,7 @@ function CustomActionProviderFields({
   providerSelectorClassName?: string
   providerSelectorTriggerSize?: ProviderSelectorTriggerSize
 }) {
-  const { actions, providers, getProviderConfig, setActionProviderId } = useCustomActionProviders()
+  const { actions, providers, setActionProviderId } = useCustomActionProviders()
 
   if (actions.length === 0) {
     return null
@@ -65,10 +61,7 @@ function CustomActionProviderFields({
       </p>
       {actions.map((action) => (
         <Field key={action.id}>
-          <FieldTitle className="flex flex-wrap items-center gap-2">
-            {action.name}
-            <SetApiKeyWarning providerConfig={getProviderConfig(action)} />
-          </FieldTitle>
+          <FieldTitle>{action.name}</FieldTitle>
           <ProviderSelector
             providers={providers}
             value={action.providerId}

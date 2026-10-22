@@ -70,13 +70,11 @@ options:
     features: Features
     translation: Translation
   apiProviders:
-    title: API Providers
-    pageDescription: Connect the AI services ReadTadpole calls, then choose which one runs each feature.
-    description: Choose which providers ReadTadpole can call — the free built-in model, the pure translators, or your own endpoint.
+    title: Providers
+    pageDescription: Connect the translation and AI services ReadTadpole calls, then choose which one runs each feature.
+    description: Choose which providers ReadTadpole can call — the free built-in model, key-free machine translators, or your own endpoint.
     configTitle: Provider config
     addProvider: Add provider
-    setApiKeyWarning:
-      message: Please set your API key on the $1 page
     badges:
       featureCount: $1 features
     dialog:
@@ -110,7 +108,6 @@ options:
         clickToRetry: Click to retry
         noModels: No models available
         selectModel: Select a model
-        apiKeyRequired: Please add API key first
         searchModels: Search models...
         noModelsFound: No models found
         label: Model
@@ -125,7 +122,7 @@ options:
         chat: Chat Completions
         responses: Responses API
       headers: Headers
-      headersHint: Custom HTTP headers sent when creating the AI provider client. Leave empty to use provider defaults; use {} to disable defaults.
+      headersHint: "Extra HTTP headers sent with every request, for every provider. {{apiKey}} is replaced by the API key; leave empty to send none."
       providerOptions: Provider options
       providerOptionsHint: Provider-specific options for non-standard API features like thinking/reasoning mode. See the Vercel AI SDK docs or your provider's official documentation for configuration details.
       providerOptionsRecommendationTrigger: View recommended provider options
@@ -138,8 +135,10 @@ options:
       description:
         bilibiliTranslate: Free Bilibili Index model for translation and AI features; no API key required
         openaiCompatible: Connect to a custom endpoint compatible with the OpenAI Chat Completions API
-        deeplx: Unofficial DeepL API
-        deepl: Official DeepL API
+        deeplx: Unofficial DeepL API for a self-hosted DeepLX server; set its endpoint yourself
+        deepl: DeepL's own API; the endpoint is editable, so a proxy or DeepL's free host also works
+        googleTranslate: Google machine translation; no API key required
+        microsoftTranslate: Microsoft machine translation; no API key required
     apiKey:
       showAPIKey: Show API key
     testConnection:
@@ -1021,8 +1020,6 @@ languageLevels:
   beginner: Beginner
   intermediate: Intermediate
   advanced: Advanced
-noAPIKeyConfig:
-  warning: If you want to use AI models, please set API key on the options page first
 languageDetection:
   llmFailed: LLM language detection failed, fell back to basic detection
 translation:

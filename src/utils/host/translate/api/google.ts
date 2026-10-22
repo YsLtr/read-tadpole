@@ -1,5 +1,7 @@
 import type { TranslationTextFormat } from "@/types/config/translate"
 import { escapeText } from "entities"
+import { GOOGLE_TRANSLATE_HTML_URL } from "@/utils/constants/provider-endpoints"
+import { resolveProviderHeaders } from "@/utils/providers/headers"
 import { attachRequestErrorMeta } from "@/utils/request/retry-policy"
 
 /**
@@ -9,7 +11,6 @@ import { attachRequestErrorMeta } from "@/utils/request/retry-policy"
  */
 const GOOGLE_TRANSLATE_PROBE_TIMEOUT_MS = 3000
 
-const GOOGLE_TRANSLATE_HTML_URL = "https://translate-pa.googleapis.com/v1/translateHtml"
 const GOOGLE_TRANSLATE_HTML_API_KEY = "AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520"
 const GOOGLE_TRANSLATE_HTML_CLIENT = "wt_lib"
 
@@ -130,6 +131,10 @@ export async function googleTranslate(
      */
     preserveLineBreaks?: boolean
     signal?: AbortSignal
+    /** The row's own endpoint, key and headers; the app's defaults stand in when blank. */
+    baseURL?: string
+    apiKey?: string
+    headers?: Record<string, unknown>
   },
 ): Promise<string> {
   // translateHtml parses the request text as HTML, so plain source text must be
@@ -154,11 +159,12 @@ export async function googleTranslate(
       .map((line) => escapeText(line.content))
       .join(GOOGLE_LINE_BREAK_MARKER_PAIR)
   }
-  const resp = await fetch(GOOGLE_TRANSLATE_HTML_URL, {
+  const resp = await fetch(options?.baseURL?.trim() || GOOGLE_TRANSLATE_HTML_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json+protobuf",
-      "X-Goog-API-Key": GOOGLE_TRANSLATE_HTML_API_KEY,
+      "X-Goog-API-Key": options?.apiKey?.trim() || GOOGLE_TRANSLATE_HTML_API_KEY,
+      ...resolveProviderHeaders(options?.headers, options?.apiKey),
     },
     body: JSON.stringify([[[requestText], fromLang, toLang], GOOGLE_TRANSLATE_HTML_CLIENT]),
     signal: options?.signal,

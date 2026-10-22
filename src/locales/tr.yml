@@ -70,13 +70,11 @@ options:
     features: Özellikler
     translation: Çeviri
   apiProviders:
-    title: API Sağlayıcıları
-    pageDescription: ReadTadpole'un çağırdığı yapay zekâ servislerini bağlayın ve her özelliğin hangisini kullanacağını seçin.
-    description: ReadTadpole'un hangi sağlayıcıları çağırabileceğini seçin — ücretsiz yerleşik model, salt çeviri sağlayıcıları veya kendi uç noktanız.
+    title: Sağlayıcılar
+    pageDescription: ReadTadpole'un çağırdığı çeviri ve yapay zekâ servislerini bağlayın, her özelliğin hangisini kullanacağını seçin.
+    description: ReadTadpole'un hangi sağlayıcıları çağırabileceğini seçin — ücretsiz yerleşik model, API anahtarı gerektirmeyen makine çevirmenleri veya kendi uç noktanız.
     configTitle: Sağlayıcı yapılandırması
     addProvider: Sağlayıcı ekle
-    setApiKeyWarning:
-      message: API anahtarınızı $1 sayfasında ayarlayın
     badges:
       featureCount: $1 özellik
     dialog:
@@ -109,7 +107,6 @@ options:
         clickToRetry: Yeniden denemek için tıklayın
         noModels: Mevcut model yok
         selectModel: Model seç
-        apiKeyRequired: Lütfen önce API anahtarı ekleyin
         searchModels: Model ara...
         noModelsFound: Model bulunamadı
         label: Model
@@ -124,7 +121,7 @@ options:
         chat: Chat Completions
         responses: Responses API
       headers: Başlıklar
-      headersHint: AI sağlayıcı istemcisi oluşturulurken gönderilecek özel HTTP başlıkları. Sağlayıcı varsayılanlarını kullanmak için boş bırakın; varsayılanları devre dışı bırakmak için {} kullanın.
+      headersHint: "Her istekte tüm sağlayıcılar için gönderilen ek HTTP başlıkları. {{apiKey}} API anahtarıyla değiştirilir; hiçbir şey göndermemek için boş bırakın."
       providerOptions: Sağlayıcı seçenekleri
       providerOptionsHint: Düşünme/akıl yürütme modu gibi standart dışı API özellikleri için sağlayıcıya özel seçenekler. Ayrıntılar için Vercel AI SDK belgelerine veya sağlayıcınızın resmi belgelerine bakın.
       providerOptionsRecommendationTrigger: Önerilen sağlayıcı seçeneklerini görüntüle
@@ -137,8 +134,10 @@ options:
       description:
         bilibiliTranslate: Çeviri ve yapay zekâ özellikleri için ücretsiz Bilibili Index modeli; API anahtarı gerekmez
         openaiCompatible: OpenAI Chat Completions API ile uyumlu özel bir uç noktaya bağlanın
-        deeplx: Resmi olmayan DeepL API
-        deepl: Resmi DeepL API
+        deeplx: Kendi DeepLX sunucunuz için resmi olmayan DeepL API; uç noktayı kendiniz ayarlarsınız
+        deepl: DeepL'nin resmi API'si; uç nokta değiştirilebilir, bu yüzden proxy veya ücretsiz sunucu da çalışır
+        googleTranslate: Google makine çevirisi; API anahtarı gerekmez
+        microsoftTranslate: Microsoft makine çevirisi; API anahtarı gerekmez
     apiKey:
       showAPIKey: API anahtarını göster
     testConnection:
@@ -1011,8 +1010,6 @@ languageLevels:
   beginner: Başlangıç
   intermediate: Orta
   advanced: İleri
-noAPIKeyConfig:
-  warning: AI modelleri kullanmak istiyorsanız, lütfen önce seçenekler sayfasında API anahtarını ayarlayın
 languageDetection:
   llmFailed: LLM dil algılama başarısız oldu, temel algılamaya geri dönüldü
 translation:
