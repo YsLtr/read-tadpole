@@ -29,7 +29,9 @@ export const ReasoningField = withForm({
         {(field) => (
           <field.SelectFieldAutoSave label={i18n.t("options.apiProviders.form.reasoning.title")}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="provider-default" />
+              <SelectValue
+                placeholder={i18n.t("options.apiProviders.form.reasoning.providerDefault")}
+              />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>

@@ -108,6 +108,7 @@ export const AI_SDK_REASONING_VALUES = [
   "medium",
   "high",
   "xhigh",
+  "max",
 ] as const
 export type AISDKReasoning = (typeof AI_SDK_REASONING_VALUES)[number]
 

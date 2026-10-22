@@ -49,7 +49,7 @@ export const ProviderOptionsField = withForm({
         serialize={toJson}
         onCommit={handleProviderOptionsCommit}
         editorAriaLabel="provider-options-editor"
-        placeholder={JSON.stringify({ field: "value" }, null, 2)}
+        placeholder={JSON.stringify({ field: "value", forceReasoning: true }, null, 2)}
         label={
           <div className="flex items-center gap-1.5">
             <span>{i18n.t("options.apiProviders.form.providerOptions")}</span>
