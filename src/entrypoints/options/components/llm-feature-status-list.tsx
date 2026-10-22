@@ -1,19 +1,18 @@
 import type { FeatureKey } from "@/utils/constants/feature-providers"
 import { useAtomValue } from "jotai"
 import { useMemo } from "react"
-import { Link } from "react-router"
-import { buttonVariants } from "@/components/ui/base-ui/button"
 import { configAtom, configFieldsAtomMap } from "@/utils/atoms/config"
-import { FEATURE_PROVIDER_DEFS, getFeatureLabelI18nKey } from "@/utils/constants/feature-providers"
+import {
+  getFeatureLabelI18nKey,
+  getFeatureProviderId,
+} from "@/utils/constants/feature-providers"
 import { i18n } from "@/utils/i18n"
 import { canResolvedProviderRefGenerateText } from "@/utils/providers/provider-ref"
 import { resolveProviderRefForCapability } from "@/utils/providers/provider-registry"
 import { cn } from "@/utils/styles/utils"
-import { buildSectionLink } from "../command-palette/section-scroll"
 
 /**
- * Per-feature "is this running on an LLM provider" status, with the way to go
- * fix it.
+ * Per-feature "is this running on an LLM provider" status.
  *
  * Used by every setting that only works on a prompt-driven provider. Each
  * feature picks its own provider, so a single global verdict would be wrong — a
@@ -24,7 +23,8 @@ import { buildSectionLink } from "../command-palette/section-scroll"
  * prompt-driven", and a pure translate provider assigned to a feature that
  * needs a model would otherwise report as configured.
  *
- * Renders as `span`s so it can sit inside a `ConfigItem` description.
+ * Renders as `span`s so it can sit inside a `ConfigItem` description, and names
+ * no way out of itself: the Feature providers section is on this same page.
  */
 export function LlmFeatureStatusList({
   featureKeys,
@@ -36,11 +36,10 @@ export function LlmFeatureStatusList({
   const config = useAtomValue(configAtom)
   const providersConfig = useAtomValue(configFieldsAtomMap.providersConfig)
 
-
   const statuses = useMemo(
     () =>
       featureKeys.map((featureKey) => {
-        const providerId = FEATURE_PROVIDER_DEFS[featureKey].getProviderId(config)
+        const providerId = getFeatureProviderId(config, featureKey)
         const providerRef = resolveProviderRefForCapability(featureKey, providersConfig, providerId)
         const featureName = i18n.t(getFeatureLabelI18nKey(featureKey))
         const hasLLMProvider = providerRef ? canResolvedProviderRefGenerateText(providerRef) : false
@@ -69,12 +68,6 @@ export function LlmFeatureStatusList({
           <span className="text-[13px]">{text}</span>
         </span>
       ))}
-      <Link
-        to={buildSectionLink("/api-providers", "feature-providers")}
-        className={cn(buttonVariants({ variant: "outline", size: "xs" }), "mt-1")}
-      >
-        {i18n.t("options.apiProviders.featureProviders.chooseProvider")}
-      </Link>
     </span>
   )
 }

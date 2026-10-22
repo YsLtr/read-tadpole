@@ -6,7 +6,7 @@ import {
   SELECTION_CONTENT_OVERLAY_LAYERS,
   SELECTION_CONTENT_OVERLAY_ROOT_ATTRIBUTE,
 } from "@/entrypoints/selection.content/overlay-layers"
-import { configFieldsAtomMap } from "@/utils/atoms/config"
+import { configAtom, configFieldsAtomMap } from "@/utils/atoms/config"
 import { NOTRANSLATE_CLASS } from "@/utils/constants/dom-labels"
 import {
   DEFERRED_SELECTION_OPEN_EVENT,
@@ -14,14 +14,12 @@ import {
   SELECTION_TOOLBAR_READY_EVENT,
 } from "@/utils/constants/selection"
 import { getSelectionToolbarItems } from "@/utils/selection-toolbar-items"
+import { isSiteEnabled } from "@/utils/site-control"
 import { cn } from "@/utils/styles/utils"
-import { urlMatchesPattern } from "@/utils/url-pattern"
 import { buildContextSnapshot, readSelectionSnapshot } from "../utils"
 import { clearSelectionStateAtom, isSelectionToolbarOpenAtom, setSelectionStateAtom } from "./atoms"
-import { CloseButton, DropEvent } from "./close-button"
+import { SelectionToolbarItems } from "./items"
 import { createModalDialogHostController } from "./modal-dialog-host"
-import { SelectionToolbarMoreMenu } from "./more-menu"
-import { SelectionToolbarPinnedItems } from "./pinned-items"
 import {
   collectSelectionScrollTargets,
   createSelectionAnchorTracker,
@@ -213,17 +211,14 @@ export function SelectionToolbar() {
   const setSelectionState = useSetAtom(setSelectionStateAtom)
   const clearSelectionState = useSetAtom(clearSelectionStateAtom)
   const selectionToolbar = useAtomValue(configFieldsAtomMap.selectionToolbar)
-  const isSiteDisabled = selectionToolbar.disabledSelectionToolbarPatterns?.some((pattern) =>
-    urlMatchesPattern(window.location.href, pattern),
-  )
-  // With nothing pinned the toolbar still shows its "more" menu; with nothing
-  // enabled there is nothing to show.
+  const config = useAtomValue(configAtom)
+  // The whole extension is off on a site its site control excludes, and the
+  // toolbar is part of the extension.
+  const isSiteDisabled = !isSiteEnabled(window.location.href, config)
   const enabledItems = getSelectionToolbarItems(selectionToolbar).filter((item) => item.enabled)
   const hasAnyEnabledItem = enabledItems.length > 0
-  const hasAnyPinnedItem = enabledItems.some((item) => item.pinned)
   const isSelectionToolbarVisible =
     isSelectionToolbarOpen && selectionToolbar.enabled && !isSiteDisabled && hasAnyEnabledItem
-  const dropdownOpenRef = useRef(false)
 
   const placeHostForSelection = useCallback(
     (ranges: Parameters<ModalDialogHostController["placeForRanges"]>[0]) => {
@@ -489,9 +484,7 @@ export function SelectionToolbar() {
         selectionPositionRef.current = null
         selectionAnchorTrackerRef.current = null
         selectionScrollTargetsRef.current = []
-        // Don't hide toolbar when dropdown is open to prevent unwanted dismissal
-        // (Firefox clears selection when dropdown gains focus)
-        if (!dropdownOpenRef.current) setIsSelectionToolbarOpen(false)
+        setIsSelectionToolbarOpen(false)
       }
     }
 
@@ -524,14 +517,6 @@ export function SelectionToolbar() {
     }
   }, [clearSelectionState, placeHostForSelection, setIsSelectionToolbarOpen, setSelectionState])
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      dropdownOpenRef.current = Boolean((e as CustomEvent).detail?.open)
-    }
-    window.addEventListener(DropEvent, handler)
-    return () => window.removeEventListener(DropEvent, handler)
-  }, [])
-
   return (
     <div
       ref={tooltipContainerRef}
@@ -552,25 +537,21 @@ export function SelectionToolbar() {
           ref={tooltipRef}
           inert={!isSelectionToolbarVisible}
           className={cn(
-            `group absolute ${SELECTION_CONTENT_OVERLAY_LAYERS.selectionOverlay} overflow-visible transition-opacity`,
+            `absolute ${SELECTION_CONTENT_OVERLAY_LAYERS.selectionOverlay} overflow-visible transition-opacity`,
             isSelectionToolbarVisible
               ? "pointer-events-auto opacity-100"
               : "pointer-events-none opacity-0",
           )}
         >
-          {/* Clips the buttons' hover fills to its rounded corners. The close
-              button is positioned against the wrapper above, so it isn't clipped. */}
+          {/* Clips the buttons' hover fills to its rounded corners. */}
           <div
             data-slot="selection-toolbar-surface"
             className="flex items-center overflow-hidden rounded-lg border border-border/50 bg-popover shadow-md"
             style={{ opacity: "var(--rf-selection-opacity, 1)" }}
           >
             <div className="no-scrollbar flex max-w-105 items-center overflow-x-auto overflow-y-hidden scroll-driven:scroll-fade-x">
-              <SelectionToolbarPinnedItems />
+              <SelectionToolbarItems />
             </div>
-            {hasAnyPinnedItem && <div className="w-px shrink-0 self-stretch bg-border" />}
-            <SelectionToolbarMoreMenu />
-            <CloseButton />
           </div>
         </div>
       )}

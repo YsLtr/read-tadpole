@@ -1,5 +1,6 @@
 import { useAtom } from "jotai"
 import { useState } from "react"
+import { useFeatureEnabledToggle } from "@/components/llm-providers/use-feature-providers"
 import { Input } from "@/components/ui/base-ui/input"
 import { Switch } from "@/components/ui/base-ui/switch"
 import { toastManager } from "@/components/ui/base-ui/toast"
@@ -17,6 +18,8 @@ const MAX_THRESHOLD = 1000
  */
 export function TriggerSection() {
   const [inputTranslation, setInputTranslation] = useAtom(configFieldsAtomMap.inputTranslation)
+  // The switch turns the feature's provider off and back on with it.
+  const setEnabled = useFeatureEnabledToggle("inputTranslation")
 
   return (
     <ConfigSection
@@ -27,12 +30,7 @@ export function TriggerSection() {
         title={i18n.t("options.inputTranslation.trigger.enable.title")}
         description={i18n.t("options.inputTranslation.trigger.enable.description")}
       >
-        <Switch
-          checked={inputTranslation.enabled}
-          onCheckedChange={(checked) => {
-            void setInputTranslation({ ...inputTranslation, enabled: checked })
-          }}
-        />
+        <Switch checked={inputTranslation.enabled} onCheckedChange={setEnabled} />
       </ConfigItem>
       <ConfigItem
         id="input-translation-threshold"

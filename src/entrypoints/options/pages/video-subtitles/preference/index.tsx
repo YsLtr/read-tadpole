@@ -1,4 +1,5 @@
 import { useAtom } from "jotai"
+import { useFeatureEnabledToggle } from "@/components/llm-providers/use-feature-providers"
 import { Switch } from "@/components/ui/base-ui/switch"
 import { subtitlesPlatformSchema } from "@/types/config/subtitles"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
@@ -19,6 +20,8 @@ export function PreferenceSection() {
   const [videoSubtitlesConfig, setVideoSubtitlesConfig] = useAtom(
     configFieldsAtomMap.videoSubtitles,
   )
+  // The switch turns the feature's provider off and back on with it.
+  const setEnabled = useFeatureEnabledToggle("videoSubtitles")
 
   return (
     <ConfigSection title={i18n.t("options.videoSubtitles.preference.title")}>
@@ -32,12 +35,7 @@ export function PreferenceSection() {
           </>
         }
       >
-        <Switch
-          checked={videoSubtitlesConfig.enabled}
-          onCheckedChange={(enabled) => {
-            void setVideoSubtitlesConfig({ enabled })
-          }}
-        />
+        <Switch checked={videoSubtitlesConfig.enabled} onCheckedChange={setEnabled} />
       </ConfigItem>
       <ConfigNavItem
         to="/video-subtitles/auto-start"

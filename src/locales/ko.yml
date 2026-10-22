@@ -149,7 +149,6 @@ options:
     featureProviders:
       title: 기능 제공업체
       description: 각 기능에 사용할 제공업체를 선택
-      chooseProvider: 제공업체 선택
       none: 없음
       features:
         pageTranslation: 페이지 번역
@@ -400,14 +399,6 @@ options:
       opacity:
         title: 투명도
         description: 선택 툴바와 여기서 열리는 확장 창의 투명도를 조절합니다
-      disabledSites:
-        title: 비활성화 사이트
-        description: 선택 툴바를 비활성화할 웹사이트를 설정합니다
-        enterUrlPattern: URL 패턴 입력
-        urlPattern: URL 패턴
-    closeMenu:
-      disableForSite: 이 사이트에서 비활성화
-      disableGlobally: 전역 비활성화
     errors:
       customActionFailed: 사용자 지정 작업 실패
       customActionFailedFallback: 사용자 지정 작업 요청에 실패했습니다
@@ -1034,11 +1025,6 @@ action:
   translation: 번역
   speak: 읽기
   playing: 재생 중
-  moreActions: 더 보기
-  pinToToolbar: 도구 모음에 고정
-  unpinFromToolbar: 도구 모음에서 고정 해제
-  dragToReorder: 드래그하여 순서 변경
-  addCustomAction: 커스텀 AI 액션 추가
 thinking:
   label: 사고 중
   complete: 사고 완료

@@ -150,7 +150,6 @@ options:
     featureProviders:
       title: Feature providers
       description: Choose which provider to use for each feature
-      chooseProvider: Choose a provider
       none: None
       features:
         pageTranslation: Page translation
@@ -401,14 +400,6 @@ options:
       opacity:
         title: Opacity
         description: Adjust the opacity of the selection toolbar and the expanded window opened from it
-      disabledSites:
-        title: Disabled sites
-        description: Configure websites where the selection toolbar should be disabled
-        enterUrlPattern: Enter URL pattern
-        urlPattern: URL pattern
-    closeMenu:
-      disableForSite: Disable for this site
-      disableGlobally: Disable globally
     errors:
       customActionFailed: Custom action failed
       customActionFailedFallback: Custom action request failed
@@ -1044,11 +1035,6 @@ action:
   translation: Translation
   speak: Speak
   playing: Playing
-  moreActions: More actions
-  pinToToolbar: Pin to toolbar
-  unpinFromToolbar: Unpin from toolbar
-  dragToReorder: Drag to reorder
-  addCustomAction: Add custom AI action
 thinking:
   label: Thinking
   complete: Thinking complete

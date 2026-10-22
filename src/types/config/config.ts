@@ -2,7 +2,11 @@ import type { LangLevel } from "@read-frog/definitions"
 import { langCodeISO6393Schema, langLevel } from "@read-frog/definitions"
 import { z } from "zod"
 import { BUILT_IN_ACTION_IDS, BUILT_IN_ACTION_KEYS } from "@/utils/constants/custom-action"
-import { FEATURE_KEYS, FEATURE_PROVIDER_DEFS } from "@/utils/constants/feature-providers"
+import {
+  FEATURE_KEYS,
+  FEATURE_PROVIDER_DEFS,
+  isFeatureEnabled,
+} from "@/utils/constants/feature-providers"
 import { DEFAULT_LANGUAGE_LEVEL } from "@/utils/constants/language"
 import {
   MAX_SELECTION_OVERLAY_OPACITY,
@@ -62,7 +66,6 @@ const selectionToolbarSpeakFeatureSchema = z.object({
 const selectionToolbarSchema = z
   .object({
     enabled: z.boolean(),
-    disabledSelectionToolbarPatterns: z.array(z.string()),
     opacity: z.number().min(MIN_SELECTION_OVERLAY_OPACITY).max(MAX_SELECTION_OVERLAY_OPACITY),
     features: z.object({
       translate: selectionToolbarFeatureSchema,
@@ -74,13 +77,9 @@ const selectionToolbarSchema = z
     // id. Kept in step with the items by the transform below. `.default([])`
     // lets a config written before this field existed still parse.
     order: z.array(z.string().min(1)).default([]),
-    // Ids of the items kept off the toolbar itself, in its "more" menu only.
-    // Every other item is pinned. Independent of an item's enabled switch,
-    // so a pin survives the item being turned off and on.
-    unpinned: z.array(z.string().min(1)).default([]),
   })
-  // Every parse brings `order` and `unpinned` in step with the actions there
-  // are, so adding or deleting an action never has to update them itself.
+  // Every parse brings `order` in step with the actions there are, so adding or
+  // deleting an action never has to update it itself.
   .transform((selectionToolbar) => normalizeSelectionToolbarLists(selectionToolbar))
 
 // Translation Hub schema. `.default()` mirrors `uiLanguageSchema`: it lets a
@@ -163,8 +162,9 @@ export const configSchema = z
       const def = FEATURE_PROVIDER_DEFS[featureKey]
       const providerId = def.getProviderId(data)
 
-      // No provider is the reader's "off": there is nothing to validate.
-      if (!providerId) continue
+      // A feature that is off has nothing to validate, and its stored provider
+      // may well be one the reader has since disabled.
+      if (!providerId || !isFeatureEnabled(data, featureKey)) continue
 
       if (
         !doesProviderSupportsCapability(featureKey, data.providersConfig, providerId, {
@@ -214,18 +214,26 @@ export const configSchema = z
     const actionProviderEntries = [
       ...BUILT_IN_ACTION_IDS.map((id) => {
         const key = BUILT_IN_ACTION_KEYS[id]
+        const state = data.selectionToolbar.builtInActions[key]
         return {
-          providerId: data.selectionToolbar.builtInActions[key].providerId,
+          enabled: state.enabled,
+          providerId: state.providerId,
           path: ["selectionToolbar", "builtInActions", key, "providerId"] as const,
         }
       }),
       ...data.selectionToolbar.customActions.map((action, index) => ({
+        enabled: action.enabled !== false,
         providerId: action.providerId,
         path: ["selectionToolbar", "customActions", index, "providerId"] as const,
       })),
     ]
 
-    actionProviderEntries.forEach(({ providerId, path }) => {
+    actionProviderEntries.forEach(({ enabled, providerId, path }) => {
+      // Like a feature, an action set to none keeps its provider as the memory of
+      // what to resume. Validating it would reject the write that switches the
+      // provider off, and any config where it has since been deleted.
+      if (!enabled) return
+
       if (
         !doesProviderSupportsCapability("customAction", data.providersConfig, providerId, {
           requireEnable: true,

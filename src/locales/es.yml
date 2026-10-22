@@ -150,7 +150,6 @@ options:
     featureProviders:
       title: Proveedores de funciones
       description: Elige qué proveedor usar para cada función
-      chooseProvider: Elegir un proveedor
       none: Ninguno
       features:
         pageTranslation: Traducción de página
@@ -401,14 +400,6 @@ options:
       opacity:
         title: Opacidad
         description: Ajusta la opacidad de la barra de selección y de la ventana expandida que se abre desde ella
-      disabledSites:
-        title: Sitios desactivados
-        description: Configura los sitios web donde se debe desactivar la barra de selección
-        enterUrlPattern: Introduce patrón de URL
-        urlPattern: Patrón de URL
-    closeMenu:
-      disableForSite: Desactivar para este sitio
-      disableGlobally: Desactivar globalmente
     errors:
       customActionFailed: Falló la acción personalizada
       customActionFailedFallback: Falló la solicitud de acción personalizada
@@ -1039,11 +1030,6 @@ action:
   translation: Traducción
   speak: Leer en voz alta
   playing: Reproduciendo
-  moreActions: Más acciones
-  pinToToolbar: Fijar en la barra
-  unpinFromToolbar: Quitar de la barra
-  dragToReorder: Arrastra para reordenar
-  addCustomAction: Añadir acción AI personalizada
 thinking:
   label: Pensando
   complete: Razonamiento completo

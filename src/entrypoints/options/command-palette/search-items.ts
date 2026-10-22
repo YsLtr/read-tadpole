@@ -350,13 +350,6 @@ export const SEARCH_ITEMS: SearchItem[] = [
     descriptionKey: "options.selectionToolbar.display.opacity.description",
     pageKey: "options.selectionToolbar.title",
   },
-  {
-    sectionId: "selection-toolbar-disabled-sites",
-    route: "/selection-toolbar",
-    titleKey: "options.selectionToolbar.display.disabledSites.title",
-    descriptionKey: "options.selectionToolbar.display.disabledSites.description",
-    pageKey: "options.selectionToolbar.title",
-  },
 
   // Translation Hub page
   {

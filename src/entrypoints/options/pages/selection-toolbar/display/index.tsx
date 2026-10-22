@@ -1,7 +1,6 @@
 import { useAtom } from "jotai"
 import { useEffect, useState } from "react"
 import { SliderComfortable } from "@/components/ui/base-ui/slider"
-import { usePatternList } from "@/hooks/use-pattern-list"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import {
   MAX_SELECTION_OVERLAY_OPACITY,
@@ -10,22 +9,10 @@ import {
 import { i18n } from "@/utils/i18n"
 import { ConfigItem } from "../../../components/config-item"
 import { ConfigSection } from "../../../components/config-section"
-import { PatternsTable } from "../../../components/patterns-table"
 
-/** How the toolbar looks where it shows, and the sites it stays off entirely. */
+/** How the toolbar looks where it shows. */
 export function DisplaySection() {
   const [selectionToolbar, setSelectionToolbar] = useAtom(configFieldsAtomMap.selectionToolbar)
-  const { disabledSelectionToolbarPatterns } = selectionToolbar
-
-  const { addPattern, removePattern } = usePatternList(
-    disabledSelectionToolbarPatterns,
-    (nextPatterns) => {
-      void setSelectionToolbar({
-        ...selectionToolbar,
-        disabledSelectionToolbarPatterns: nextPatterns,
-      })
-    },
-  )
 
   return (
     <ConfigSection
@@ -42,20 +29,6 @@ export function DisplaySection() {
           onValueCommitted={(opacity) => {
             void setSelectionToolbar({ opacity })
           }}
-        />
-      </ConfigItem>
-      <ConfigItem
-        id="selection-toolbar-disabled-sites"
-        orientation="vertical"
-        title={i18n.t("options.selectionToolbar.display.disabledSites.title")}
-        description={i18n.t("options.selectionToolbar.display.disabledSites.description")}
-      >
-        <PatternsTable
-          patterns={disabledSelectionToolbarPatterns}
-          onAddPattern={addPattern}
-          onRemovePattern={removePattern}
-          placeholderText={i18n.t("options.selectionToolbar.display.disabledSites.enterUrlPattern")}
-          tableHeaderText={i18n.t("options.selectionToolbar.display.disabledSites.urlPattern")}
         />
       </ConfigItem>
     </ConfigSection>

@@ -17,8 +17,8 @@ import { patchProviderConfigAtom } from "@/utils/atoms/entity-config"
 import { getAPIProvidersConfig, getProviderConfigById } from "@/utils/config/helpers"
 import {
   FEATURE_KEYS,
-  FEATURE_PROVIDER_DEFS,
   getFeatureLabelI18nKey,
+  getFeatureProviderId,
 } from "@/utils/constants/feature-providers"
 import { PROVIDER_PRESETS } from "@/utils/constants/providers"
 import { getSelectionToolbarActions } from "@/utils/custom-actions"
@@ -215,11 +215,13 @@ function ProviderCard({ providerConfig }: { providerConfig: APIProviderConfig })
   const config = useAtomValue(configAtom)
   const switchRef = useRef<HTMLButtonElement>(null)
 
-  const assignedFeatures = FEATURE_KEYS.filter(
-    (key) => FEATURE_PROVIDER_DEFS[key].getProviderId(config) === id,
-  )
+  // "In use" means running on it. A feature or an action set to none keeps its
+  // old provider as the memory of what to resume, so the stored id alone must
+  // not count as usage — that would make a provider the reader has switched off
+  // everything for look busy, and block disabling it for no reason.
+  const assignedFeatures = FEATURE_KEYS.filter((key) => getFeatureProviderId(config, key) === id)
   const assignedCustomActions = getSelectionToolbarActions(config.selectionToolbar).filter(
-    (action) => action.providerId === id,
+    (action) => action.enabled !== false && action.providerId === id,
   )
   const isLanguageDetectionProvider =
     config.languageDetection.mode === "llm" && config.languageDetection.providerId === id

@@ -13,7 +13,11 @@ import {
   isLLMProviderConfig,
   isTranslateProviderConfig,
 } from "@/types/config/provider"
-import { FEATURE_KEYS, FEATURE_PROVIDER_DEFS } from "@/utils/constants/feature-providers"
+import {
+  FEATURE_KEYS,
+  FEATURE_PROVIDER_DEFS,
+  isFeatureEnabled,
+} from "@/utils/constants/feature-providers"
 import { getSelectionToolbarActions, patchSelectionToolbarAction } from "@/utils/custom-actions"
 import { getUsableProviderIdsForCapability } from "@/utils/providers/provider-availability"
 
@@ -135,20 +139,19 @@ export function computeProviderFallbacksAfterDeletion(
  * has not loaded) treats them as usable, so an unreachable status endpoint
  * cannot block someone from deleting their own credentials.
  *
- * Features the user has switched off count too. Their `providerId` is stored
- * either way, and `computeProviderFallbacksAfterDeletion` can only reassign it
- * when a replacement exists — so letting the delete through leaves the slot
- * pointing at a provider that no longer exists at all, which resolves to null
- * the moment the feature is switched back on.
+ * Features the user has switched off are skipped: their provider is only a
+ * memory of what to resume, and switching one back on picks whatever can still
+ * run it (or refuses). Blocking a delete for a slot nothing is using would make
+ * the last provider undeletable.
  */
 export function findFeatureMissingProvider(
   remainingProviders: ProvidersConfig,
   config?: Config,
 ): FeatureKey | "languageDetection" | null {
   for (const key of FEATURE_KEYS) {
-    // A feature set to none has no provider to lose: nothing to reassign, and
-    // nothing left dangling, so it must not block deleting the last provider.
-    if (config && !FEATURE_PROVIDER_DEFS[key].getProviderId(config)) continue
+    // A feature that is off has nothing to lose: it keeps its provider, and
+    // switching it back on resumes whatever can still run it.
+    if (config && !isFeatureEnabled(config, key)) continue
     if (!getUsableProviderIdsForCapability(key, remainingProviders)[0]) {
       return key
     }

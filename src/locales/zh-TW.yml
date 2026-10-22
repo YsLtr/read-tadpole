@@ -150,7 +150,6 @@ options:
     featureProviders:
       title: 功能提供者
       description: 為每個功能選擇使用的提供者
-      chooseProvider: 選擇提供者
       none: 無
       features:
         pageTranslation: 網頁翻譯
@@ -401,14 +400,6 @@ options:
       opacity:
         title: 透明度
         description: 調整選取工具列及其展開內容視窗的透明度
-      disabledSites:
-        title: 停用網站
-        description: 設定需要停用選取工具列的網站
-        enterUrlPattern: 輸入網址模式
-        urlPattern: URL 模式
-    closeMenu:
-      disableForSite: 停用此網站
-      disableGlobally: 全域停用
     errors:
       customActionFailed: 自訂操作失敗
       customActionFailedFallback: 自訂操作請求失敗
@@ -1044,11 +1035,6 @@ action:
   translation: 翻譯
   speak: 朗讀
   playing: 播放中
-  moreActions: 更多操作
-  pinToToolbar: 釘選到工具列
-  unpinFromToolbar: 從工具列取消釘選
-  dragToReorder: 拖曳以排序
-  addCustomAction: 新增自訂 AI 指令
 thinking:
   label: 思考中
   complete: 思考完成

@@ -5,6 +5,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai"
 import { useMemo, useState } from "react"
 import { useLocation } from "react-router"
 import { requestEditorNavigationAtom } from "@/components/form/autosave-navigation"
+import { useActionEnabledToggle } from "@/components/llm-providers/use-feature-providers"
 import { SortableList } from "@/components/sortable-list"
 import { Button } from "@/components/ui/base-ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/base-ui/dialog"
@@ -13,7 +14,7 @@ import {
   BUILT_IN_DICTIONARY_ACTION_ID,
   DEFAULT_ACTION_NAME,
 } from "@/utils/constants/custom-action"
-import { getBuiltInActions, patchSelectionToolbarAction } from "@/utils/custom-actions"
+import { getBuiltInActions } from "@/utils/custom-actions"
 import { i18n } from "@/utils/i18n"
 import { createLayoutSampleData } from "@/utils/layout-host/sample"
 import { getUniqueName } from "@/utils/name"
@@ -132,8 +133,8 @@ export function CustomActionCardList() {
 }
 
 function BuiltInActionCard({ action }: { action: SelectionToolbarCustomAction }) {
-  const setSelectionToolbarConfig = useSetAtom(configFieldsAtomMap.selectionToolbar)
   const [selectedCustomActionId, setSelectedCustomActionId] = useAtom(selectedCustomActionIdAtom)
+  const setEnabled = useActionEnabledToggle(action.id)
 
   return (
     <EntityListItem.Root
@@ -155,11 +156,7 @@ function BuiltInActionCard({ action }: { action: SelectionToolbarCustomAction })
         <EntityListItem.Toggle
           aria-label={action.name}
           checked={action.enabled !== false}
-          onCheckedChange={(enabled) => {
-            void setSelectionToolbarConfig((current) =>
-              patchSelectionToolbarAction(current, action.id, { enabled }),
-            )
-          }}
+          onCheckedChange={setEnabled}
         />
       </EntityListItem.Content>
     </EntityListItem.Root>
@@ -167,8 +164,8 @@ function BuiltInActionCard({ action }: { action: SelectionToolbarCustomAction })
 }
 
 function CustomActionCard({ action }: { action: SelectionToolbarCustomAction }) {
-  const setSelectionToolbarConfig = useSetAtom(configFieldsAtomMap.selectionToolbar)
   const [selectedCustomActionId, setSelectedCustomActionId] = useAtom(selectedCustomActionIdAtom)
+  const setEnabled = useActionEnabledToggle(action.id)
 
   return (
     <EntityListItem.Root
@@ -186,11 +183,7 @@ function CustomActionCard({ action }: { action: SelectionToolbarCustomAction }) 
         <EntityListItem.Toggle
           aria-label={action.name}
           checked={action.enabled !== false}
-          onCheckedChange={(enabled) => {
-            void setSelectionToolbarConfig((current) =>
-              patchSelectionToolbarAction(current, action.id, { enabled }),
-            )
-          }}
+          onCheckedChange={setEnabled}
         />
       </EntityListItem.Content>
     </EntityListItem.Root>

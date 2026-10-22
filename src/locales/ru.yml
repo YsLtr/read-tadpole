@@ -149,7 +149,6 @@ options:
     featureProviders:
       title: Провайдеры функций
       description: Выберите провайдера для каждой функции
-      chooseProvider: Выбрать провайдера
       none: Нет
       features:
         pageTranslation: Перевод страницы
@@ -400,14 +399,6 @@ options:
       opacity:
         title: Прозрачность
         description: Настройте прозрачность панели выделения и раскрытого окна, которое открывается из неё
-      disabledSites:
-        title: Отключённые сайты
-        description: Настройте веб-сайты, где панель выделения должна быть отключена
-        enterUrlPattern: Введите URL-шаблон
-        urlPattern: URL-шаблон
-    closeMenu:
-      disableForSite: Отключить для этого сайта
-      disableGlobally: Отключить глобально
     errors:
       customActionFailed: Не удалось выполнить пользовательское действие
       customActionFailedFallback: Запрос пользовательского действия не удался
@@ -1034,11 +1025,6 @@ action:
   translation: Перевод
   speak: Озвучить
   playing: Воспроизведение
-  moreActions: Другие действия
-  pinToToolbar: Закрепить на панели
-  unpinFromToolbar: Открепить от панели
-  dragToReorder: Перетащите, чтобы изменить порядок
-  addCustomAction: Добавить своё AI-действие
 thinking:
   label: Размышление
   complete: Размышление завершено

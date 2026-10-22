@@ -149,7 +149,6 @@ options:
     featureProviders:
       title: Özellik sağlayıcıları
       description: Her özellik için kullanılacak sağlayıcıyı seçin
-      chooseProvider: Sağlayıcı seç
       none: Yok
       features:
         pageTranslation: Sayfa çevirisi
@@ -400,14 +399,6 @@ options:
       opacity:
         title: Opaklık
         description: Seçim araç çubuğunun ve buradan açılan genişletilmiş pencerenin opaklığını ayarlayın
-      disabledSites:
-        title: Devre dışı siteler
-        description: Seçim araç çubuğunun devre dışı bırakılması gereken web sitelerini yapılandırın
-        enterUrlPattern: URL kalıbı girin
-        urlPattern: URL kalıbı
-    closeMenu:
-      disableForSite: Bu site için devre dışı bırak
-      disableGlobally: Genel olarak devre dışı bırak
     errors:
       customActionFailed: Özel eylem başarısız oldu
       customActionFailedFallback: Özel eylem isteği başarısız oldu
@@ -1034,11 +1025,6 @@ action:
   translation: Çeviri
   speak: Oku
   playing: Çalınıyor
-  moreActions: Diğer eylemler
-  pinToToolbar: Araç çubuğuna sabitle
-  unpinFromToolbar: Araç çubuğundan kaldır
-  dragToReorder: Sıralamak için sürükleyin
-  addCustomAction: Özel AI eylemi ekle
 thinking:
   label: Düşünüyor
   complete: Düşünme tamamlandı

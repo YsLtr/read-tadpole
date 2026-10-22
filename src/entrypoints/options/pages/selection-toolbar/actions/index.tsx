@@ -1,4 +1,5 @@
 import { useAtom } from "jotai"
+import { useFeatureEnabledToggle } from "@/components/llm-providers/use-feature-providers"
 import { Switch } from "@/components/ui/base-ui/switch"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
 import { i18n } from "@/utils/i18n"
@@ -10,14 +11,13 @@ import { ShortcutLink } from "../../../components/shortcut-link"
 export function ActionsSection() {
   const [selectionToolbar, setSelectionToolbar] = useAtom(configFieldsAtomMap.selectionToolbar)
   const { features } = selectionToolbar
+  // Translating turns the feature's provider off and back on with it.
+  const setTranslationEnabled = useFeatureEnabledToggle("selectionTranslation")
 
-  const setFeatureEnabled = (key: "translate" | "speak", enabled: boolean) => {
+  const setSpeakEnabled = (enabled: boolean) => {
     void setSelectionToolbar({
       ...selectionToolbar,
-      features: {
-        ...features,
-        [key]: { ...features[key], enabled },
-      },
+      features: { ...features, speak: { ...features.speak, enabled } },
     })
   }
 
@@ -38,7 +38,7 @@ export function ActionsSection() {
       >
         <Switch
           checked={features.translate.enabled}
-          onCheckedChange={(checked) => setFeatureEnabled("translate", checked)}
+          onCheckedChange={setTranslationEnabled}
         />
       </ConfigItem>
       <ConfigItem
@@ -53,7 +53,7 @@ export function ActionsSection() {
       >
         <Switch
           checked={features.speak.enabled}
-          onCheckedChange={(checked) => setFeatureEnabled("speak", checked)}
+          onCheckedChange={setSpeakEnabled}
         />
       </ConfigItem>
     </ConfigSection>

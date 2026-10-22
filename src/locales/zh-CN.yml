@@ -150,7 +150,6 @@ options:
     featureProviders:
       title: 功能提供商
       description: 为每个功能选择使用的提供商
-      chooseProvider: 选择提供商
       none: 无
       features:
         pageTranslation: 网页翻译
@@ -401,14 +400,6 @@ options:
       opacity:
         title: 透明度
         description: 调整选择工具栏及其展开内容窗的透明度
-      disabledSites:
-        title: 禁用网站
-        description: 配置需要禁用选择工具栏的网站
-        enterUrlPattern: 输入网址模式
-        urlPattern: 网址模式
-    closeMenu:
-      disableForSite: 当前网站禁用
-      disableGlobally: 全局禁用
     errors:
       customActionFailed: 自定义操作失败
       customActionFailedFallback: 自定义操作请求失败
@@ -1044,11 +1035,6 @@ action:
   translation: 翻译
   speak: 朗读
   playing: 播放中
-  moreActions: 更多操作
-  pinToToolbar: 固定到工具栏
-  unpinFromToolbar: 从工具栏取消固定
-  dragToReorder: 拖动以排序
-  addCustomAction: 添加自定义 AI 指令
 thinking:
   label: 思考中
   complete: 思考完成

@@ -1,24 +1,28 @@
-import type { ProviderConfig } from "@/types/config/provider"
 import type { SelectionToolbarCustomAction } from "@/types/config/selection-toolbar"
 import type { FeatureKey } from "@/utils/constants/feature-providers"
 import type { ProviderSelectorOption } from "@/utils/providers/provider-display"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useCallback, useMemo } from "react"
+import { toastManager } from "@/components/ui/base-ui/toast"
 import { configAtom, configFieldsAtomMap, writeConfigAtom } from "@/utils/atoms/config"
-import { getProviderConfigById } from "@/utils/config/helpers"
 import {
+  buildFeatureEnabledPatch,
   buildFeatureProviderAssignment,
-  buildFeatureProviderPatch,
-  FEATURE_PROVIDER_DEFS,
+  getFeatureProviderId,
+  resolveProviderToResumeFrom,
 } from "@/utils/constants/feature-providers"
-import { getSelectionToolbarActions, patchSelectionToolbarAction } from "@/utils/custom-actions"
+import {
+  findSelectionToolbarAction,
+  getSelectionToolbarActions,
+  patchSelectionToolbarAction,
+} from "@/utils/custom-actions"
+import { i18n } from "@/utils/i18n"
 import { getSelectableProvidersForCapability } from "@/utils/providers/provider-registry"
 import { providerSupportsTranslationOnlyMode } from "@/utils/providers/translation-only-gate"
 
 export interface FeatureProviderBinding {
   providers: ProviderSelectorOption[]
   providerId: string
-  providerConfig: ProviderConfig | null
   setProviderId: (providerId: string) => void
 }
 
@@ -28,7 +32,6 @@ export function useFeatureProvider(featureKey: FeatureKey): FeatureProviderBindi
   const setConfig = useSetAtom(writeConfigAtom)
   const providersConfig = useAtomValue(configFieldsAtomMap.providersConfig)
   const translationMode = useAtomValue(configFieldsAtomMap.pageTranslation).mode
-  const providerId = FEATURE_PROVIDER_DEFS[featureKey].getProviderId(config)
 
   // Page translate in translationOnly mode cannot run on providers without
   // markup support (see translation-only-gate.ts) — hide them so the blocked
@@ -45,18 +48,82 @@ export function useFeatureProvider(featureKey: FeatureKey): FeatureProviderBindi
   }, [featureKey, providersConfig, hideTranslationOnlyUnsupported])
 
   const setProviderId = useCallback(
-    // No provider is the feature's "off": keeps its own switch in step too, so
-    // the rest of the UI (and an import/export round trip) reads the same.
+    // No provider turns the feature off; its own switch is kept in step, so the
+    // rest of the UI reads the same state wherever it looks.
     (id: string) => void setConfig(buildFeatureProviderAssignment(featureKey, id)),
     [featureKey, setConfig],
   )
 
   return {
     providers,
-    providerId,
-    providerConfig: getProviderConfigById(providersConfig, providerId) ?? null,
+    // Empty while the feature is off: the row shows "none" without losing the
+    // provider it comes back to.
+    providerId: getFeatureProviderId(config, featureKey),
     setProviderId,
   }
+}
+
+/**
+ * Flips a feature's own switch, keeping its provider in step: off leaves the
+ * provider stored, on resumes it (or the first one that can still run the
+ * feature). With nothing to resume, the switch refuses and says why.
+ */
+export function useFeatureEnabledToggle(featureKey: FeatureKey): (enabled: boolean) => void {
+  const config = useAtomValue(configAtom)
+  const setConfig = useSetAtom(writeConfigAtom)
+
+  return useCallback(
+    (enabled: boolean) => {
+      const patch = buildFeatureEnabledPatch(config, featureKey, enabled)
+      if (!patch) {
+        toastManager.add({
+          type: "error",
+          title: i18n.t("options.apiProviders.form.atLeastOneLLMProvider"),
+        })
+        return
+      }
+      void setConfig(patch)
+    },
+    [config, featureKey, setConfig],
+  )
+}
+
+/**
+ * Flips an action's switch the way a feature's works: off keeps the provider it
+ * ran on (an action cannot run without one), on resumes that provider or the
+ * first one that can still run an action. With nothing to resume, the switch
+ * refuses instead of writing a config that would not parse.
+ */
+export function useActionEnabledToggle(actionId: string): (enabled: boolean) => void {
+  const config = useAtomValue(configAtom)
+  const setConfig = useSetAtom(writeConfigAtom)
+
+  return useCallback(
+    (enabled: boolean) => {
+      const { selectionToolbar } = config
+      const patch = (changes: { enabled: boolean; providerId?: string }) => ({
+        selectionToolbar: patchSelectionToolbarAction(selectionToolbar, actionId, changes),
+      })
+
+      if (!enabled) {
+        void setConfig(patch({ enabled: false }))
+        return
+      }
+
+      const storedProviderId =
+        findSelectionToolbarAction(selectionToolbar, actionId)?.providerId ?? ""
+      const providerId = resolveProviderToResumeFrom(config, "customAction", storedProviderId)
+      if (!providerId) {
+        toastManager.add({
+          type: "error",
+          title: i18n.t("options.apiProviders.form.atLeastOneLLMProvider"),
+        })
+        return
+      }
+      void setConfig(patch({ enabled: true, providerId }))
+    },
+    [actionId, config, setConfig],
+  )
 }
 
 export interface CustomActionProvidersBinding {

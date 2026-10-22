@@ -3,6 +3,7 @@ import { browser } from "#imports"
 import { Button } from "@/components/ui/base-ui/button"
 import { Kbd, KbdGroup } from "@/components/ui/base-ui/kbd"
 import { configFieldsAtomMap } from "@/utils/atoms/config"
+import { featureProviderRefAtom } from "@/utils/atoms/provider"
 import { i18n } from "@/utils/i18n"
 import { sendMessage } from "@/utils/message"
 import { formatHotkeyParts } from "@/utils/os.ts"
@@ -16,6 +17,7 @@ export default function TranslateButton({ className }: { className?: string }) {
   const [isPageTranslated, setIsPageTranslated] = useAtom(isPageTranslatedAtom)
   const isIgnoreTab = useAtomValue(isIgnoreTabAtom)
   const translateConfig = useAtomValue(configFieldsAtomMap.pageTranslation)
+  const pageTranslationProvider = useAtomValue(featureProviderRefAtom("pageTranslation"))
   const { mode } = useAtomValue(configFieldsAtomMap.siteControl)
   const isCurrentSiteInWhitelist = useAtomValue(isCurrentSiteInWhitelistAtom)
   const isCurrentSiteInBlacklist = useAtomValue(isCurrentSiteInBlacklistAtom)
@@ -37,7 +39,10 @@ export default function TranslateButton({ className }: { className?: string }) {
   }
 
   const isSiteBlocked = mode === "whitelist" ? !isCurrentSiteInWhitelist : isCurrentSiteInBlacklist
-  const isDisabled = isIgnoreTab || isSiteBlocked
+  // With no provider there is nothing to run, so the button says so instead of
+  // doing nothing when pressed. A page that is already translated can always be
+  // put back, which needs no provider.
+  const isDisabled = isIgnoreTab || isSiteBlocked || (!isPageTranslated && !pageTranslationProvider)
   const shortcutParts = isShortcutEmpty(translateConfig.page.shortcut)
     ? []
     : formatHotkeyParts(translateConfig.page.shortcut)

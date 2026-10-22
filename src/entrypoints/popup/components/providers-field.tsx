@@ -11,7 +11,11 @@ import { Avatar, AvatarGroup, AvatarGroupCount, AvatarImage } from "@/components
 import { Button } from "@/components/ui/base-ui/button"
 import { Drawer, DrawerBody, DrawerContent, DrawerTrigger } from "@/components/ui/base-ui/drawer"
 import { configAtom, configFieldsAtomMap } from "@/utils/atoms/config"
-import { FEATURE_KEYS, FEATURE_PROVIDER_DEFS } from "@/utils/constants/feature-providers"
+import {
+  FEATURE_KEYS,
+  FEATURE_PROVIDER_DEFS,
+  isFeatureEnabled,
+} from "@/utils/constants/feature-providers"
 import { getSelectionToolbarActions } from "@/utils/custom-actions"
 import { i18n } from "@/utils/i18n"
 import { getProviderLogo, getProviderName } from "@/utils/providers/provider-display"
@@ -46,6 +50,8 @@ function getSelectedProviderOptions(
   }
 
   for (const featureKey of FEATURE_KEYS) {
+    // Only the features that are on: an off one keeps a provider but runs nothing.
+    if (!isFeatureEnabled(config, featureKey)) continue
     addProvider(featureKey, FEATURE_PROVIDER_DEFS[featureKey].getProviderId(config))
   }
 

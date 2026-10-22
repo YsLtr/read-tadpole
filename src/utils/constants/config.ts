@@ -156,7 +156,6 @@ export const DEFAULT_CONFIG: Config = {
   tts: DEFAULT_TTS_CONFIG,
   selectionToolbar: {
     enabled: true,
-    disabledSelectionToolbarPatterns: [],
     opacity: DEFAULT_SELECTION_OVERLAY_OPACITY,
     features: {
       translate: {
@@ -180,7 +179,6 @@ export const DEFAULT_CONFIG: Config = {
     },
     customActions: [],
     order: [...SELECTION_TOOLBAR_FEATURE_IDS, BUILT_IN_DICTIONARY_ACTION_ID],
-    unpinned: [],
   },
   inputTranslation: {
     enabled: true,

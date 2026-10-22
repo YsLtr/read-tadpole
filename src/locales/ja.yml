@@ -155,7 +155,6 @@ options:
     featureProviders:
       title: 機能プロバイダー
       description: 各機能に使用するプロバイダーを選択
-      chooseProvider: プロバイダーを選択
       none: なし
       features:
         pageTranslation: ページ翻訳
@@ -406,14 +405,6 @@ options:
       opacity:
         title: 透明度
         description: 選択ツールバーとそこから開く展開ウィンドウの透明度を調整します
-      disabledSites:
-        title: 無効化サイト
-        description: 選択ツールバーを無効化するウェブサイトを設定します
-        enterUrlPattern: URL パターンを入力
-        urlPattern: URL パターン
-    closeMenu:
-      disableForSite: このサイトで無効化
-      disableGlobally: グローバルで無効化
     errors:
       customActionFailed: カスタムアクションに失敗しました
       customActionFailedFallback: カスタムアクションのリクエストに失敗しました
@@ -1040,11 +1031,6 @@ action:
   translation: 翻訳
   speak: 読み上げ
   playing: 再生中
-  moreActions: その他の操作
-  pinToToolbar: ツールバーに固定
-  unpinFromToolbar: ツールバーから固定解除
-  dragToReorder: ドラッグして並べ替え
-  addCustomAction: カスタム AI アクションを追加
 thinking:
   label: 思考中
   complete: 思考完了

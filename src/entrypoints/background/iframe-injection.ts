@@ -11,7 +11,6 @@ import { logger } from "@/utils/logger"
 import { onMessage } from "@/utils/message"
 import { isSiteEnabled, SITE_CONTROL_URL_WINDOW_KEY } from "@/utils/site-control"
 import { getEffectiveSiteRule } from "@/utils/site-rules/effective"
-import { urlMatchesPattern } from "@/utils/url-pattern"
 import { ensureInitializedConfig } from "./config"
 import { isSameOriginIframeSender, resolveSiteControlUrl } from "./iframe-injection-utils"
 import { getPageTranslationEnabled } from "./page-translation-state"
@@ -329,13 +328,7 @@ export function setupIframeInjection() {
       if (!frame || (documentId && frame.documentId && frame.documentId !== documentId))
         return false
       if (!isSiteEnabled(tab.url, config) || !isSiteEnabled(frameUrl, config)) return false
-      if (
-        !config.selectionToolbar.enabled ||
-        config.selectionToolbar.disabledSelectionToolbarPatterns.some((pattern) =>
-          urlMatchesPattern(frameUrl, pattern),
-        )
-      )
-        return false
+      if (!config.selectionToolbar.enabled) return false
       if (
         getEffectiveSiteRule(config, tab.url).injectIntoIframes === false ||
         getEffectiveSiteRule(config, frameUrl).injectIntoIframes === false
