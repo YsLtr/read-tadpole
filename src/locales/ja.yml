@@ -307,7 +307,6 @@ options:
           description: 設定が変更された場合、1時間ごとに自動的にバックアップが作成されます。
         item:
           extensionVersion: 拡張機能のバージョン：
-          schemaVersion: 設定のバージョン：
           restore: 復元
           export: エクスポート
           delete: 削除

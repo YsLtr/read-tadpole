@@ -302,7 +302,6 @@ options:
           description: Las copias de seguridad se crean automáticamente cada hora si la configuración cambia.
         item:
           extensionVersion: "Versión de la extensión:"
-          schemaVersion: "Versión del esquema:"
           restore: Restaurar
           export: Exportar
           delete: Eliminar

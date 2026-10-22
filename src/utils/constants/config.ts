@@ -7,7 +7,7 @@ import type { PageTranslateRange } from "@/types/config/translate"
 import { DEFAULT_LAYOUT } from "@read-frog/layout-engine/presets"
 import { DEFAULT_BUILT_IN_ACTION_PROVIDER_ID } from "@/types/config/selection-toolbar"
 import { buildDictionaryActionLayout } from "@/utils/layout-host/slots"
-import { BUILT_IN_ACTION_DEFAULT_SHORTCUTS, BUILT_IN_DICTIONARY_ACTION_ID } from "./custom-action"
+import { BUILT_IN_DICTIONARY_ACTION_ID } from "./custom-action"
 import { createDictionaryDefinition } from "./custom-action-templates"
 import {
   DEFAULT_SUBTITLE_TRANSLATE_PROMPTS_CONFIG,
@@ -47,6 +47,7 @@ import {
   DEFAULT_TRANSLATION_MODE_SHORTCUT_KEY,
 } from "./translate"
 import { DEFAULT_NODE_TRANSLATION_SHORTCUT_KEY } from "./hotkeys"
+import { DEFAULT_LANGUAGE_LEVEL } from "./language"
 import { DEFAULT_TRANSLATION_HUB_SHORTCUT_KEY } from "./translation-hub"
 import { TRANSLATION_NODE_STYLE_ON_INSTALLED } from "./translation-node-style"
 import { DEFAULT_TTS_CONFIG } from "./tts"
@@ -57,15 +58,6 @@ export const GOOGLE_DRIVE_TOKEN_STORAGE_KEY = "__googleDriveToken"
 
 export const THEME_STORAGE_KEY = "theme"
 export const DEFAULT_DETECTED_CODE = "eng" as const
-
-
-/**
- * The shape of the stored config. Nothing upgrades a config written by an older
- * build any more — the migration chain is gone — so this is only the stamp written
- * alongside a config (and into exports) to say what produced it. A stored config
- * that does not match the current schema is replaced by the defaults.
- */
-export const CONFIG_SCHEMA_VERSION = 115
 
 type OutputSchema = SelectionToolbarCustomActionOutputField[]
 
@@ -113,7 +105,7 @@ export const DEFAULT_CONFIG: Config = {
   language: {
     sourceCode: "auto",
     targetCode: "cmn",
-    level: "intermediate",
+    level: DEFAULT_LANGUAGE_LEVEL,
   },
   providersConfig: DEFAULT_PROVIDER_CONFIG_LIST,
   pageTranslation: {
@@ -181,7 +173,9 @@ export const DEFAULT_CONFIG: Config = {
       dictionary: {
         enabled: true,
         providerId: DEFAULT_BUILT_IN_ACTION_PROVIDER_ID,
-        shortcut: BUILT_IN_ACTION_DEFAULT_SHORTCUTS[BUILT_IN_DICTIONARY_ACTION_ID],
+        // No key here on purpose: a built-in action's default key comes from
+        // `BUILT_IN_ACTION_DEFAULT_SHORTCUTS` at read time, and a stored one is
+        // kept only once the reader has changed it (see `utils/custom-actions`).
       },
     },
     customActions: [],
@@ -253,23 +247,23 @@ export const DEFAULT_CONFIG: Config = {
 }
 
 /**
- * A fresh config ships with the free Bilibili preset already selected for every
- * translate feature, so translation works before the user adds a key.
+ * The config a fresh install is written with: `DEFAULT_CONFIG` itself, with the
+ * providers' default descriptions filled in.
+ *
+ * This is the one place the two are allowed to differ, and it has to be here:
+ * `DEFAULT_CONFIG` is a module constant, evaluated before any UI language is
+ * known, while a provider's description is resolved in the interface language in
+ * effect when the row is created. Everything else — the free Bilibili preset
+ * selected for every translate feature, the toolbar's items — is in
+ * `DEFAULT_CONFIG`, so there is no second copy of it to keep in step.
+ *
+ * The clone matters: a caller that repairs its copy must never reach into the
+ * shared default.
  */
 export function buildFreshDefaultConfig(): Config {
   return {
-    ...DEFAULT_CONFIG,
+    ...structuredClone(DEFAULT_CONFIG),
     providersConfig: buildDefaultProviderConfigList(),
-    selectionToolbar: {
-      ...DEFAULT_CONFIG.selectionToolbar,
-      builtInActions: {
-        dictionary: {
-          enabled: true,
-          providerId: DEFAULT_BUILT_IN_ACTION_PROVIDER_ID,
-        },
-      },
-      customActions: [],
-    },
   }
 }
 

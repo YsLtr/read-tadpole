@@ -302,7 +302,6 @@ options:
           description: 如果設定有變更，每小時會自動建立備份。
         item:
           extensionVersion: 擴充功能版本：
-          schemaVersion: 設定版本：
           restore: 還原
           export: 匯出
           delete: 刪除

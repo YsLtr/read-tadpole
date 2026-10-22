@@ -302,7 +302,6 @@ options:
           description: Backups are created automatically every hour if the config is changed.
         item:
           extensionVersion: "Extension version:"
-          schemaVersion: "Schema version:"
           restore: Restore
           export: Export
           delete: Delete

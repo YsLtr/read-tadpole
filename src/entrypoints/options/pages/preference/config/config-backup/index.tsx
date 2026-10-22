@@ -51,10 +51,7 @@ export function ConfigBackupPage() {
                   key={backupWithMetadata.id}
                   backupId={backupWithMetadata.id}
                   backupMetadata={backupWithMetadata.metadata}
-                  backup={{
-                    schemaVersion: backupWithMetadata.schemaVersion,
-                    config: backupWithMetadata.config,
-                  }}
+                  backup={backupWithMetadata}
                 />
               ))}
             </>

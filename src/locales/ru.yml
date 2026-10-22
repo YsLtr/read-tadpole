@@ -301,7 +301,6 @@ options:
           description: Резервные копии создаются автоматически каждый час при изменении конфигурации.
         item:
           extensionVersion: "Версия расширения:"
-          schemaVersion: "Версия схемы:"
           restore: Восстановить
           export: Экспорт
           delete: Удалить

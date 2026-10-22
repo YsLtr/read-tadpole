@@ -22,7 +22,6 @@ import { configAtom, writeConfigAtom } from "@/utils/atoms/config"
 import { addBackup } from "@/utils/backup/storage"
 import { parseImportedConfig } from "@/utils/config/parse-imported"
 import { EXTENSION_VERSION } from "@/utils/constants/app"
-import { CONFIG_SCHEMA_VERSION } from "@/utils/constants/config"
 import { i18n } from "@/utils/i18n"
 import { queryClient } from "@/utils/tanstack-query"
 import { ConfigItem } from "../../../../components/config-item"
@@ -71,16 +70,12 @@ function ImportConfig() {
         reader.readAsText(file)
       })
 
-      // `schemaVersion` is still written into an export for identification, but
-      // nothing upgrades a file written by an older build any more, so it plays
-      // no part in reading one back.
-      const parsed = JSON.parse(fileContent) as { config?: unknown }
+      // Nothing upgrades a file written by an older build any more, so this hands
+      // the whole payload over: `parseImportedConfig` reads it field by field and
+      // accepts the wrap an export uses as well as a bare config.
+      const parsed: unknown = JSON.parse(fileContent)
 
-      if (parsed.config === undefined) {
-        throw new TypeError("Missing config payload")
-      }
-
-      const newConfig = parseImportedConfig(parsed.config)
+      const newConfig = parseImportedConfig(parsed)
 
       await addBackup(currentConfig, EXTENSION_VERSION)
       await setConfig(newConfig)
@@ -133,10 +128,7 @@ function ExportConfig() {
   const [open, setOpen] = useState(false)
   const config = useAtomValue(configAtom)
 
-  const { mutate: exportConfig, isPending: isExporting } = useExportConfig({
-    config,
-    schemaVersion: CONFIG_SCHEMA_VERSION,
-  })
+  const { mutate: exportConfig, isPending: isExporting } = useExportConfig({ config })
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

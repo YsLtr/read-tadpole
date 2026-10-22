@@ -4,7 +4,6 @@ import { dequal } from "dequal"
 import { configSchema } from "@/types/config/config"
 import { getLocalConfigAndMeta, setLocalConfigAndMeta } from "../config/storage"
 import { getLastSyncedConfigAndMeta, setLastSyncConfigAndMeta } from "../config/sync"
-import { CONFIG_SCHEMA_VERSION } from "../constants/config"
 import { logger } from "../logger"
 import { GoogleAccountChangedError, getGoogleUserInfo, getValidAccessToken } from "./auth"
 import { getRemoteConfigAndMetaWithUserEmail, setRemoteConfigAndMeta } from "./storage"
@@ -49,7 +48,6 @@ export async function syncMergedConfig(mergedConfig: Config, email: string): Pro
 
     // Save to local storage
     await setLocalConfigAndMeta(validatedConfig, {
-      schemaVersion: CONFIG_SCHEMA_VERSION,
       lastModifiedAt: now,
     })
 
@@ -57,14 +55,13 @@ export async function syncMergedConfig(mergedConfig: Config, email: string): Pro
     await setRemoteConfigAndMeta(
       {
         value: validatedConfig,
-        meta: { schemaVersion: CONFIG_SCHEMA_VERSION, lastModifiedAt: now },
+        meta: { lastModifiedAt: now },
       },
       accessToken,
     )
 
     // Update sync metadata
     await setLastSyncConfigAndMeta(validatedConfig, {
-      schemaVersion: CONFIG_SCHEMA_VERSION,
       lastModifiedAt: now,
       email,
     })
@@ -126,10 +123,11 @@ export async function syncConfig(token?: string): Promise<SyncResult> {
         logger.info("Local and remote configurations are the same, no conflicts detected")
         const syncedAt = Date.now()
 
-        // if the schemaVersion is different, use local config's schemaVersion
+        // Same content on both sides: stamp it as just synced, so the next run
+        // has nothing to report.
         const mergedConfigValueAndMeta = {
           value: localConfigValueAndMeta.value,
-          meta: { schemaVersion: CONFIG_SCHEMA_VERSION, lastModifiedAt: syncedAt },
+          meta: { lastModifiedAt: syncedAt },
         }
 
         await setLocalConfigAndMeta(mergedConfigValueAndMeta.value, mergedConfigValueAndMeta.meta)

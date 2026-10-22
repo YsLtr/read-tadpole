@@ -301,7 +301,6 @@ options:
           description: Các bản sao lưu được tạo tự động mỗi giờ nếu cấu hình thay đổi.
         item:
           extensionVersion: "Phiên bản tiện ích:"
-          schemaVersion: "Phiên bản schema:"
           restore: Khôi phục
           export: Xuất
           delete: Xóa

@@ -3,7 +3,7 @@ import { browser, storage } from "#imports"
 import { addBackup, isSameAsLatestBackup } from "@/utils/backup/storage"
 import { EXTENSION_VERSION } from "@/utils/constants/app"
 import { BACKUP_INTERVAL_MINUTES } from "@/utils/constants/backup"
-import { CONFIG_SCHEMA_VERSION, CONFIG_STORAGE_KEY } from "@/utils/constants/config"
+import { CONFIG_STORAGE_KEY } from "@/utils/constants/config"
 import { logger } from "@/utils/logger"
 
 const CONFIG_BACKUP_ALARM = "config-backup"
@@ -41,7 +41,7 @@ async function performAutoBackup() {
       return
     }
 
-    if (await isSameAsLatestBackup(config, CONFIG_SCHEMA_VERSION)) {
+    if (await isSameAsLatestBackup(config)) {
       logger.info("Skipping backup: config is identical to latest backup")
       return
     }

@@ -1,7 +1,9 @@
+import type { LangLevel } from "@read-frog/definitions"
 import { langCodeISO6393Schema, langLevel } from "@read-frog/definitions"
 import { z } from "zod"
 import { BUILT_IN_ACTION_IDS, BUILT_IN_ACTION_KEYS } from "@/utils/constants/custom-action"
 import { FEATURE_KEYS, FEATURE_PROVIDER_DEFS } from "@/utils/constants/feature-providers"
+import { DEFAULT_LANGUAGE_LEVEL } from "@/utils/constants/language"
 import {
   MAX_SELECTION_OVERLAY_OPACITY,
   MIN_SELECTION_OVERLAY_OPACITY,
@@ -27,7 +29,16 @@ import { ttsConfigSchema } from "./tts"
 const languageSchema = z.object({
   sourceCode: langCodeISO6393Schema.or(z.literal("auto")),
   targetCode: langCodeISO6393Schema,
-  level: langLevel,
+  // No setting writes this level, so a stored one is not a choice the reader can
+  // act on: every config is read at the level this build builds prompts for, which
+  // also lets a config that predates the field parse. `.optional()` covers that
+  // missing case the way `.default()` does elsewhere; the transform is what makes
+  // sure a level this build cannot offer (a name from another build, a number) is
+  // not carried into a prompt. It is also why a config file does not carry it —
+  // see `config/portable-config`.
+  level: langLevel
+    .optional()
+    .transform((): LangLevel => DEFAULT_LANGUAGE_LEVEL),
 })
 
 const selectionToolbarFeatureSchema = z.object({

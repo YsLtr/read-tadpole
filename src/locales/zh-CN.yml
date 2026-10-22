@@ -302,7 +302,6 @@ options:
           description: 如果配置发生变化，每小时会自动创建备份。
         item:
           extensionVersion: 扩展版本：
-          schemaVersion: 配置版本：
           restore: 恢复
           export: 导出
           delete: 删除

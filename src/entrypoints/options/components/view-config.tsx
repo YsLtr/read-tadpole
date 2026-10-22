@@ -1,6 +1,7 @@
 import type { VariantProps } from "class-variance-authority"
 import type { buttonVariants } from "@/components/ui/base-ui/button"
 import type { Config } from "@/types/config/config"
+import type { PortableConfig } from "@/utils/config/portable-config"
 import { Icon } from "@iconify/react"
 import { Button } from "@/components/ui/base-ui/button"
 import {
@@ -11,17 +12,21 @@ import {
   DialogTrigger,
 } from "@/components/ui/base-ui/dialog"
 import { ScrollArea } from "@/components/ui/base-ui/scroll-area"
-import { CONFIG_SCHEMA_VERSION } from "@/utils/constants/config"
 import { i18n } from "@/utils/i18n"
 
+/**
+ * The config as it lies in storage, which is what this is for: inspecting it.
+ *
+ * That is the whole config for the install, and the projected record for a backup,
+ * because that is what a backup stores. Both are shown as they are — this is the
+ * one place that does not tidy anything up.
+ */
 export function ViewConfig({
   config,
-  configSchemaVersion,
   size = "default",
   className,
 }: {
-  config: Config
-  configSchemaVersion?: number
+  config: Config | PortableConfig
   size?: VariantProps<typeof buttonVariants>["size"]
   className?: string
 }) {
@@ -38,14 +43,7 @@ export function ViewConfig({
         </DialogHeader>
         <ScrollArea className="h-96 w-full rounded-lg border bg-muted">
           <pre className="overflow-wrap-anywhere p-4 text-xs break-all whitespace-pre-wrap">
-            {JSON.stringify(
-              {
-                schemaVersion: configSchemaVersion ?? CONFIG_SCHEMA_VERSION,
-                config,
-              },
-              null,
-              2,
-            )}
+            {JSON.stringify({ config }, null, 2)}
           </pre>
         </ScrollArea>
       </DialogContent>

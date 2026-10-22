@@ -3,7 +3,7 @@ import type { Config } from "@/types/config/config"
 import { dequal } from "dequal"
 import { storage } from "#imports"
 import { BACKUP_ID_PREFIX, MAX_BACKUPS_COUNT } from "@/utils/constants/backup"
-import { CONFIG_SCHEMA_VERSION } from "@/utils/constants/config"
+import { getPortableConfig } from "@/utils/config/portable-config"
 import { getRandomUUID } from "@/utils/crypto-polyfill"
 import { logger } from "@/utils/logger"
 
@@ -37,25 +37,27 @@ export async function getAllBackupsWithMetadata(): Promise<Array<ConfigBackupWit
 }
 
 /**
- * Check if config is the same as the latest backup
+ * Whether `config` is what the latest backup already holds.
+ *
+ * Both sides are compared in the shape a backup stores, so a config whose only
+ * difference is a value this build generates itself is not a new backup. The
+ * comparison is on content alone: a backup written before a schema change is
+ * still the same backup if the reader's config has not moved since.
+ *
+ * The stored side is projected as well, because a backup written by an older
+ * build holds the whole config rather than the projection — and projecting a
+ * projection leaves it as it is, so both kinds compare on the same footing.
  */
-export async function isSameAsLatestBackup(
-  config: Config,
-  configSchemaVersion: number,
-): Promise<boolean> {
+export async function isSameAsLatestBackup(config: Config): Promise<boolean> {
   const backupsWithMetadata = await getAllBackupsWithMetadata()
   if (backupsWithMetadata.length === 0) {
     return false
   }
 
-  const latestBackupWithMetadata = backupsWithMetadata[0]
-
-  // Compare schema version
-  if (latestBackupWithMetadata!.schemaVersion !== configSchemaVersion) {
-    return false
-  }
-
-  return dequal(latestBackupWithMetadata!.config, config)
+  return dequal(
+    getPortableConfig(backupsWithMetadata[0]!.config),
+    getPortableConfig(config),
+  )
 }
 
 /**
@@ -68,9 +70,10 @@ export async function addBackup(config: Config, extensionVersion: string): Promi
     const timestamp = Date.now()
     const backupId = generateBackupId(timestamp)
 
+    // The backup keeps what the reader chose, not what this build generates: see
+    // `types/backup` for why, and `config/portable-config` for what that leaves out.
     const backup: ConfigBackup = {
-      schemaVersion: CONFIG_SCHEMA_VERSION,
-      config,
+      config: getPortableConfig(config),
     }
 
     // Get current backup IDs

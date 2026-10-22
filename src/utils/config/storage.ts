@@ -2,7 +2,7 @@ import type { Config } from "@/types/config/config"
 import type { ConfigMeta, ConfigValueAndMeta } from "@/types/config/meta"
 import { storage } from "#imports"
 import { configSchema } from "@/types/config/config"
-import { CONFIG_SCHEMA_VERSION, CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
+import { CONFIG_STORAGE_KEY, DEFAULT_CONFIG } from "../constants/config"
 import { logger } from "../logger"
 import { sendMessage } from "../message"
 
@@ -78,7 +78,6 @@ export async function getLocalConfigAndMeta(): Promise<ConfigValueAndMeta> {
     return {
       value: parsedConfig.data,
       meta: {
-        schemaVersion: meta?.schemaVersion ?? CONFIG_SCHEMA_VERSION,
         lastModifiedAt: meta?.lastModifiedAt ?? Date.now(),
       },
     }

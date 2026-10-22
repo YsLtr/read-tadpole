@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/base-ui/button"
 import { toastManager } from "@/components/ui/base-ui/toast"
 import { useExportConfig } from "@/hooks/use-export-config"
 import { configAtom, writeConfigAtom } from "@/utils/atoms/config"
-import { buildFreshDefaultConfig, CONFIG_SCHEMA_VERSION } from "@/utils/constants/config"
+import { buildFreshDefaultConfig } from "@/utils/constants/config"
 import { i18n } from "@/utils/i18n"
 import { Alert, AlertDescription, AlertTitle } from "../ui/base-ui/alert"
 
@@ -30,10 +30,7 @@ export function RecoveryFallback({ error, onRecovered }: RecoveryFallbackProps) 
   const setConfig = useSetAtom(writeConfigAtom)
   const [isResetting, setIsResetting] = useState(false)
 
-  const { mutate: exportConfig, isPending: isExporting } = useExportConfig({
-    config,
-    schemaVersion: CONFIG_SCHEMA_VERSION,
-  })
+  const { mutate: exportConfig, isPending: isExporting } = useExportConfig({ config })
 
   const handleResetConfig = async () => {
     setIsResetting(true)

@@ -301,7 +301,6 @@ options:
           description: 설정이 변경되면 매시간 자동으로 백업이 생성됩니다.
         item:
           extensionVersion: 확장 프로그램 버전：
-          schemaVersion: 설정 버전：
           restore: 복원
           export: 내보내기
           delete: 삭제

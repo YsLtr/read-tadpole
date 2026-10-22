@@ -13,10 +13,11 @@ import { shortcutSchema } from "./shortcut"
 export const DEFAULT_BUILT_IN_ACTION_PROVIDER_ID = "bilibili-translate-default"
 
 // Upper bound (UTF-16 code units) of a custom action's HTML layout. NEVER lower
-// it: an older build that reads a config holding a longer layout fails schema
-// validation, falls back to DEFAULT_CONFIG and overwrites the synced remote
-// copy. Raising it is fine only together with a CONFIG_SCHEMA_VERSION bump, so
-// older builds refuse the newer config instead of choking on it.
+// it: a build that reads a config holding a longer layout fails schema validation
+// and falls back to DEFAULT_CONFIG, overwriting the reader's settings. Raising it
+// is safe, but a build older than the raise drops the field instead of the whole
+// config: an imported config is read field by field (see `config/parse-imported`),
+// so what an older build loses is the layout, not everything around it.
 export const MAX_CUSTOM_ACTION_LAYOUT_LENGTH = 32768
 
 // Upper bound (UTF-16 code units) of each text in a custom action's sample

@@ -6,7 +6,6 @@ import { isAPIProviderConfig } from "@/types/config/provider"
 import { initI18n } from "@/utils/i18n"
 import {
   buildFreshDefaultConfig,
-  CONFIG_SCHEMA_VERSION,
   CONFIG_STORAGE_KEY,
   DEFAULT_CONFIG,
 } from "../constants/config"
@@ -52,8 +51,7 @@ export async function initializeConfig(): Promise<void> {
     didConfigChange = didConfigChange || apiKeyResult.changed
   }
 
-  const didMetaNeedUpdate =
-    configMeta?.schemaVersion !== CONFIG_SCHEMA_VERSION || configMeta?.lastModifiedAt === undefined
+  const didMetaNeedUpdate = configMeta?.lastModifiedAt === undefined
 
   if (didConfigChange) {
     await storage.setItem<Config>(`local:${CONFIG_STORAGE_KEY}`, config)
@@ -61,7 +59,6 @@ export async function initializeConfig(): Promise<void> {
 
   if (didConfigChange || didMetaNeedUpdate) {
     await storage.setMeta<ConfigMeta>(`local:${CONFIG_STORAGE_KEY}`, {
-      schemaVersion: CONFIG_SCHEMA_VERSION,
       lastModifiedAt: configMeta?.lastModifiedAt ?? Date.now(),
     })
   }
