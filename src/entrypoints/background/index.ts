@@ -1,4 +1,6 @@
 import "@/utils/zod-config"
+// Registers every locale statically: a service worker cannot load chunks on demand.
+import "@/utils/i18n/resources-eager"
 import type { Config, UiLanguage } from "@/types/config/config"
 import { browser, defineBackground } from "#imports"
 import { storageAdapter } from "@/utils/atoms/storage-adapter"

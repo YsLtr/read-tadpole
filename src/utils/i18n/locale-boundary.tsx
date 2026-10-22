@@ -24,8 +24,8 @@ function getLanguage() {
  * Mechanism: the subtree is keyed on i18next's language, so it remounts in the new
  * language whenever that changes — including when another tree changed it, since the
  * content runtime's UIs share one i18next. A change of the configured `uiLanguage` is
- * applied in a layout effect; with bundled resources the switch is synchronous, so the
- * remount paints in the new language.
+ * applied in a layout effect; the new locale's chunk is fetched first and
+ * `i18next.language` changes only afterwards, so the remount paints in the new language.
  *
  * The first value is not applied. Every entrypoint runs `initI18n` with the stored config
  * before it renders, while a jotai store that isn't hydrated starts from the default

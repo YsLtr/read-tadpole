@@ -3,7 +3,12 @@ import type { SupportedUiLocale } from "./resources"
 import type { UiLanguage } from "@/types/config/config"
 import i18next, { changeLanguage, getFixedT, init, t as translate } from "i18next"
 import { resolveUiLocale } from "./locale-map"
-import { DEFAULT_UI_LOCALE, resources, SUPPORTED_UI_LOCALES } from "./resources"
+import {
+  DEFAULT_UI_LOCALE,
+  loadLocaleResources,
+  resources,
+  SUPPORTED_UI_LOCALES,
+} from "./resources"
 
 /**
  * Runtime-switchable i18n facade.
@@ -18,8 +23,9 @@ import { DEFAULT_UI_LOCALE, resources, SUPPORTED_UI_LOCALES } from "./resources"
  *        │ explicit → passthrough                      │
  *        └───────── initI18n() / setUiLanguage() ──────┘
  *
- * Resources for all 9 locales are bundled, so `init`/`changeLanguage` complete
- * synchronously — the React `<LocaleBoundary>` relies on this to switch without a flash.
+ * English is bundled eagerly; every other locale is fetched before it is applied, so
+ * `i18next.language` (and therefore the `<LocaleBoundary>` remount) only changes once
+ * its resources are in place — the switch still paints in the new language.
  */
 
 type Substitution = string | number
@@ -48,6 +54,8 @@ type FacadeT = <K extends I18nKey>(
 ) => string
 
 let initialized = false
+// Only the latest requested language may be applied: lazy chunks can resolve out of order.
+let languageChangeRequest = 0
 
 const I18NEXT_OPTIONS = {
   resources,
@@ -75,19 +83,35 @@ const I18NEXT_OPTIONS = {
  */
 export async function initI18n(uiLanguage: UiLanguage = "auto"): Promise<void> {
   const lng = resolveUiLocale(uiLanguage)
-  if (initialized) {
-    if (i18next.language !== lng) {
-      await changeLanguage(lng)
-    }
+  await loadLocaleResources(lng)
+
+  if (!initialized) {
+    initialized = true
+    await init({ ...I18NEXT_OPTIONS, lng })
     return
   }
-  initialized = true
-  await init({ ...I18NEXT_OPTIONS, lng })
+
+  await switchLanguage(lng)
 }
 
-/** Switch the active UI language (synchronous with bundled resources). */
+/** Switch the active UI language once its resources have arrived. */
 export async function setUiLanguage(uiLanguage: UiLanguage): Promise<void> {
-  await changeLanguage(resolveUiLocale(uiLanguage))
+  await switchLanguage(resolveUiLocale(uiLanguage))
+}
+
+async function switchLanguage(lng: SupportedUiLocale): Promise<void> {
+  const request = ++languageChangeRequest
+  await loadLocaleResources(lng)
+  if (request !== languageChangeRequest) return
+
+  addLoadedResourceBundle(lng)
+  if (i18next.language !== lng) await changeLanguage(lng)
+}
+
+/** `init` only saw the resources loaded at that moment; add later ones explicitly. */
+function addLoadedResourceBundle(locale: SupportedUiLocale) {
+  const bundle = resources[locale]
+  if (bundle) i18next.addResourceBundle(locale, "translation", bundle.translation, true, true)
 }
 
 /**

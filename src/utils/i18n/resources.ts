@@ -2,14 +2,7 @@
 import type { Resource } from "i18next"
 import type { SupportedUiLocale } from "./locales"
 import en from "@/locales/en.yml"
-import es from "@/locales/es.yml"
-import ja from "@/locales/ja.yml"
-import ko from "@/locales/ko.yml"
-import ru from "@/locales/ru.yml"
-import tr from "@/locales/tr.yml"
-import vi from "@/locales/vi.yml"
-import zhCN from "@/locales/zh-CN.yml"
-import zhTW from "@/locales/zh-TW.yml"
+import { logger } from "@/utils/logger"
 
 export type { SupportedUiLocale } from "./locales"
 export { DEFAULT_UI_LOCALE, SUPPORTED_UI_LOCALES } from "./locales"
@@ -42,22 +35,39 @@ function convertTree(node: LocaleTree): LocaleTree {
   return out
 }
 
-const rawResources: Record<SupportedUiLocale, LocaleTree> = {
-  en,
-  es,
-  ja,
-  ko,
-  ru,
-  tr,
-  vi,
-  "zh-CN": zhCN,
-  "zh-TW": zhTW,
-}
+// Every non-English locale is its own chunk, fetched only when selected.
+// English stays eager: it is `fallbackLng`, and `translateIn("en", ...)` needs it.
+const LOCALE_LOADERS = import.meta.glob<{ default: LocaleTree }>([
+  "../../locales/*.yml",
+  "!../../locales/en.yml",
+])
 
 /**
  * i18next resource bundle: `{ [locale]: { translation: <nested string tree> } }`.
  * Single default namespace ("translation"); keys are traversed with keySeparator ".".
+ * Holds only the locales loaded so far, always including English.
  */
-export const resources: Resource = Object.fromEntries(
-  Object.entries(rawResources).map(([lng, tree]) => [lng, { translation: convertTree(tree) }]),
-)
+export const resources: Resource = {
+  en: { translation: convertTree(en) },
+}
+
+/** Add a locale whose tree the caller already has (see resources-eager.ts). */
+export function registerLocaleResources(locale: SupportedUiLocale, tree: LocaleTree): void {
+  resources[locale] = { translation: convertTree(tree) }
+}
+
+/**
+ * Fetch and add a locale to `resources`; a no-op once it is there. A locale whose
+ * chunk cannot be fetched leaves i18next on `fallbackLng` instead of failing the
+ * entrypoint's startup.
+ */
+export async function loadLocaleResources(locale: SupportedUiLocale): Promise<void> {
+  if (locale in resources) return
+  const load = LOCALE_LOADERS[`../../locales/${locale}.yml`]
+  if (!load) return
+  try {
+    registerLocaleResources(locale, (await load()).default)
+  } catch (error) {
+    logger.warn(`[i18n] Failed to load the "${locale}" locale, falling back to English`, error)
+  }
+}
