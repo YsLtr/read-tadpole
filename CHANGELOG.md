@@ -1,5 +1,45 @@
 # @read-tadpole/extension
 
+## 2.1.0
+
+### Minor Changes
+
+- 77911b8: fix(subtitles): keep translated cues across a reload, and stop missing the next video's auto-start
+  
+  Translated cues now survive a reload of the same tab for five minutes, keyed by the
+  video and by everything that decides what a translation reads like (provider, model,
+  language pair, segmentation, prompt). A reload inside that window shows what was
+  already translated instead of asking the provider again, and the look-ahead no longer
+  re-requests those cues. The store is the tab's own, so nothing has to be swept up
+  afterwards, and a cue whose text or timing changed is dropped rather than shown.
+  
+  Translate-on-open ran once per video, from the player's own navigation events. Two
+  ways into a video slipped past those: a pre-roll, which answers caption queries with
+  the ad's empty track and made the single attempt report "no subtitles" for a video
+  that has them, and entries the events do not announce (a history entry, back/forward,
+  a layout swap). Auto-start now waits for an ad to give the video back, and the video id
+  is also read on a timer so a change the events missed is still noticed.
+  
+  The translate button went in front of the controls bar's first child, which on YouTube
+  is where other extensions put their buttons, so it landed wedged between SponsorBlock's
+  buttons. It now goes in front of the player's own controls, i.e. right after those.
+
+### Patch Changes
+
+- cecbfea: fix(i18n): sync every locale to the zh-CN header and undo the pasted brand strings
+  
+  `extName` is now the bare brand and `extDescription` the local-language form of
+  阅读蛙青春版 (English: `Read Frog Lite`), with no feature blurb appended — matching
+  zh-CN. Non-Chinese locales no longer paste the Chinese tagline into their
+  description.
+  
+  Also filled the keys the non-Chinese locales were missing, so they stop falling
+  back to English: the selection toolbar's custom-action badges and template picker
+  (es, ja, ko, ru, tr, vi), the "provider in use" warning (ja, ko, ru, tr, vi), and
+  the whole popup providers block plus the custom-CSS example comment (es, ja, ko,
+  ru, tr, vi). The Japanese locale also still carried three dead `popup.hub`,
+  `popup.discord` and `popup.blog` keys from the old branding; those are removed.
+
 ## 2.0.0
 
 ### Major Changes

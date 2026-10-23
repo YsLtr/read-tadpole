@@ -1,6 +1,6 @@
 {
   "name": "@read-tadpole/extension",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "ReadTadpole（阅读蝌蚪）: readfrog lite 阅读蛙青春版 — AI bilingual translation and video subtitles",
   "type": "module",
