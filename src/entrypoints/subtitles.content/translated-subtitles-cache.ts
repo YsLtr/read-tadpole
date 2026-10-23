@@ -18,6 +18,7 @@ interface CacheEntry {
 // or the prompt cannot be answered from an older run's translations.
 const CACHE_KEY_PREFIX = "read-tadpole:subtitles-translations:v1"
 const MAX_CACHED_CUES = 2000
+// A long-lived tab watches many videos; only the newest few are worth the quota.
 const MAX_CACHED_VIDEOS = 3
 
 export function translatedSubtitlesCacheKey(videoId: string, settingsIdentity: string): string {
@@ -30,20 +31,77 @@ function isCacheEntry(value: unknown): value is CacheEntry {
   return typeof entry.savedAt === "number" && Array.isArray(entry.cues)
 }
 
+function ourKeys(): string[] {
+  const keys: string[] = []
+  for (let index = 0; index < sessionStorage.length; index++) {
+    const key = sessionStorage.key(index)
+    if (key?.startsWith(CACHE_KEY_PREFIX)) {
+      keys.push(key)
+    }
+  }
+  return keys
+}
+
+/** When an entry was last written, or null if it is unreadable / not one of ours. */
+function savedAtOf(key: string): number | null {
+  try {
+    const entry: unknown = JSON.parse(sessionStorage.getItem(key) ?? "")
+    return isCacheEntry(entry) ? entry.savedAt : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Nothing sweeps this store on a timer, so the only way an idle tab's entries stop
+ * occupying the quota it shares with the page is for a read or a write to drop them:
+ * everything past the window goes, and so does anything unreadable.
+ */
+function pruneExpiredEntries(except?: string) {
+  const cutoff = Date.now() - TRANSLATED_SUBTITLES_CACHE_TTL_MS
+
+  for (const key of ourKeys()) {
+    if (key === except) continue
+
+    const savedAt = savedAtOf(key)
+    if (savedAt === null || savedAt < cutoff) {
+      sessionStorage.removeItem(key)
+    }
+  }
+}
+
+/** Keep the newest few videos, so watching many in one tab cannot fill the quota. */
+function pruneOldestBeyondLimit(except: string) {
+  const others = ourKeys()
+    .filter((key) => key !== except)
+    .map((key) => ({ key, savedAt: savedAtOf(key) ?? 0 }))
+    .sort((a, b) => b.savedAt - a.savedAt)
+
+  for (const entry of others.slice(MAX_CACHED_VIDEOS - 1)) {
+    sessionStorage.removeItem(entry.key)
+  }
+}
+
 export function readTranslatedSubtitles(key: string): CachedTranslatedCue[] | null {
+  // Every session start is also a chance to drop what has aged out, so a tab left
+  // open does not keep old videos around until it closes. This removes `key` too
+  // when it is past the window, which is how the miss below happens.
+  pruneExpiredEntries()
+
   try {
     const raw = sessionStorage.getItem(key)
     if (!raw) return null
 
     const entry: unknown = JSON.parse(raw)
-    if (!isCacheEntry(entry) || Date.now() - entry.savedAt > TRANSLATED_SUBTITLES_CACHE_TTL_MS) {
+    if (!isCacheEntry(entry)) {
       sessionStorage.removeItem(key)
       return null
     }
 
     return entry.cues
   } catch {
-    // Unreadable or foreign value: treat as a miss rather than break the session.
+    // Unreadable or foreign value: drop it rather than break the session.
+    sessionStorage.removeItem(key)
     return null
   }
 }
@@ -51,47 +109,26 @@ export function readTranslatedSubtitles(key: string): CachedTranslatedCue[] | nu
 export function writeTranslatedSubtitles(key: string, cues: CachedTranslatedCue[]): void {
   if (cues.length === 0) return
 
-  const entry: CacheEntry = {
+  const payload = JSON.stringify({
     savedAt: Date.now(),
     cues: [...cues].sort((a, b) => a.start - b.start).slice(0, MAX_CACHED_CUES),
-  }
+  } satisfies CacheEntry)
 
   try {
-    sessionStorage.setItem(key, JSON.stringify(entry))
-    pruneOtherEntries(key)
+    sessionStorage.setItem(key, payload)
   } catch {
-    // The quota is shared with the page; a video too long to fit simply is not cached.
-  }
-}
-
-/**
- * Nothing sweeps this store on a timer — it is the tab's, so closing the tab is the
- * bulk cleanup. This keeps what stays behind in a long-lived tab bounded: entries
- * old enough to be a miss anyway are dropped, and only the newest few videos stay.
- */
-function pruneOtherEntries(keepKey: string) {
-  const others: Array<{ key: string; savedAt: number }> = []
-
-  for (let index = 0; index < sessionStorage.length; index++) {
-    const key = sessionStorage.key(index)
-    if (!key || !key.startsWith(CACHE_KEY_PREFIX) || key === keepKey) continue
-
-    let savedAt = 0
+    // The quota is shared with the page. Free what is stale and what is past the
+    // newest few, retry once, and otherwise leave the cache off rather than throw
+    // into the subtitle pipeline.
+    pruneExpiredEntries(key)
+    pruneOldestBeyondLimit(key)
     try {
-      const entry: unknown = JSON.parse(sessionStorage.getItem(key) ?? "")
-      savedAt = isCacheEntry(entry) ? entry.savedAt : 0
+      sessionStorage.setItem(key, payload)
     } catch {
-      savedAt = 0
+      return
     }
-    others.push({ key, savedAt })
   }
 
-  const cutoff = Date.now() - TRANSLATED_SUBTITLES_CACHE_TTL_MS
-  others
-    .sort((a, b) => b.savedAt - a.savedAt)
-    .forEach((entry, index) => {
-      if (entry.savedAt < cutoff || index >= MAX_CACHED_VIDEOS - 1) {
-        sessionStorage.removeItem(entry.key)
-      }
-    })
+  pruneExpiredEntries(key)
+  pruneOldestBeyondLimit(key)
 }
