@@ -1,5 +1,6 @@
 import type { ControlsConfig, PlatformConfig } from "@/entrypoints/subtitles.content/platforms"
 import type { Config } from "@/types/config/config"
+import type { SerializableProviderRef } from "@/utils/providers/provider-ref"
 import type { SubtitlesFetcher } from "@/utils/subtitles/fetchers/types"
 import type { SubtitlesVideoContext } from "@/utils/subtitles/processor/translator"
 import type { SubtitlesFragment } from "@/utils/subtitles/types"
@@ -9,13 +10,16 @@ import {
   HIDE_NATIVE_CAPTIONS_STYLE_ID,
   NAVIGATION_HANDLER_DELAY,
   TRANSLATE_BUTTON_CONTAINER_ID,
+  TRANSLATED_SUBTITLES_CACHE_WRITE_DELAY_MS,
+  VIDEO_ID_POLL_INTERVAL_MS,
 } from "@/utils/constants/subtitles"
 import { getSourceDocumentTitle } from "@/utils/content/document-title"
 import { getDocumentDescription } from "@/utils/content/metadata"
 import { resolveLanguageCodeFromLocale } from "@/utils/content/page-language"
 import { waitForElement } from "@/utils/dom/wait-for-element"
+import { Sha256Hex } from "@/utils/hash"
 import { i18n } from "@/utils/i18n"
-import { canProviderRefGenerateText } from "@/utils/providers/provider-ref"
+import { canProviderRefGenerateText, getProviderCacheIdentity } from "@/utils/providers/provider-ref"
 import { removeReactShadowHost } from "@/utils/react-shadow-host/create-shadow-host"
 import { OverlaySubtitlesError, ToastSubtitlesError } from "@/utils/subtitles/errors"
 import { optimizeSubtitles } from "@/utils/subtitles/processor/optimizer"
@@ -42,6 +46,12 @@ import { renderSubtitlesTranslateButton } from "./renderer/render-translate-butt
 import { SegmentationPipeline } from "./segmentation-pipeline"
 import { SubtitlesScheduler } from "./subtitles-scheduler"
 import { TranslatedSubtitlesDownloader } from "./translated-subtitles-downloader"
+import type { CachedTranslatedCue } from "./translated-subtitles-cache"
+import {
+  readTranslatedSubtitles,
+  translatedSubtitlesCacheKey,
+  writeTranslatedSubtitles,
+} from "./translated-subtitles-cache"
 import { TranslationCoordinator } from "./translation-coordinator"
 import { ROOT_VIEW } from "./ui/subtitles-settings-panel/views"
 
@@ -96,6 +106,11 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
   // touching the page.
   private destroyed = false
 
+  private videoIdPollIntervalId: ReturnType<typeof setInterval> | null = null
+  private translatedCacheKey: string | null = null
+  private translatedCacheCues = new Map<number, CachedTranslatedCue>()
+  private translatedCacheTimer: ReturnType<typeof setTimeout> | null = null
+
   get embedded() {
     return this.config.embedded
   }
@@ -139,6 +154,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     await this.tryAutoStartSubtitles()
     if (this.destroyed) return
     this.setupNavigationListeners()
+    this.startVideoIdWatch()
   }
 
   /**
@@ -162,6 +178,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     }
 
     this.clearNavigationReinitTimeout()
+    this.stopVideoIdWatch()
     subtitlesStore.set(currentVideoIdAtom, null)
     this.teardownAdObserver()
     this.translatedSubtitlesDownloader?.dispose()
@@ -369,6 +386,9 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
   }
 
   private clearRuntimeSession() {
+    this.flushTranslatedSubtitlesCache()
+    this.translatedCacheKey = null
+    this.translatedCacheCues.clear()
     this.translationCoordinator?.stop()
     this.segmentationPipeline?.stop()
     this.translationCoordinator = null
@@ -378,6 +398,56 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     this.sessionVideoId = null
     this.subtitlesSummaryContextHash = null
     subtitlesStore.set(sourceTrackAtom, [])
+  }
+
+  /**
+   * Everything that decides what a translated cue reads like, hashed. Part of the
+   * session cache key, so "settings unchanged" is what a cache hit actually means:
+   * a new provider, model, language pair or prompt cannot be served an old run.
+   */
+  private translationSettingsIdentity(
+    config: Config | null,
+    providerRef: SerializableProviderRef | null,
+  ): string {
+    return Sha256Hex(
+      providerRef ? getProviderCacheIdentity(providerRef) : "no-provider",
+      config?.language.sourceCode ?? "",
+      config?.language.targetCode ?? "",
+      config?.videoSubtitles?.aiSegmentation ? "ai-segmentation" : "rule-segmentation",
+      config?.videoSubtitles?.customPromptsConfig?.promptId ?? "",
+    )
+  }
+
+  /** Keep what was just translated, and write it out once the burst settles. */
+  private rememberTranslatedCues(fragments: SubtitlesFragment[]) {
+    if (!this.translatedCacheKey) return
+
+    for (const fragment of fragments) {
+      if (!fragment.translation) continue
+      this.translatedCacheCues.set(fragment.start, {
+        start: fragment.start,
+        end: fragment.end,
+        text: fragment.text,
+        translation: fragment.translation,
+      })
+    }
+
+    if (this.translatedCacheTimer !== null) return
+    this.translatedCacheTimer = setTimeout(() => {
+      this.translatedCacheTimer = null
+      this.flushTranslatedSubtitlesCache()
+    }, TRANSLATED_SUBTITLES_CACHE_WRITE_DELAY_MS)
+  }
+
+  private flushTranslatedSubtitlesCache() {
+    if (this.translatedCacheTimer !== null) {
+      clearTimeout(this.translatedCacheTimer)
+      this.translatedCacheTimer = null
+    }
+
+    const key = this.translatedCacheKey
+    if (!key || this.translatedCacheCues.size === 0) return
+    writeTranslatedSubtitles(key, [...this.translatedCacheCues.values()])
   }
 
   private clearVisibleStateForNavigation() {
@@ -409,6 +479,32 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
 
     if (events.navigateFinish) {
       window.addEventListener(events.navigateFinish, this.handleNavigationFinish)
+    }
+  }
+
+  /**
+   * The player's navigation events are the primary signal, but they are not the
+   * only way into a video: a history entry, a back/forward, an experiment that
+   * swaps the layout without announcing it. Those used to leave the previous
+   * video's session on screen and its translate-on-open never ran for the new
+   * one, so the id is also read on a timer. Cheap (a URL read and one lookup),
+   * and it cannot miss a change the events did.
+   */
+  private startVideoIdWatch() {
+    this.stopVideoIdWatch()
+
+    this.videoIdPollIntervalId = setInterval(() => {
+      if (this.destroyed || this.navigationReinitTimeoutId !== null) return
+      // Leaving a video for a non-video page is the layout's business, not ours.
+      if (this.config.getVideoId?.() == null || !this.videoIdChanged) return
+      this.notifyNavigation()
+    }, VIDEO_ID_POLL_INTERVAL_MS)
+  }
+
+  private stopVideoIdWatch() {
+    if (this.videoIdPollIntervalId !== null) {
+      clearInterval(this.videoIdPollIntervalId)
+      this.videoIdPollIntervalId = null
     }
   }
 
@@ -539,11 +635,14 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
 
     const toggleButton = renderSubtitlesTranslateButton({ adapter: this })
 
-    if (this.config.embedded) {
-      container.appendChild(toggleButton)
-    } else {
-      container.insertBefore(toggleButton, container.firstChild)
-    }
+    // In front of the player's own buttons, so it lands after the ones other
+    // extensions put at the head of the bar (SponsorBlock's segment buttons) and
+    // before the player's, instead of being wedged among either group.
+    const playerOwned = this.config.selectors.controlsPlayerOwned
+    const anchor = playerOwned
+      ? container.querySelector<HTMLElement>(`:scope > ${playerOwned}`)
+      : null
+    container.insertBefore(toggleButton, anchor)
   }
 
   private async tryAutoStartSubtitles() {
@@ -554,6 +653,12 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     const learningOpen = subtitlesStore.get(subtitlesSidebarOpenAtom)
 
     if (!autoStart && !learningOpen) return
+
+    // A pre-roll answers every caption question with the ad's own track, which is
+    // empty, so starting now would report "no subtitles" for a video that has them
+    // and never try again — this runs once per video. Wait the ad out instead.
+    await this.waitForAdToEnd()
+    if (this.destroyed) return
 
     if (this.config.embedded) {
       const video = this.subtitlesScheduler?.getVideoElement()
@@ -573,6 +678,20 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     }
 
     this.toggleSubtitlesWithSource(true)
+  }
+
+  /** Resolves at once when no ad is on, otherwise when the ad gives the video back. */
+  private async waitForAdToEnd(): Promise<void> {
+    if (!subtitlesStore.get(adPlayingAtom)) return
+
+    await new Promise<void>((resolve) => {
+      let unsubscribe = () => {}
+      unsubscribe = subtitlesStore.sub(adPlayingAtom, () => {
+        if (subtitlesStore.get(adPlayingAtom)) return
+        unsubscribe()
+        resolve()
+      })
+    })
   }
 
   private toggleSubtitlesWithSource(enabled: boolean) {
@@ -789,6 +908,7 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
     const scheduler = this.subtitlesScheduler
     if (!scheduler) return
 
+    const currentVideoId = this.config.getVideoId?.() ?? ""
     const useAiSegmentation = !!config?.videoSubtitles?.aiSegmentation
 
     this.sessionProcessedFragments = [...this.sourceProcessedSubtitles]
@@ -848,9 +968,31 @@ export class UniversalVideoAdapter implements SubtitlesProvidersAdapter {
       getVideoElement: () => scheduler.getVideoElement(),
       getCurrentState: () => scheduler.getState(),
       segmentationPipeline: this.segmentationPipeline,
-      onTranslated: (fragments) => scheduler.supplementSubtitles(fragments),
+      onTranslated: (fragments) => {
+        scheduler.supplementSubtitles(fragments)
+        this.rememberTranslatedCues(fragments)
+      },
       onStateChange: (state, data) => scheduler.setState(state, data),
     })
+
+    // A reload within the cache window shows what was already translated instead
+    // of paying the provider for it again. Seeded before start(), so the first
+    // look-ahead never requests these cues.
+    this.translatedCacheKey =
+      currentVideoId === ""
+        ? null
+        : translatedSubtitlesCacheKey(
+            currentVideoId,
+            this.translationSettingsIdentity(config, providerRef),
+          )
+    this.translatedCacheCues.clear()
+    const cachedCues = this.translatedCacheKey
+      ? readTranslatedSubtitles(this.translatedCacheKey)
+      : null
+    if (cachedCues) {
+      this.translationCoordinator.seedTranslations(cachedCues)
+    }
+
     this.translationCoordinator.start(videoContext)
     // The hash and the summary must share one ref — the promptable one — or
     // the cache identity and the ref that rides the message could diverge.

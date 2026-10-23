@@ -39,6 +39,7 @@ const YOUTUBE_MODE_CONFIGS: Record<YoutubeMode, PlatformConfig> = {
       video: "video.html5-main-video",
       playerContainer: WATCH_PLAYER,
       controlsBar: "#movie_player .ytp-right-controls",
+      controlsPlayerOwned: ".ytp-right-controls-left",
       nativeSubtitles: YOUTUBE_NATIVE_SUBTITLES_CLASS,
     },
     events: NAVIGATE_EVENTS,

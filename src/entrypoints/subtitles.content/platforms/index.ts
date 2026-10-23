@@ -18,6 +18,8 @@ export interface PlatformConfig {
     video: string
     playerContainer: string
     controlsBar?: string
+    /** First child of the controls bar that belongs to the player itself; the translate button goes in front of it. */
+    controlsPlayerOwned?: string
     nativeSubtitles?: string
   }
 

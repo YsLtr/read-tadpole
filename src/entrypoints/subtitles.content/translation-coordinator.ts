@@ -1,4 +1,5 @@
 import type { SegmentationPipeline } from "./segmentation-pipeline"
+import type { CachedTranslatedCue } from "./translated-subtitles-cache"
 import type { SubtitlesVideoContext } from "@/utils/subtitles/processor/translator"
 import type { SubtitlesFragment, SubtitlesState } from "@/utils/subtitles/types"
 import { getLocalConfig } from "@/utils/config/storage"
@@ -122,6 +123,32 @@ export class TranslationCoordinator {
 
   clearFailed() {
     this.failedStarts.clear()
+  }
+
+  /**
+   * Book cues as already translated — a session cache hit — so they render at
+   * once and the look-ahead never asks the provider for them again. Only cues
+   * that are still the same cue (start+end+text) are accepted: a re-fetched
+   * track or an AI recut can move or reword them, and a stale translation must
+   * not win over the current text.
+   */
+  seedTranslations(cached: ReadonlyArray<CachedTranslatedCue>) {
+    const byStart = new Map(this.getFragments().map((fragment) => [fragment.start, fragment]))
+    const seeded: SubtitlesFragment[] = []
+
+    for (const cue of cached) {
+      const current = byStart.get(cue.start)
+      if (!current || current.end !== cue.end || current.text !== cue.text) continue
+      if (this.translatedStarts.has(current.start)) continue
+
+      this.translatedStarts.add(current.start)
+      this.rememberIdentity(current)
+      seeded.push({ ...current, translation: cue.translation })
+    }
+
+    if (seeded.length > 0) {
+      this.onTranslated(seeded)
+    }
   }
 
   /**

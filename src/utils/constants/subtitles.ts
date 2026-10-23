@@ -107,6 +107,15 @@ export const POT_WAIT_INTERVAL_MS = 200
 export const MAX_SELECTED_TRACK_WAIT_ATTEMPTS = 8
 export const SELECTED_TRACK_WAIT_INTERVAL_MS = 100
 
+// How often the adapter re-reads the page's video id. The player's own navigation
+// events are the primary signal; this only catches the navigations they miss.
+export const VIDEO_ID_POLL_INTERVAL_MS = 1500
+
+// Translated cues are kept per tab, keyed by video and translation settings, so a
+// reload within this window shows them without asking the provider again.
+export const TRANSLATED_SUBTITLES_CACHE_TTL_MS = 5 * 60_000
+export const TRANSLATED_SUBTITLES_CACHE_WRITE_DELAY_MS = 1000
+
 // Subtitle style constants
 export const MIN_FONT_SCALE = 30
 export const MAX_FONT_SCALE = 150
